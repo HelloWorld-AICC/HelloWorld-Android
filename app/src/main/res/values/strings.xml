@@ -1,8 +1,3 @@
 <resources>
     <string name="app_name">HelloWorld</string>
-    <string name="title_home">홈</string>
-    <string name="title_chat_consultation">채팅 상담</string>
-    <string name="title_writing">이력서 작성</string>
-    <string name="title_community">커뮤니티</string>
-    <string name="title_consultation_center">상담 센터</string>
 </resources>
