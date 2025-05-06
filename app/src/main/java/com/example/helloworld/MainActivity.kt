@@ -8,19 +8,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.core.ui.MyApplicationTheme
-import com.example.feature.ui.MainScreen // 원하는 화면 컴포저블 직접 import
+import com.example.helloworld.ui.theme.HelloWorldTheme
+import com.example.feature.ui.MainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyApplicationTheme {
+            HelloWorldTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen() // ✅ Navigation 없이 직접 표시
+                    MainScreen()
                 }
             }
         }
