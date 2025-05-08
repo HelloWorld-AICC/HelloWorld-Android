@@ -21,8 +21,8 @@ data class NavItem(
 
 // 아이콘 리스트 구성
 val items = listOf(
-    NavItem("채팅 상담", R.drawable.ic_chat_consultation, R.drawable.ic_chat_consultation_click),
     NavItem("상담 센터", R.drawable.ic_consultation_center, R.drawable.ic_consultation_center_click),
+    NavItem("채팅 상담", R.drawable.ic_chat_consultation2, R.drawable.ic_chat_consultation2_click),
     NavItem("홈", R.drawable.ic_home, R.drawable.ic_home_click),
     NavItem("이력서 작성", R.drawable.ic_resume_writing, R.drawable.ic_resume_writing_click),
     NavItem("커뮤니티", R.drawable.ic_community, R.drawable.ic_community_click)
@@ -69,8 +69,8 @@ fun MyBottomNavigation(navController: NavHostController) {
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "홈") {
-        composable("채팅 상담") { Text("채팅 상담", modifier = Modifier.padding(16.dp)) }
         composable("상담 센터") { Text("상담 센터", modifier = Modifier.padding(16.dp)) }
+        composable("채팅 상담") { Text("채팅 상담", modifier = Modifier.padding(16.dp)) }
         composable("홈") { Text("HelloWorld", modifier = Modifier.padding(16.dp)) }
         composable("이력서 작성") { Text("이력서 작성", modifier = Modifier.padding(16.dp)) }
         composable("커뮤니티") { Text("커뮤니티", modifier = Modifier.padding(16.dp)) }
