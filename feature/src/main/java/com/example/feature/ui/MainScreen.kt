@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.feature.R
+import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
 
 // 아이콘 리소스 구성 (기본 / 클릭)
 data class NavItem(
@@ -69,7 +70,7 @@ fun MyBottomNavigation(navController: NavHostController) {
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
     NavHost(navController, startDestination = "홈") {
-        composable("상담 센터") { Text("상담 센터", modifier = Modifier.padding(16.dp)) }
+        composable("상담 센터") { ConsultationCenterScreen() }
         composable("채팅 상담") { Text("채팅 상담", modifier = Modifier.padding(16.dp)) }
         composable("홈") { Text("HelloWorld", modifier = Modifier.padding(16.dp)) }
         composable("이력서 작성") { Text("이력서 작성", modifier = Modifier.padding(16.dp)) }
