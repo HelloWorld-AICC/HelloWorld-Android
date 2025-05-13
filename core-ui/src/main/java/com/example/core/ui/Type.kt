@@ -72,6 +72,11 @@ val AppTypography = Typography(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
+    ),
+    labelSmall = TextStyle(  // Label03
+        fontFamily = PretendardVariable,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp
     )
 )
 
