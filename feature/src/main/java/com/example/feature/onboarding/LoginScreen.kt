@@ -2,9 +2,19 @@ package com.example.feature.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,8 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.core.ui.theme.Main0
-import com.example.core.ui.theme.Main500
+import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldMain0
+import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
 import com.example.feature.splash.SplashImg
@@ -26,7 +37,7 @@ fun LoginScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Main0)
+            .background(HelloWorldMain0)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -41,10 +52,8 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "삶과 일이 이어지는 그 모든 순간을 함께",
-                    fontSize = 16.sp,
-                    fontFamily = Pretendard,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Main500
+                    style = AppTypography.heading04,
+                    color = HelloWorldMain500
                 )
             }
 

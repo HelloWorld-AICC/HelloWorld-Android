@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
 import androidx.navigation.NavController
+import com.example.core.ui.theme.HelloWorldMain0
 import kotlinx.coroutines.delay
-import com.example.core.ui.theme.Main0
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -24,7 +24,7 @@ fun SplashScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Main0)
+            .background(HelloWorldMain0)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 
 // 라이트 테마
 private val LightColorScheme = lightColorScheme(
-    background = Main0,
-    error = Error,
+    background = HelloWorldMain0,
+    error = HelloWorldError,
 )
 
 // 다크 테마 
@@ -25,7 +25,6 @@ fun HelloWorldTheme(
 
     MaterialTheme(
         colorScheme = colors,
-        typography = AppTypography,
         content = content
     )
 }

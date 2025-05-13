@@ -1,101 +1,120 @@
 package com.example.core.ui.theme
 
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.example.core.ui.R
 
 // Pretendard Font 설정
 val Pretendard = FontFamily(
-    Font(R.font.pretendard_medium, FontWeight.Medium),
-    Font(R.font.pretendard_semibold, FontWeight.SemiBold),
-    Font(R.font.pretendard_bold, FontWeight.Bold)
+    Font(R.font.pretendard_variable, weight = FontWeight.Normal) // Variable font 단일 파일
+)
+data class CustomTypography(
+    val display01: TextStyle,
+    val title01: TextStyle,
+    val title02: TextStyle,
+    val title03: TextStyle,
+    val heading01: TextStyle,
+    val heading02: TextStyle,
+    val heading03: TextStyle,
+    val heading04: TextStyle,
+    val body01: TextStyle,
+    val body02: TextStyle,
+    val label01: TextStyle,
+    val label02: TextStyle,
+    val label03: TextStyle,
+    val carousel : TextStyle
 )
 
-// 기본 Typography 설정 (Material3에서 지원하는 항목만 포함)
-val AppTypography = Typography(
-    displayLarge = TextStyle(
+
+val AppTypography = CustomTypography(
+    display01 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 72.sp,
         letterSpacing = (-0.03).em
     ),
-    titleLarge = TextStyle(
+    title01 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 36.sp,
         letterSpacing = (-0.03).em
     ),
-    titleMedium = TextStyle(
+    title02 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp,
         letterSpacing = (-0.03).em
     ),
-    titleSmall = TextStyle(
+    title03 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         letterSpacing = (-0.03).em
     ),
-    headlineLarge = TextStyle(
+    heading01 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         letterSpacing = (-0.03).em
     ),
-    headlineMedium = TextStyle(
+    heading02 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         letterSpacing = (-0.01).em
     ),
-    headlineSmall = TextStyle(
+    heading03 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         letterSpacing = (-0.01).em
     ),
-    bodyLarge = TextStyle(
+    heading04 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         letterSpacing = (-0.02).em
     ),
-    bodyMedium = TextStyle(
+    body01 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         letterSpacing = (-0.02).em
     ),
-    bodySmall = TextStyle(
+    body02 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.sp
     ),
-    labelLarge = TextStyle(
+    label01 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
         letterSpacing = (-0.01).em
     ),
-    labelMedium = TextStyle(
+    label02 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         letterSpacing = (-0.01).em
     ),
-    labelSmall = TextStyle(
+    label03 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 10.sp,
         letterSpacing = 0.em
+    ),
+    carousel = TextStyle (
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
+        fontSize = 6.sp,
+        letterSpacing = (-0.01).em
     )
 )
 
