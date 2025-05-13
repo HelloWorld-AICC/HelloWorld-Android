@@ -35,7 +35,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Preview
@@ -45,38 +44,40 @@ fun ConsultationCenterScreen() {
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
 
-    val centerList = remember {
-        listOf(
-            CenterInfo(
-                name = "용인시 외국인 복지센터",
-                status = "영업 중",
-                phone = "010 - 0000 - 0000",
-                address = "경기도 용인시 처인구 금령로",
-                location = LatLng(37.582000, 126.926000)
-            ),
-            CenterInfo(
-                name = "서대문 외국인 센터",
-                status = "영업 종료",
-                phone = "010 - 1234 - 5678",
-                address = "서울특별시 서대문구 연희로",
-                location = LatLng(37.578500, 126.924500)
-            ),
-            CenterInfo(
-                name = "이대 상담소",
-                status = "영업 중",
-                phone = "02 - 9876 - 5432",
-                address = "서울특별시 서대문구 이화여대길",
-                location = LatLng(37.581200, 126.920000)
-            ),
-            CenterInfo(
-                name = "용인시 외국인 복지센터",
-                status = "영업 중",
-                phone = "010 - 0000 - 0000",
-                address = "경기도 용인시 처인구 금령로",
-                location = LatLng(37.582000, 126.926000)
-            )
+    val centerList = listOf(
+        CenterInfo(
+            name = "용인시 외국인 복지센터",
+            status = "영업 중",
+            phone = "010 - 0000 - 0000",
+            address = "경기도 용인시 처인구 금령로",
+            latitude = 37.582000,
+            longitude = 126.926000
+        ),
+        CenterInfo(
+            name = "서대문 외국인 센터",
+            status = "영업 종료",
+            phone = "010 - 1234 - 5678",
+            address = "서울특별시 서대문구 연희로",
+            latitude = 37.578500,
+            longitude = 126.924500
+        ),
+        CenterInfo(
+            name = "이대 상담소",
+            status = "영업 중",
+            phone = "02 - 9876 - 5432",
+            address = "서울특별시 서대문구 이화여대길",
+            latitude = 37.581200,
+            longitude = 126.920000
+        ),
+        CenterInfo(
+            name = "신촌 외국인 상담소",
+            status = "영업 중",
+            phone = "02 - 1234 - 5678",
+            address = "서울특별시 서대문구 신촌로",
+            latitude = 37.556000,
+            longitude = 126.935000
         )
-    }
+    )
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -146,7 +147,7 @@ fun ConsultationCenterScreen() {
         ) {
             centerList.forEach { center ->
                 Marker(
-                    state = MarkerState(position = center.location),
+                    state = MarkerState(position = LatLng(center.latitude, center.longitude)),
                     title = center.name
                 )
             }
