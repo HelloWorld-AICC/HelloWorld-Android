@@ -11,6 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.feature.R
+import com.example.feature.home.HomeScreen
+import com.example.feature.onboarding.AgreementScreen
+import com.example.feature.onboarding.LanguageScreen
+import com.example.feature.onboarding.LoginScreen
+import kotlinx.coroutines.delay
 
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
 import com.example.feature.ui.community.navigation.communityPostWriteScreen
@@ -75,13 +80,18 @@ fun MyBottomNavigation(navController: NavHostController) {
     }
 }
 
+// 메인 네비게이션 호스트
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "홈") {
+    NavHost(navController, startDestination = "스플래시") {
+        composable("스플래시") { SplashScreen(navController) }
+        composable("온보딩") { LoginScreen(navController) }
+        composable("언어 설정") { LanguageScreen(navController) }
+        composable("이용 동의") { AgreementScreen() }
+        composable("홈") { HomeScreen() }
         composable("상담 센터") { ConsultationCenterScreen() }
-        composable("채팅 상담") { Text("채팅 상담", modifier = Modifier.padding(16.dp)) }
-        composable("홈") { Text("HelloWorld", modifier = Modifier.padding(16.dp)) }
-        composable("이력서 작성") { Text("이력서 작성", modifier = Modifier.padding(16.dp)) }
+        composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
+        composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
         communityScreen(
             onWriteClick = navController::navigateToCommunityPostWrite,
             onPostClick = navController::navigateToCommunityPostDetail,
@@ -95,14 +105,20 @@ fun MyNavigationHost(navController: NavHostController) {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // 바텀바가 보일 화면만 정의
+    val bottomBarRoutes = bottomBarItems.map { it.route }
+
     Scaffold(
-        bottomBar = { MyBottomNavigation(navController) }
+        bottomBar = {
+            if (currentRoute in bottomBarRoutes) {
+                MyBottomNavigation(navController)
+            }
+        }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
+        Box(modifier = Modifier.padding(innerPadding)) {
             MyNavigationHost(navController)
         }
     }
