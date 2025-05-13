@@ -104,7 +104,7 @@ internal fun Community(
             ) {
                 Text(
                     text = "커뮤니티",
-                    style = AppTypography.bodyLarge,
+                    style = AppTypography.body01,
                     color = HelloWorldGrayScale800
                 )
             }
@@ -250,7 +250,7 @@ private fun CommunityPostItem(
             ) {
                 Text(
                     text = post.title,
-                    style = AppTypography.bodyMedium,
+                    style = AppTypography.body02,
                     color = HelloWorldGrayScale800,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -258,7 +258,7 @@ private fun CommunityPostItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = post.content,
-                    style = AppTypography.labelLarge,
+                    style = AppTypography.label01,
                     color = HelloWorldGrayScale500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -331,7 +331,7 @@ private fun TabIconAndLabel(
         }
         Text(
             text = title,
-            style = AppTypography.labelLarge,
+            style = AppTypography.label01,
             color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300
         )
     }

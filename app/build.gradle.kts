@@ -7,6 +7,12 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+val googleMapKey: String = if (project.hasProperty("google_map_key")) {
+    (project.property("google_map_key") as String).replace("\"", "")
+} else {
+    ""
+}
+
 android {
     namespace = "com.example.helloworld"
     compileSdk = 35
@@ -19,6 +25,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        resValue("string", "google_map_key", googleMapKey)
     }
 
     buildTypes {
@@ -41,6 +49,7 @@ android {
         compose = true
     }
 }
+
 
 dependencies {
 

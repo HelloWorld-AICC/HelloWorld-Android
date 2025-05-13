@@ -28,7 +28,7 @@ internal fun CommunityPostDetail(
         ) {
             Text(
                 text = "커뮤니티",
-                style = AppTypography.bodyLarge,
+                style = AppTypography.body01,
                 color = HelloWorldGrayScale800
             )
         }

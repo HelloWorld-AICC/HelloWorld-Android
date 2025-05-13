@@ -7,8 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.helloworld.ui.theme.HelloWorldTheme
+import com.example.core.ui.MyApplicationTheme
 import com.example.feature.ui.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 
