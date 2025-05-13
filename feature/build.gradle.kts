@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-data"))
+    implementation(project(":data"))
     implementation(project(":core-ui"))
 
     // Core Android dependencies
