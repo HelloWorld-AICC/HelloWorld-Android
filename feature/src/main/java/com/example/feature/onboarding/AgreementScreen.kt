@@ -15,22 +15,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.core.ui.theme.*
 import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun AgreementScreen() {
+fun AgreementScreen(navController: NavHostController) {
     var allAgree by remember { mutableStateOf(false) }
     var agreeTerms by remember { mutableStateOf(false) }
     var agreePrivacy by remember { mutableStateOf(false) }
     var showModal by remember { mutableStateOf(false) }
+    var shouldNavigateToHome by remember { mutableStateOf(false) }
 
     LaunchedEffect(allAgree) {
         if (allAgree) {
             agreeTerms = true
             agreePrivacy = true
+        }
+    }
+
+    LaunchedEffect(shouldNavigateToHome) {
+        if (shouldNavigateToHome) {
+            navController.navigate("홈") {
+                popUpTo("이용 동의") { inclusive = true }
+                launchSingleTop = true
+            }
         }
     }
 
@@ -116,7 +127,12 @@ fun AgreementScreen() {
     }
 
     if (showModal) {
-        TermsModal(onDismiss = { showModal = false })
+        TermsModal(
+            onDismiss = {
+                showModal = false
+                shouldNavigateToHome = true
+            }
+        )
     }
 }
 
