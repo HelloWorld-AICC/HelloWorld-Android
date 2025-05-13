@@ -1,17 +1,26 @@
 package com.example.feature.splash
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
+import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 import com.example.core.ui.theme.Main0
-import com.example.core.ui.theme.Main500
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navController: NavController) {
+    // 1초 후 OnboardingScreen으로 이동
+    LaunchedEffect(Unit) {
+        delay(1000)
+        navController.navigate("온보딩") {
+            popUpTo("스플래시") { inclusive = true }
+        }
+    }
+
+    // UI 구성
     Box(
         modifier = Modifier
             .fillMaxSize()

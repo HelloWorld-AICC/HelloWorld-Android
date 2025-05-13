@@ -8,9 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.core.ui.theme.HelloWorldTheme
-import com.example.feature.splash.SplashScreen
-import com.example.feature.home.HomeScreen
-import com.example.feature.ui.MainScreen
+import com.example.feature.splash.MainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
