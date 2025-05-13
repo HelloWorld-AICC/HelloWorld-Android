@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import com.example.core.ui.theme.HelloWorldTheme
 import com.example.feature.splash.SplashScreen
 import com.example.feature.home.HomeScreen
+import com.example.feature.ui.MainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SplashScreen();
+                    MainScreen();
                 }
             }
         }
