@@ -26,6 +26,7 @@ data class CustomTypography(
     val label01: TextStyle,
     val label02: TextStyle,
     val label03: TextStyle,
+    val labelSmall: TextStyle,
     val carousel : TextStyle
 )
 
@@ -90,11 +91,19 @@ val AppTypography = CustomTypography(
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
     ),
+
+    labelSmall = TextStyle(  // Label03
+        fontFamily = PretendardVariable,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp
+    ),
+
     label03 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 10.sp
     ),
+  
     carousel = TextStyle (
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Normal,
