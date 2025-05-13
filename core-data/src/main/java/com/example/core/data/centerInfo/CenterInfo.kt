@@ -1,4 +1,4 @@
-package com.example.core.data
+package com.example.core.data.centerInfo
 
 data class CenterInfo(
     val name: String,
@@ -8,4 +8,3 @@ data class CenterInfo(
     val latitude: Double,
     val longitude: Double
 )
-

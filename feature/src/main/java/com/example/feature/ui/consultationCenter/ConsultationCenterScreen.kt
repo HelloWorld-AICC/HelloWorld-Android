@@ -37,7 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.core.data.CenterInfo
+import com.example.core.data.centerInfo.CenterInfo
 import com.example.core.ui.AppTypography
 import com.example.feature.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -270,7 +270,7 @@ fun ConsultationCenterCard(center: CenterInfo) {
             }
 
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
+                painter = painterResource(id = R.drawable.ic_google),
                 contentDescription = null,
                 modifier = Modifier
                     .size(64.dp)

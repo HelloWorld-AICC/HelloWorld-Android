@@ -283,7 +283,7 @@ private fun CommunityPostItem(
             // 카테고리, 날짜
             Text(
                 text = "$${post.category} • $${post.date}",
-                style = AppTypography.labelSmall,
+                style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )
             // 댓글
@@ -300,7 +300,7 @@ private fun CommunityPostItem(
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = post.commentCount,
-                    style = AppTypography.labelSmall,
+                    style = AppTypography.label03,
                     color = HelloWorldGrayScale500
                 )
             }

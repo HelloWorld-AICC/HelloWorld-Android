@@ -8,9 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.core.ui.theme.HelloWorldTheme
-import com.example.feature.splash.MainScreen
-import com.example.core.ui.MyApplicationTheme
-import com.example.feature.ui.MainScreen
+import com.example.feature.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 

@@ -1,12 +1,10 @@
 package com.example.core.ui
 
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.core.ui.R
 
 val PretendardVariable = FontFamily(
     Font(R.font.pretendard_variable, weight = FontWeight.Normal) // Variable font 단일 파일
@@ -26,7 +24,6 @@ data class CustomTypography(
     val label01: TextStyle,
     val label02: TextStyle,
     val label03: TextStyle,
-    val labelSmall: TextStyle,
     val carousel : TextStyle
 )
 
@@ -90,12 +87,6 @@ val AppTypography = CustomTypography(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
-    ),
-
-    labelSmall = TextStyle(  // Label03
-        fontFamily = PretendardVariable,
-        fontWeight = FontWeight.Medium,
-        fontSize = 10.sp
     ),
 
     label03 = TextStyle(

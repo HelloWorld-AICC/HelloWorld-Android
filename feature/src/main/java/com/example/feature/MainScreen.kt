@@ -1,4 +1,4 @@
-package com.example.feature.ui
+package com.example.feature
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -15,6 +15,7 @@ import com.example.feature.home.HomeScreen
 import com.example.feature.onboarding.AgreementScreen
 import com.example.feature.onboarding.LanguageScreen
 import com.example.feature.onboarding.LoginScreen
+import com.example.feature.splash.SplashScreen
 import kotlinx.coroutines.delay
 
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
@@ -87,7 +88,7 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("스플래시") { SplashScreen(navController) }
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
-        composable("이용 동의") { AgreementScreen() }
+        composable("이용 동의") { AgreementScreen(navController) }
         composable("홈") { HomeScreen() }
         composable("상담 센터") { ConsultationCenterScreen() }
         composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
@@ -109,7 +110,7 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     // 바텀바가 보일 화면만 정의
-    val bottomBarRoutes = bottomBarItems.map { it.route }
+    val bottomBarRoutes = items.map { it.route }
 
     Scaffold(
         bottomBar = {
