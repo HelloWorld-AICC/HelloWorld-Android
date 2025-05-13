@@ -12,72 +12,104 @@ val PretendardVariable = FontFamily(
     Font(R.font.pretendard_variable, weight = FontWeight.Normal) // Variable font 단일 파일
 )
 
-val AppTypography = Typography(
-    displayLarge = TextStyle( // Display01
+data class CustomTypography(
+    val display01: TextStyle,
+    val title01: TextStyle,
+    val title02: TextStyle,
+    val title03: TextStyle,
+    val heading01: TextStyle,
+    val heading02: TextStyle,
+    val heading03: TextStyle,
+    val heading04: TextStyle,
+    val body01: TextStyle,
+    val body02: TextStyle,
+    val label01: TextStyle,
+    val label02: TextStyle,
+    val label03: TextStyle,
+    val labelSmall: TextStyle,
+    val carousel : TextStyle
+)
+
+val AppTypography = CustomTypography(
+    display01 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 72.sp
     ),
-    headlineLarge = TextStyle( // Title01
+    title01 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 36.sp
     ),
-    headlineMedium = TextStyle( // Title02
+    title02 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp
     ),
-    headlineSmall = TextStyle( // Title03
+    title03 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp
     ),
-    titleLarge = TextStyle( // Heading01
+    heading01 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp
     ),
-    titleMedium = TextStyle( // Heading02
+    heading02 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp
     ),
-    titleSmall = TextStyle( // Heading03
+    heading03 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp
     ),
-    bodyLarge = TextStyle( // Heading04
+    heading04 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp
     ),
-    bodyMedium = TextStyle( // Body01
+    body01 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp
     ),
-    bodySmall = TextStyle( // Body02
+    body02 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp
     ),
-    labelLarge = TextStyle( // Label01
+    label01 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp
     ),
-    labelMedium = TextStyle( // Label02
+    label02 = TextStyle(
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp
     ),
+
     labelSmall = TextStyle(  // Label03
         fontFamily = PretendardVariable,
         fontWeight = FontWeight.Medium,
         fontSize = 10.sp
+    ),
+
+    label03 = TextStyle(
+        fontFamily = PretendardVariable,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp
+    ),
+  
+    carousel = TextStyle (
+        fontFamily = PretendardVariable,
+        fontWeight = FontWeight.Normal,
+        fontSize = 6.sp
     )
 )
+
 
 
