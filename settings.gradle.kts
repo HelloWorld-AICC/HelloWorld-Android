@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "HelloWorld"
 include(":app")
-include(":core-data")
 include(":core-ui")
 include(":feature")
+include(":core-data")
 include(":core-domain")
