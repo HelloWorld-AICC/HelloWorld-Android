@@ -32,26 +32,22 @@ fun NavGraphBuilder.communityScreen(
     }
 }
 
-//fun NavController.navigateToCommunityPostDetail(navOptions: NavOptions? = null) = navigate(route = CommunityPostDetail, navOptions)
-fun NavController.navigateToCommunityPostDetail(navOptions: NavOptions? = null) = navigate(route = "커뮤니티 상세", navOptions)
+fun NavController.navigateToCommunityPostDetail(navOptions: NavOptions? = null) = navigate(route = CommunityPostDetail, navOptions)
 
 fun NavGraphBuilder.communityPostDetailScreen(
 
 ) {
-//    composable<CommunityPostDetail> {
-    composable("커뮤니티 상세") {
+    composable<CommunityPostDetail> {
         CommunityPostDetail()
     }
 }
 
-//fun NavController.navigateToCommunityPostWrite(navOptions: NavOptions? = null) = navigate(route = CommunityPostWrite, navOptions)
-fun NavController.navigateToCommunityPostWrite(navOptions: NavOptions? = null) = navigate(route = "커뮤니티 글작성", navOptions)
+fun NavController.navigateToCommunityPostWrite(navOptions: NavOptions? = null) = navigate(route = CommunityPostWrite, navOptions)
 
 fun NavGraphBuilder.communityPostWriteScreen(
 
 ) {
-//    composable<CommunityPostWrite> {
-    composable("커뮤니티 글작성") {
+    composable<CommunityPostWrite> {
         CommunityPostWrite()
     }
 }
