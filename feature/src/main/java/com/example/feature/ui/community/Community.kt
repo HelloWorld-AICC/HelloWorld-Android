@@ -50,6 +50,7 @@ import com.example.core.ui.HelloWorldGrayScale300
 import com.example.core.ui.HelloWorldGrayScale500
 import com.example.core.ui.HelloWorldGrayScale800
 import com.example.core.ui.HelloWorldMain200
+import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
