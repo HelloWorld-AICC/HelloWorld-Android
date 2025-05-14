@@ -151,46 +151,50 @@ fun ConsultationCenterScreen() {
     }
 
     // UI 영역
-    Box(Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        HeaderTitle( )
 
-
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = locationPermissionState.status.isGranted
-            ),
-            uiSettings = MapUiSettings(
-                myLocationButtonEnabled = true
-            )
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f) // 나머지 공간을 지도+오버레이가 채움
         ) {
-            centerList.forEach { center ->
-                Marker(
-                    state = MarkerState(position = LatLng(center.latitude, center.longitude)),
-                    title = center.name
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    isMyLocationEnabled = locationPermissionState.status.isGranted
+                ),
+                uiSettings = MapUiSettings(
+                    myLocationButtonEnabled = true
                 )
+            ) {
+                centerList.forEach { center ->
+                    Marker(
+                        state = MarkerState(position = LatLng(center.latitude, center.longitude)),
+                        title = center.name
+                    )
+                }
             }
-        }
 
-        HeaderTitle(
-            modifier = Modifier
-                .align(Alignment.TopStart) // 위치 지정
-        )
+            // 지도 위에 오버레이
+            ConsultationCenterListOverlay(
+                centerList = centerList,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+            )
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        ) {
-            ConsultationCenterListOverlay(centerList)
         }
     }
 }
 
 @Composable
-fun ConsultationCenterListOverlay(centerList: List<CenterInfo>) {
+fun ConsultationCenterListOverlay(
+    centerList: List<CenterInfo>,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(320.dp)
             .height(373.dp)
             .clip(RoundedCornerShape(24.dp))
