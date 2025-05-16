@@ -52,6 +52,7 @@ import com.example.core.ui.HelloWorldGrayScale800
 import com.example.core.ui.HelloWorldMain200
 import kotlinx.serialization.Serializable
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun Community(
@@ -105,7 +106,7 @@ internal fun Community(
             ) {
                 Text(
                     text = "커뮤니티",
-                    style = AppTypography.bodyLarge,
+                    style = AppTypography.body01,
                     color = HelloWorldGrayScale800
                 )
             }
@@ -251,7 +252,7 @@ private fun CommunityPostItem(
             ) {
                 Text(
                     text = post.title,
-                    style = AppTypography.bodyMedium,
+                    style = AppTypography.body02,
                     color = HelloWorldGrayScale800,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -259,7 +260,7 @@ private fun CommunityPostItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = post.content,
-                    style = AppTypography.labelLarge,
+                    style = AppTypography.label01,
                     color = HelloWorldGrayScale500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -284,7 +285,7 @@ private fun CommunityPostItem(
             // 카테고리, 날짜
             Text(
                 text = "$${post.category} • $${post.date}",
-                style = AppTypography.labelSmall,
+                style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )
             // 댓글
@@ -301,7 +302,7 @@ private fun CommunityPostItem(
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = post.commentCount,
-                    style = AppTypography.labelSmall,
+                    style = AppTypography.label03,
                     color = HelloWorldGrayScale500
                 )
             }
@@ -332,7 +333,7 @@ private fun TabIconAndLabel(
         }
         Text(
             text = title,
-            style = AppTypography.labelLarge,
+            style = AppTypography.label01,
             color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300
         )
     }

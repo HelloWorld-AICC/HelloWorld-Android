@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.material.android)
     implementation(libs.androidx.navigation.compose)
 
+
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
 
@@ -82,4 +83,10 @@ dependencies {
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.maps.android:maps-compose:4.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 }
