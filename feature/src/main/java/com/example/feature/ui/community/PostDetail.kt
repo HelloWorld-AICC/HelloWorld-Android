@@ -1,36 +1,224 @@
 package com.example.feature.ui.community
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldGrayScale100
+import com.example.core.ui.theme.HelloWorldGrayScale300
+import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
+import com.example.core.ui.theme.HelloWorldMain200
+import com.example.core.ui.theme.HelloWorldMain500
 
 @Composable
 internal fun CommunityPostDetail(
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: PostDetailViewModel = hiltViewModel()
 ) {
+    val commentText = viewModel.commentText.collectAsState()
+
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val posts = remember { mutableStateListOf<String>() }
+    val charRange = ('A'..'Z')
+    LaunchedEffect(Unit) {
+        for (i in 0..12) posts.add(charRange.random().toString())
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .clickable(
+                indication = null,
+                interactionSource = interactionSource,
+            ) {
+                focusManager.clearFocus()
+            }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
+                .padding(start = 8.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = null,
+                tint = HelloWorldMain500,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .clickable { onBackClick() }
+                    .padding(8.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "커뮤니티",
-                style = AppTypography.body01,
+                style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
+        }
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth(),
+            thickness = 1.dp,
+            color = HelloWorldMain200
+        )
+        // Content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "직장 내 고충 • 25.05.06",
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale500,
+                )
+                Text(
+                    text = "월급이 제대로 안 들어 온 것 같아요.",
+                    style = AppTypography.heading02,
+                    color = HelloWorldGrayScale800,
+                )
+            }
+            Text(
+                text = "안녕하세요.\n" +
+                        "이번 달 월급이 들어왔는데, 평소보다 금액이 많이 적어서 걱정돼요." +
+                        " 근무 시간은 그대로였고 결근도 없었는데 왜 이런지 모르겠어요… \uD83D\uDE22\n" +
+                        "혹시 회사에서 공제되는 항목이 있을 수 있는 건가요?\n" +
+                        "어디서 확인해야 할지, 어떻게 문의해야 할지도 잘 모르겠어요.\n" +
+                        "비슷한 경험 있으신 분 계시면 도와주시면 정말 감사하겠습니다!",
+                style = AppTypography.body02,
+                color = HelloWorldGrayScale500,
+            )
+            LazyRow(
+                modifier = Modifier
+                    .height(100.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(posts) {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(HelloWorldGrayScale300),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = it
+                        )
+                    }
+                }
+            }
+        }
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth(),
+            thickness = 1.dp,
+            color = HelloWorldMain200
+        )
+        // Comment
+        LazyColumn(
+            modifier = Modifier
+                .weight(0.7f)
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {  }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 80.dp)
+                .padding(bottom = 10.dp)
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BasicTextField(
+                value = commentText.value,
+                onValueChange = { viewModel.updateComment(it) },
+                textStyle = AppTypography.label02,
+                modifier = Modifier
+                    .background(Color.White, RoundedCornerShape(8.dp))
+                    .height(40.dp)
+                    .border(1.dp, HelloWorldGrayScale100, RoundedCornerShape(8.dp))
+                    .padding(start = 12.dp)
+                    .fillMaxWidth(),
+            ) { innerTextField ->
+                Box (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (commentText.value.isEmpty()) {
+                        Text(
+                            text = "댓글을 남겨보세요",
+                            style = AppTypography.label02,
+                            color = HelloWorldGrayScale300,
+                        )
+                    }
+                    innerTextField()
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -38,5 +226,7 @@ internal fun CommunityPostDetail(
 @Preview(showBackground = true)
 @Composable
 private fun CommunityPostDetailPreview() {
-    CommunityPostDetail()
+    CommunityPostDetail(
+        onBackClick = {}
+    )
 }
