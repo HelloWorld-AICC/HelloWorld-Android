@@ -9,9 +9,9 @@ import com.example.feature.ui.community.CommunityPostDetail
 import com.example.feature.ui.community.CommunityPostWrite
 import kotlinx.serialization.Serializable
 
-//@Serializable data class Community(val id: Int)
 @Serializable data object Community
 
+//@Serializable data class CommunityPostDetail(val id: Int)
 @Serializable data object CommunityPostDetail
 
 @Serializable data object CommunityPostWrite
@@ -35,19 +35,23 @@ fun NavGraphBuilder.communityScreen(
 fun NavController.navigateToCommunityPostDetail(navOptions: NavOptions? = null) = navigate(route = CommunityPostDetail, navOptions)
 
 fun NavGraphBuilder.communityPostDetailScreen(
-
+    onBackClick: () -> Unit,
 ) {
     composable<CommunityPostDetail> {
-        CommunityPostDetail()
+        CommunityPostDetail(
+            onBackClick = onBackClick
+        )
     }
 }
 
 fun NavController.navigateToCommunityPostWrite(navOptions: NavOptions? = null) = navigate(route = CommunityPostWrite, navOptions)
 
 fun NavGraphBuilder.communityPostWriteScreen(
-
+    onBackClick: () -> Unit,
 ) {
     composable<CommunityPostWrite> {
-        CommunityPostWrite()
+        CommunityPostWrite(
+            onBackClick = onBackClick
+        )
     }
 }
