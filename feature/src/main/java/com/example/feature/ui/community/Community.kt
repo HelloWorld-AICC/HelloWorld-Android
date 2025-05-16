@@ -44,13 +44,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.ui.AppTypography
-import com.example.core.ui.HelloWorldGrayScale200
-import com.example.core.ui.HelloWorldGrayScale300
-import com.example.core.ui.HelloWorldGrayScale500
-import com.example.core.ui.HelloWorldGrayScale800
-import com.example.core.ui.HelloWorldMain200
-import kotlinx.serialization.Serializable
+import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldGrayScale200
+import com.example.core.ui.theme.HelloWorldGrayScale300
+import com.example.core.ui.theme.HelloWorldGrayScale500
+import com.example.core.ui.theme.HelloWorldGrayScale800
+import com.example.core.ui.theme.HelloWorldMain200
+import com.example.core.util.extension.truncateWithEllipsis
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +96,7 @@ internal fun Community(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             Box(
                 modifier = Modifier
@@ -152,22 +152,18 @@ internal fun Community(
                     0 -> CommunityTabContent(
                         posts = problemPosts.value,
                         onPostClick = { onPostClick() },
-                        category = "problem"
                     )
                     1 -> CommunityTabContent(
                         posts = nationalPosts.value,
                         onPostClick = { onPostClick() },
-                        category = "national"
                     )
                     2 -> CommunityTabContent(
                         posts = medicalPosts.value,
                         onPostClick = { onPostClick() },
-                        category = "medical"
                     )
                     3 -> CommunityTabContent(
                         posts = etcPosts.value,
                         onPostClick = { onPostClick() },
-                        category = "etc"
                     )
                 }
             }
@@ -194,7 +190,6 @@ internal fun Community(
 
 @Composable
 private fun CommunityTabContent(
-    category: String,
     posts: List<CommunityPost>,
     onPostClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -203,8 +198,8 @@ private fun CommunityTabContent(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
+                .padding(horizontal = 24.dp)
         ) {
-            stickyHeader { Text(text = category) }
             items(posts) { post ->
                 CommunityPostItem(
                     post = post,
@@ -236,9 +231,9 @@ private fun CommunityPostItem(
 ) {
     Column(
         modifier = modifier
-            .padding(vertical = 20.dp)
             .fillMaxWidth()
             .clickable { onPostClick() }
+            .padding(vertical = 20.dp)
     ) {
         Row(
             modifier = Modifier
@@ -251,7 +246,7 @@ private fun CommunityPostItem(
                     .weight(1f)
             ) {
                 Text(
-                    text = post.title,
+                    text = post.title.truncateWithEllipsis(20),
                     style = AppTypography.body02,
                     color = HelloWorldGrayScale800,
                     maxLines = 1,
@@ -259,7 +254,7 @@ private fun CommunityPostItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = post.content,
+                    text = post.content.truncateWithEllipsis(if (post.thumbnail) 30 else 40),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale500,
                     maxLines = 1,
@@ -271,11 +266,12 @@ private fun CommunityPostItem(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .background(HelloWorldGrayScale200)
                 )
             }
         }
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -284,7 +280,7 @@ private fun CommunityPostItem(
         ) {
             // 카테고리, 날짜
             Text(
-                text = "$${post.category} • $${post.date}",
+                text = "${post.category} • ${post.date}",
                 style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )
@@ -311,7 +307,7 @@ private fun CommunityPostItem(
 }
 
 @Composable
-private fun TabIconAndLabel(
+internal fun TabIconAndLabel(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     title: String = "",
@@ -344,6 +340,40 @@ private fun TabIconAndLabel(
 private fun CommunityPreview() {
     Community(
         onWriteClick = {},
+        onPostClick = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PostItemAndImagePreview() {
+    CommunityPostItem(
+        post = CommunityPost(
+            id = "1",
+            title = "월급이 제대로 안 들어 온 것 같아요",
+            content = "이번 달 일을 했는데 제가 계산한 돈과 월급이 다르게 들어 온 것 같아요",
+            category = "problem",
+            date = "25.05.06",
+            commentCount = "30",
+            thumbnail = true
+        ),
+        onPostClick = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PostItemAndPreview() {
+    CommunityPostItem(
+        post = CommunityPost(
+            id = "1",
+            title = "월급이 제대로 안 들어 온 것 같아요",
+            content = "이번 달 일을 했는데 제가 계산한 돈과 월급이 다르게 들어 온 것 같아요",
+            category = "problem",
+            date = "25.05.06",
+            commentCount = "30",
+            thumbnail = false
+        ),
         onPostClick = {},
     )
 }
