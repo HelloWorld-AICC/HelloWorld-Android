@@ -1,4 +1,4 @@
-package com.example.feature.onboarding
+package com.example.feature.ui.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

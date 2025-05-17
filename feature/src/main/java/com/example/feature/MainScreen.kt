@@ -10,13 +10,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.example.feature.R
-import com.example.feature.home.HomeScreen
-import com.example.feature.onboarding.AgreementScreen
-import com.example.feature.onboarding.LanguageScreen
-import com.example.feature.onboarding.LoginScreen
-import com.example.feature.splash.SplashScreen
-import kotlinx.coroutines.delay
+import com.example.feature.ui.home.HomeScreen
+import com.example.feature.ui.onboarding.AgreementScreen
+import com.example.feature.ui.onboarding.LanguageScreen
+import com.example.feature.ui.onboarding.LoginScreen
+import com.example.feature.ui.splash.SplashScreen
 
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
 import com.example.feature.ui.community.navigation.communityPostWriteScreen

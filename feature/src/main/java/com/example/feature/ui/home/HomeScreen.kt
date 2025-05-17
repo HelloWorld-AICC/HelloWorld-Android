@@ -1,5 +1,5 @@
 // feature/home/HomeScreen.kt
-package com.example.feature.home
+package com.example.feature.ui.home
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

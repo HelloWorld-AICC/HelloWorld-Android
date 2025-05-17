@@ -1,4 +1,4 @@
-package com.example.feature.onboarding
+package com.example.feature.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -29,8 +29,8 @@ import com.example.core.ui.theme.HelloWorldMain0
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
-import com.example.feature.splash.SplashImg
-import com.example.feature.splash.SplashLogo
+import com.example.feature.ui.splash.SplashImg
+import com.example.feature.ui.splash.SplashLogo
 
 @Composable
 fun LoginScreen(navController: NavController) {
