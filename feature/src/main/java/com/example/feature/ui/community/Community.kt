@@ -44,12 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.ui.AppTypography
-import com.example.core.ui.HelloWorldGrayScale200
-import com.example.core.ui.HelloWorldGrayScale300
-import com.example.core.ui.HelloWorldGrayScale500
-import com.example.core.ui.HelloWorldGrayScale800
-import com.example.core.ui.HelloWorldMain200
+import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldGrayScale200
+import com.example.core.ui.theme.HelloWorldGrayScale300
+import com.example.core.ui.theme.HelloWorldGrayScale500
+import com.example.core.ui.theme.HelloWorldGrayScale800
+import com.example.core.ui.theme.HelloWorldMain200
 import kotlinx.serialization.Serializable
 
 

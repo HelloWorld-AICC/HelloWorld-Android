@@ -89,4 +89,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+
+    //animation
+    implementation("androidx.compose.animation:animation-core:1.6.1") // Compose 버전에 따라 조정
+
 }

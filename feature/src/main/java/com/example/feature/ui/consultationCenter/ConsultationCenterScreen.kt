@@ -1,5 +1,6 @@
 package com.example.feature.ui.consultationCenter
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,14 +55,17 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import androidx.hilt.navigation.compose.hiltViewModel
+
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview
 @Composable
-fun ConsultationCenterScreen() {
+fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+
+    val selectedCenter by viewModel.selectedCenter.collectAsState()
 
     val centerList = listOf(
         CenterInfo(
@@ -166,12 +170,23 @@ fun ConsultationCenterScreen() {
                 ),
                 uiSettings = MapUiSettings(
                     myLocationButtonEnabled = true
-                )
+                ),
+                onMapClick = {
+                    viewModel.selectCenter(null) // ✅ 지도 클릭 시 선택 해제
+                }
             ) {
                 centerList.forEach { center ->
+                    val markerState = remember(center) {
+                        MarkerState(position = LatLng(center.latitude, center.longitude))
+                    }
+
                     Marker(
-                        state = MarkerState(position = LatLng(center.latitude, center.longitude)),
-                        title = center.name
+                        state = markerState,
+                        title = center.name,
+                        onClick = {
+                            viewModel.selectCenter(center) // ✅ 마커 클릭 시 ViewModel 통해 선택
+                            false
+                        }
                     )
                 }
             }
@@ -179,11 +194,11 @@ fun ConsultationCenterScreen() {
             // 지도 위에 오버레이
             ConsultationCenterListOverlay(
                 centerList = centerList,
+                selectedCenter = selectedCenter, // ✅ 전달
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
             )
-
         }
     }
 }
@@ -191,12 +206,21 @@ fun ConsultationCenterScreen() {
 @Composable
 fun ConsultationCenterListOverlay(
     centerList: List<CenterInfo>,
+    selectedCenter: CenterInfo?, // ✅ 추가
     modifier: Modifier = Modifier
 ) {
+
+    val targetHeight = if (selectedCenter != null) 373.dp else 200.dp
+
+    val animatedHeight by animateDpAsState(
+        targetValue = targetHeight,
+        label = "overlayHeight"
+    )
+
     Box(
         modifier = modifier
             .width(320.dp)
-            .height(373.dp)
+            .height(animatedHeight)
             .clip(RoundedCornerShape(24.dp))
             .background(Color.White)
     ) {
@@ -214,10 +238,12 @@ fun ConsultationCenterListOverlay(
             LazyColumn(
                 modifier = Modifier
                     .width(281.dp)
-                    .heightIn(300.dp)
+                    .weight(1f) // 높이 자동 확장
             ) {
                 items(centerList) { center ->
-                    ConsultationCenterCard(center)
+                    ConsultationCenterCard(
+                        center = center
+                    )
                 }
             }
         }
@@ -287,8 +313,6 @@ fun ConsultationCenterCard(center: CenterInfo) {
     }
 }
 
-
-@Preview
 @Composable
 fun HeaderTitle(modifier: Modifier = Modifier) {
     Row(
