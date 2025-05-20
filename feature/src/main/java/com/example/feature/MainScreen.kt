@@ -101,7 +101,9 @@ fun MyNavigationHost(navController: NavHostController) {
             )
         }
         aiChatScreen(
-            onPostClick = navController::navigateToAIChatDetail,
+            onPostClick = { chatId ->
+                navController.navigateToAIChatDetail(chatId)
+            }
         )
         aiChatDetailScreen(
             onBackClick = navController::navigateUp

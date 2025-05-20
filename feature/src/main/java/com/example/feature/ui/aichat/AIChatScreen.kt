@@ -43,7 +43,7 @@ import com.example.feature.R
 
 @Composable
 internal fun AiChatScreen(
-    onPostClick: () -> Unit,
+    onPostClick: (Int) -> Unit,
     viewModel: AIChatViewModel = hiltViewModel()
 ) {
     val conversations by viewModel.conversations.collectAsState()
@@ -113,7 +113,7 @@ fun ChatNewButton(
 @Composable
 fun RecentChatSection(
     conversations: List<ChatInfo>,
-    onPostClick: () -> Unit
+    onPostClick: (Int) -> Unit
 ) {
     Column {
         Row(
@@ -130,7 +130,7 @@ fun RecentChatSection(
             )
             ChatNewButton(
                 onClick = {
-                    onPostClick()
+                    onPostClick(-1)
                 }
             )
         }
@@ -145,7 +145,9 @@ fun RecentChatSection(
             items(conversations) { conversation ->
                 ConversationItem(
                     conversation = conversation,
-                    onPostClick = { onPostClick() }
+                    onPostClick = {
+                        onPostClick(conversation.id)
+                    }
                 )
             }
         }
