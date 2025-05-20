@@ -48,7 +48,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
+fun ConsultationCenterScreen (
+    onBackClick: () -> Unit,
+    viewModel: CenterViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -146,7 +149,7 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
     Column(modifier = Modifier.fillMaxSize()) {
         BackHeader(
             title = "오프라인 상담센터",
-            onBackClick = { /* 뒤로가기 로직 구현 */ }
+            onBackClick = { onBackClick() }
         )
 
         Box(modifier = Modifier

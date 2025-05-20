@@ -27,6 +27,10 @@ import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
 
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
 
+import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
+import com.example.feature.ui.aichat.navigation.aiChatScreen
+import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
+
 
 // 아이콘 리소스 구성 (기본 / 클릭)
 data class NavItem(
@@ -85,14 +89,25 @@ fun MyBottomNavigation(navController: NavHostController) {
 // 메인 네비게이션 호스트
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "스플래시") {
+    NavHost(navController, startDestination = "홈") {
         composable("스플래시") { SplashScreen(navController) }
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
         composable("홈") { HomeScreen() }
-        composable("상담 센터") { ConsultationCenterScreen() }
-        composable("채팅 상담") { AiChatScreen() }
+        composable("상담 센터") {
+            ConsultationCenterScreen (
+                onBackClick = navController::navigateUp
+            )
+        }
+        aiChatScreen(
+            onPostClick = { chatId ->
+                navController.navigateToAIChatDetail(chatId)
+            }
+        )
+        aiChatDetailScreen(
+            onBackClick = navController::navigateUp
+        )
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
         communityScreen(
             onWriteClick = navController::navigateToCommunityPostWrite,
