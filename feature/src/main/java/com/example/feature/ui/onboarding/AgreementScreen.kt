@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.*
 import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
@@ -45,79 +45,71 @@ fun AgreementScreen(navController: NavHostController) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Image(
-            painter = painterResource(id = R.drawable.language_character),
-            contentDescription = "agreement character",
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "HelloWorld와 함께해요",
-            style = AppTypography.heading01,
-            color = HelloWorldGrayScale800
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "서비스 이용을 위한 약관에 동의해 주세요",
-            style = AppTypography.body02,
-            color = HelloWorldGrayScale300
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Column(modifier = Modifier.fillMaxWidth()) {
-            AgreementCheckbox(text = "모두 동의", checked = allAgree, onCheckedChange = {
-                allAgree = it
-            })
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AgreementCheckbox(text = "개인정보 처리방침", checked = agreePrivacy, onCheckedChange = {
-                agreePrivacy = it
-                allAgree = agreePrivacy && agreeTerms
-            })
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AgreementCheckbox(text = "서비스 이용약관", checked = agreeTerms, onCheckedChange = {
-                agreeTerms = it
-                allAgree = agreePrivacy && agreeTerms
-            })
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = { showModal = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (agreePrivacy && agreeTerms) HelloWorldMain500 else HelloWorldGrayScale300
-            ),
-            enabled = agreePrivacy && agreeTerms
-        ) {
-            Text(
+    Scaffold(
+        bottomBar = {
+            BottomButton(
                 text = "확인",
-                style = AppTypography.heading01,
-                color = Color.White
+                onClick = { showModal = true },
+                enabled = agreePrivacy && agreeTerms,
+                modifier = Modifier.fillMaxWidth()
             )
         }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(48.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Image(
+                painter = painterResource(id = R.drawable.language_character),
+                contentDescription = "agreement character",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "HelloWorld와 함께해요",
+                style = AppTypography.heading01,
+                color = HelloWorldGrayScale800
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "서비스 이용을 위한 약관에 동의해 주세요",
+                style = AppTypography.body02,
+                color = HelloWorldGrayScale300
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AgreementCheckbox(text = "모두 동의", checked = allAgree, onCheckedChange = {
+                    allAgree = it
+                })
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                AgreementCheckbox(text = "개인정보 처리방침", checked = agreePrivacy, onCheckedChange = {
+                    agreePrivacy = it
+                    allAgree = agreePrivacy && agreeTerms
+                })
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                AgreementCheckbox(text = "서비스 이용약관", checked = agreeTerms, onCheckedChange = {
+                    agreeTerms = it
+                    allAgree = agreePrivacy && agreeTerms
+                })
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 
     if (showModal) {
@@ -168,12 +160,13 @@ fun AgreementCheckbox(text: String, checked: Boolean, onCheckedChange: (Boolean)
 fun TermsModal(onDismiss: () -> Unit) {
     val scrollState = rememberScrollState()
     val agreed = remember { mutableStateOf(false) }
-    val hasScrolledToBottom = remember { derivedStateOf {
-        scrollState.maxValue > 0 && scrollState.value == scrollState.maxValue
-    } }
+    val hasScrolledToBottom = remember {
+        derivedStateOf {
+            scrollState.maxValue > 0 && scrollState.value == scrollState.maxValue
+        }
+    }
 
     val coroutineScope = rememberCoroutineScope()
-
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -204,10 +197,12 @@ fun TermsModal(onDismiss: () -> Unit) {
             }
         },
         text = {
-            Column(modifier = Modifier
-                .height(400.dp)
-                .verticalScroll(scrollState)
-                .padding(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .height(400.dp)
+                    .verticalScroll(scrollState)
+                    .padding(8.dp)
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_info),
                     contentDescription = "info icon",
