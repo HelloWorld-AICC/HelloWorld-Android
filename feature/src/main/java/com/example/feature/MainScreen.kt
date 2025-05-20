@@ -16,6 +16,7 @@ import com.example.feature.onboarding.AgreementScreen
 import com.example.feature.onboarding.LanguageScreen
 import com.example.feature.onboarding.LoginScreen
 import com.example.feature.splash.SplashScreen
+import com.example.feature.ui.aichat.AiChatScreen
 import kotlinx.coroutines.delay
 
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
@@ -91,7 +92,7 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("이용 동의") { AgreementScreen(navController) }
         composable("홈") { HomeScreen() }
         composable("상담 센터") { ConsultationCenterScreen() }
-        composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
+        composable("채팅 상담") { AiChatScreen() }
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
         communityScreen(
             onWriteClick = navController::navigateToCommunityPostWrite,

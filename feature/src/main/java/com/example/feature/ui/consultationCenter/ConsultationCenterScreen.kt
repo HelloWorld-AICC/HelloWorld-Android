@@ -3,22 +3,11 @@ package com.example.feature.ui.consultationCenter
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -35,10 +24,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.centerInfo.CenterInfo
+import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -55,7 +44,6 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -156,7 +144,10 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
 
     // UI 영역
     Column(modifier = Modifier.fillMaxSize()) {
-        HeaderTitle( )
+        BackHeader(
+            title = "오프라인 상담센터",
+            onBackClick = { /* 뒤로가기 로직 구현 */ }
+        )
 
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -172,7 +163,7 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
                     myLocationButtonEnabled = true
                 ),
                 onMapClick = {
-                    viewModel.selectCenter(null) // ✅ 지도 클릭 시 선택 해제
+                    viewModel.selectCenter(null)
                 }
             ) {
                 centerList.forEach { center ->
@@ -184,7 +175,7 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
                         state = markerState,
                         title = center.name,
                         onClick = {
-                            viewModel.selectCenter(center) // ✅ 마커 클릭 시 ViewModel 통해 선택
+                            viewModel.selectCenter(center)
                             false
                         }
                     )
@@ -194,7 +185,7 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
             // 지도 위에 오버레이
             ConsultationCenterListOverlay(
                 centerList = centerList,
-                selectedCenter = selectedCenter, // ✅ 전달
+                selectedCenter = selectedCenter,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 16.dp)
@@ -206,7 +197,7 @@ fun ConsultationCenterScreen(viewModel: CenterViewModel = hiltViewModel()) {
 @Composable
 fun ConsultationCenterListOverlay(
     centerList: List<CenterInfo>,
-    selectedCenter: CenterInfo?, // ✅ 추가
+    selectedCenter: CenterInfo?,
     modifier: Modifier = Modifier
 ) {
 
@@ -248,7 +239,6 @@ fun ConsultationCenterListOverlay(
             }
         }
 
-        // ▶ 하단 그라디언트 덮개 (블러처럼 보이게)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -312,32 +302,3 @@ fun ConsultationCenterCard(center: CenterInfo) {
         HorizontalDivider(color = Color(0xFFCFE3FD))
     }
 }
-
-@Composable
-fun HeaderTitle(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_arrow_left),
-            contentDescription = "뒤로가기",
-            tint = Color.Unspecified,
-            modifier = Modifier.padding(end = 12.dp).size(24.dp)
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = "오프라인 상담센터",
-            style = AppTypography.heading04,
-            textAlign = TextAlign.Start
-        )
-    }
-}
-
