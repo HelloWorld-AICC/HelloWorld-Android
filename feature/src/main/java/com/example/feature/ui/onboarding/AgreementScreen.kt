@@ -63,7 +63,7 @@ fun AgreementScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.language_character),
+                painter = painterResource(id = R.drawable.agreement_character),
                 contentDescription = "agreement character",
                 modifier = Modifier.fillMaxWidth()
             )
