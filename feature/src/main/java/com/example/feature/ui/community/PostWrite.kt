@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,11 +79,11 @@ internal fun CommunityPostWrite(
         modifier = modifier
             .fillMaxSize()
             .clickable(
-                indication = null,
                 interactionSource = interactionSource,
+                indication = null
             ) {
                 focusManager.clearFocus()
-            }
+            },
     ) {
         Row(
             modifier = Modifier
@@ -107,236 +109,230 @@ internal fun CommunityPostWrite(
             )
         }
         HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
-            color = HelloWorldMain200
+            color = HelloWorldMain200,
         )
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .advancedImePadding()
+                .padding(horizontal = 24.dp)
+                .weight(1f),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 84.dp)
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                ) {
-                    Text(
-                        text = "카테고리",
-                        style = AppTypography.label01,
-                        color = HelloWorldGrayScale800,
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(96.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TabIconAndLabel(
-                            title = "직장 내 고충",
-                            icon = Icons.Default.Build,
-                            onIconClick = { viewModel.changeTab("problem") },
-                            isSelected = selectedTab.value == "problem",
-                        )
-                        TabIconAndLabel(
-                            title = "체류 및 비자",
-                            icon = Icons.Default.Call,
-                            onIconClick = { viewModel.changeTab("national") },
-                            isSelected = selectedTab.value == "national",
-                        )
-                        TabIconAndLabel(
-                            title = "산재 및 의료",
-                            icon = Icons.Default.Favorite,
-                            onIconClick = { viewModel.changeTab("medical") },
-                            isSelected = selectedTab.value == "medical",
-                        )
-                        TabIconAndLabel(
-                            title = "기타",
-                            icon = Icons.Default.Info,
-                            onIconClick = { viewModel.changeTab("etc") },
-                            isSelected = selectedTab.value == "etc",
-                        )
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "제목",
-                        style = AppTypography.label01,
-                        color = HelloWorldGrayScale800,
-                    )
-                    BasicTextField(
-                        value = title.value,
-                        onValueChange = { viewModel.updateTitle(it) },
-                        singleLine = true,
-                        textStyle = AppTypography.heading02.copy(color = HelloWorldGrayScale800),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(45.dp)
-                    ) { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                                .padding(12.dp),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            if (title.value.isEmpty()) {
-                                Text(
-                                    text = "제목을 작성해 주세요 ( 최대 50자 )",
-                                    style = AppTypography.heading02,
-                                    color = HelloWorldGrayScale300,
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "내용",
-                        style = AppTypography.label01,
-                        color = HelloWorldGrayScale800,
-                    )
-                    BasicTextField(
-                        value = content.value,
-                        onValueChange = { viewModel.updateContent(it) },
-                        textStyle = AppTypography.body02.copy(color = HelloWorldGrayScale800),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    ) { innerTextField ->
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                                .padding(12.dp),
-                            contentAlignment = Alignment.TopStart
-                        ) {
-                            if (content.value.isEmpty()) {
-                                Text(
-                                    text = "게시글을 작성해 주세요 ( 최대 2000자 )",
-                                    style = AppTypography.body02,
-                                    color = HelloWorldGrayScale300,
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "사진",
-                        style = AppTypography.label01,
-                        color = HelloWorldGrayScale800,
-                    )
-                    FlowRow(
-                        modifier = Modifier
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                            .fillMaxWidth()
-                            .heightIn(min = 74.dp)
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        if (posts.size < 12) {
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        val randomChar = charRange.random().toString()
-                                        posts.add(randomChar)
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                        // TODO Image 추가
-                        posts.forEachIndexed { index, item ->
-                            Box(
-                                modifier = Modifier
-                                    .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
-                                    .size(50.dp)
-                                    .clickable {
-                                        posts.removeAt(index)
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) { Text(text = item) }
-                        }
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = "사진은 최대 10장까지 업로드 가능합니다",
-                        style = AppTypography.label03,
-                        color = HelloWorldGrayScale300,
-                    )
-                    Text(
-                        text = "영상은 최대 2개까지 업로드 가능합니다",
-                        style = AppTypography.label03,
-                        color = HelloWorldGrayScale300,
-                    )
-                    Text(
-                        text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
-                        style = AppTypography.label03,
-                        color = HelloWorldGrayScale300,
-                    )
-                    Text(
-                        text = "초상권•저작권 침해 등 위법 게시물은 관리자 판단으로 삭제될 수 있습니다",
-                        style = AppTypography.label03,
-                        color = HelloWorldGrayScale300,
-                    )
-                }
-            }
-            TextButton(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(84.dp)
-                    .align(Alignment.BottomCenter),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = Color(0xFFF9FBFC),
-                    containerColor = HelloWorldMain400,
-                    disabledContentColor = HelloWorldGrayScale500,
-                    disabledContainerColor = HelloWorldGrayScale100,
-                ),
-                shape = RoundedCornerShape(0),
-                contentPadding = PaddingValues(
-                    top = 22.dp,
-                    bottom = 36.dp,
-                )
+                    .padding(top = 12.dp)
             ) {
                 Text(
-                    text = "완료",
-                    style = AppTypography.heading01,
+                    text = "카테고리",
+                    style = AppTypography.label01,
+                    color = HelloWorldGrayScale800,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(96.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TabIconAndLabel(
+                        title = "직장 내 고충",
+                        icon = Icons.Default.Build,
+                        onIconClick = { viewModel.changeTab("problem") },
+                        isSelected = selectedTab.value == "problem",
+                    )
+                    TabIconAndLabel(
+                        title = "체류 및 비자",
+                        icon = Icons.Default.Call,
+                        onIconClick = { viewModel.changeTab("national") },
+                        isSelected = selectedTab.value == "national",
+                    )
+                    TabIconAndLabel(
+                        title = "산재 및 의료",
+                        icon = Icons.Default.Favorite,
+                        onIconClick = { viewModel.changeTab("medical") },
+                        isSelected = selectedTab.value == "medical",
+                    )
+                    TabIconAndLabel(
+                        title = "기타",
+                        icon = Icons.Default.Info,
+                        onIconClick = { viewModel.changeTab("etc") },
+                        isSelected = selectedTab.value == "etc",
+                    )
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "제목",
+                    style = AppTypography.label01,
+                    color = HelloWorldGrayScale800,
+                )
+                BasicTextField(
+                    value = title.value,
+                    onValueChange = { viewModel.updateTitle(it) },
+                    singleLine = true,
+                    textStyle = AppTypography.heading02.copy(color = HelloWorldGrayScale800),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    )
+                ) { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White)
+                            .padding(12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (title.value.isEmpty()) {
+                            Text(
+                                text = "제목을 작성해 주세요 ( 최대 50자 )",
+                                style = AppTypography.heading02,
+                                color = HelloWorldGrayScale300,
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "내용",
+                    style = AppTypography.label01,
+                    color = HelloWorldGrayScale800,
+                )
+                BasicTextField(
+                    value = content.value,
+                    onValueChange = { viewModel.updateContent(it) },
+                    textStyle = AppTypography.body02.copy(color = HelloWorldGrayScale800),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                ) { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White)
+                            .padding(12.dp),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        if (content.value.isEmpty()) {
+                            Text(
+                                text = "게시글을 작성해 주세요 ( 최대 2000자 )",
+                                style = AppTypography.body02,
+                                color = HelloWorldGrayScale300,
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "사진",
+                    style = AppTypography.label01,
+                    color = HelloWorldGrayScale800,
+                )
+                FlowRow(
+                    modifier = Modifier
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .heightIn(min = 74.dp)
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    if (posts.size < 12) {
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    val randomChar = charRange.random().toString()
+                                    posts.add(randomChar)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    // TODO Image 추가
+                    posts.forEachIndexed { index, item ->
+                        Box(
+                            modifier = Modifier
+                                .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
+                                .size(50.dp)
+                                .clickable {
+                                    posts.removeAt(index)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) { Text(text = item) }
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "사진은 최대 10장까지 업로드 가능합니다",
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale300,
+                )
+                Text(
+                    text = "영상은 최대 2개까지 업로드 가능합니다",
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale300,
+                )
+                Text(
+                    text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale300,
+                )
+                Text(
+                    text = "초상권•저작권 침해 등 위법 게시물은 관리자 판단으로 삭제될 수 있습니다",
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale300,
                 )
             }
+        }
+        TextButton(
+            onClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .advancedImePadding(),
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = Color(0xFFF9FBFC),
+                containerColor = HelloWorldMain400,
+                disabledContentColor = HelloWorldGrayScale500,
+                disabledContainerColor = HelloWorldGrayScale100,
+            ),
+            shape = RoundedCornerShape(0),
+            contentPadding = PaddingValues(
+                top = 22.dp,
+                bottom = 36.dp,
+            )
+        ) {
+            Text(
+                text = "완료",
+                style = AppTypography.heading01,
+            )
         }
     }
 }
