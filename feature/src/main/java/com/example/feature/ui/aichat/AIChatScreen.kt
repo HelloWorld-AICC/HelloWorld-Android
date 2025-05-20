@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
@@ -36,7 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.chatInfo.ChatInfo
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
-import com.example.core.ui.theme.HelloWorldMain0
+import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
 
@@ -62,17 +61,22 @@ val sampleConversations = listOf(
 
 @Composable
 fun AiChatScreen(viewModel: AIChatViewModel = hiltViewModel()) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent)
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+            .background(Color.Transparent),
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         HeaderTitle()
+        HorizontalDivider(color = HelloWorldMain200)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Banner()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         RecentChatSection(
             conversations = sampleConversations,
             onChatSelected = { viewModel.selectChat(it) }
@@ -87,6 +91,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 24.dp)
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -128,7 +133,9 @@ fun RecentChatSection(
 ) {
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -146,7 +153,11 @@ fun RecentChatSection(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+        ) {
             items(conversations) { conversation ->
                 ConversationItem(
                     conversation = conversation,
@@ -165,7 +176,7 @@ fun ConversationItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+            .padding(top = 10.dp)
             .clickable { onClick() }
     ) {
         Row(
@@ -195,21 +206,21 @@ fun ConversationItem(
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-        HorizontalDivider(color = Color(0xFFCFE3FD))
+        HorizontalDivider(color = HelloWorldMain200)
     }
 }
 
 @Preview
 @Composable
 fun HeaderTitle(modifier: Modifier = Modifier) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.Transparent)
             .padding(horizontal = 16.dp, vertical = 12.dp),
 
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Ai Chat",
