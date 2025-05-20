@@ -22,6 +22,7 @@ import com.example.feature.ui.community.navigation.navigateToCommunityPostDetail
 import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
 
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
+import com.example.feature.ui.mypage.MypageScreen
 
 
 // 아이콘 리소스 구성 (기본 / 클릭)
@@ -87,6 +88,7 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
         composable("홈") { HomeScreen(navController) }
+        composable("마이페이지") { MypageScreen() }
         composable("상담 센터") { ConsultationCenterScreen() }
         composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }

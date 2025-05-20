@@ -73,7 +73,9 @@ fun HomeScreen(navController: NavController) {
                 Text(
                     text = "마이페이지 가기 →",
                     style = AppTypography.label02,
-                    color = HelloWorldMain600
+                    color = HelloWorldMain600,
+                    modifier = Modifier
+                        .clickable { navController.navigate("마이페이지") }
                 )
             }
             // 사용자 아바타
