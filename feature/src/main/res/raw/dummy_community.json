@@ -1,0 +1,276 @@
+[
+  {
+    "id": "1",
+    "title": "Problem Title 1",
+    "content": "This is a sample content for problem post 1.",
+    "category": "problem",
+    "date": "2025-05-15",
+    "commentCount": "3",
+    "thumbnail": true
+  },
+  {
+    "id": "2",
+    "title": "Problem Title 2",
+    "content": "This is a sample content for problem post 2.",
+    "category": "problem",
+    "date": "2025-05-14",
+    "commentCount": "1",
+    "thumbnail": false
+  },
+  {
+    "id": "3",
+    "title": "Problem Title 3",
+    "content": "This is a sample content for problem post 3.",
+    "category": "problem",
+    "date": "2025-05-13",
+    "commentCount": "5",
+    "thumbnail": true
+  },
+  {
+    "id": "4",
+    "title": "Problem Title 4",
+    "content": "This is a sample content for problem post 4.",
+    "category": "problem",
+    "date": "2025-05-12",
+    "commentCount": "0",
+    "thumbnail": false
+  },
+  {
+    "id": "5",
+    "title": "Problem Title 5",
+    "content": "This is a sample content for problem post 5.",
+    "category": "problem",
+    "date": "2025-05-11",
+    "commentCount": "2",
+    "thumbnail": true
+  },
+
+  {
+    "id": "6",
+    "title": "National Title 1",
+    "content": "This is a sample content for national post 1.",
+    "category": "national",
+    "date": "2025-05-15",
+    "commentCount": "4",
+    "thumbnail": true
+  },
+  {
+    "id": "7",
+    "title": "National Title 2",
+    "content": "This is a sample content for national post 2.",
+    "category": "national",
+    "date": "2025-05-14",
+    "commentCount": "2",
+    "thumbnail": false
+  },
+  {
+    "id": "8",
+    "title": "National Title 3",
+    "content": "This is a sample content for national post 3.",
+    "category": "national",
+    "date": "2025-05-13",
+    "commentCount": "0",
+    "thumbnail": true
+  },
+  {
+    "id": "9",
+    "title": "National Title 4",
+    "content": "This is a sample content for national post 4.",
+    "category": "national",
+    "date": "2025-05-12",
+    "commentCount": "7",
+    "thumbnail": true
+  },
+  {
+    "id": "10",
+    "title": "National Title 5",
+    "content": "This is a sample content for national post 5.",
+    "category": "national",
+    "date": "2025-05-11",
+    "commentCount": "1",
+    "thumbnail": false
+  },
+
+  {
+    "id": "11",
+    "title": "Medical Title 1",
+    "content": "This is a sample content for medical post 1.",
+    "category": "medical",
+    "date": "2025-05-15",
+    "commentCount": "8",
+    "thumbnail": false
+  },
+  {
+    "id": "12",
+    "title": "Medical Title 2",
+    "content": "This is a sample content for medical post 2.",
+    "category": "medical",
+    "date": "2025-05-14",
+    "commentCount": "4",
+    "thumbnail": true
+  },
+  {
+    "id": "13",
+    "title": "Medical Title 3",
+    "content": "This is a sample content for medical post 3.",
+    "category": "medical",
+    "date": "2025-05-13",
+    "commentCount": "2",
+    "thumbnail": false
+  },
+  {
+    "id": "14",
+    "title": "Medical Title 4",
+    "content": "This is a sample content for medical post 4.",
+    "category": "medical",
+    "date": "2025-05-12",
+    "commentCount": "6",
+    "thumbnail": true
+  },
+  {
+    "id": "15",
+    "title": "Medical Title 5",
+    "content": "This is a sample content for medical post 5.",
+    "category": "medical",
+    "date": "2025-05-11",
+    "commentCount": "0",
+    "thumbnail": false
+  },
+  {
+    "id": "21",
+    "title": "Problem Title 1",
+    "content": "This is a sample content for problem post 1.",
+    "category": "problem",
+    "date": "2025-05-15",
+    "commentCount": "3",
+    "thumbnail": true
+  },
+  {
+    "id": "22",
+    "title": "Problem Title 2",
+    "content": "This is a sample content for problem post 2.",
+    "category": "problem",
+    "date": "2025-05-14",
+    "commentCount": "1",
+    "thumbnail": false
+  },
+  {
+    "id": "23",
+    "title": "Problem Title 3",
+    "content": "This is a sample content for problem post 3.",
+    "category": "problem",
+    "date": "2025-05-13",
+    "commentCount": "5",
+    "thumbnail": true
+  },
+  {
+    "id": "24",
+    "title": "Problem Title 4",
+    "content": "This is a sample content for problem post 4.",
+    "category": "problem",
+    "date": "2025-05-12",
+    "commentCount": "0",
+    "thumbnail": false
+  },
+  {
+    "id": "25",
+    "title": "Problem Title 5",
+    "content": "This is a sample content for problem post 5.",
+    "category": "problem",
+    "date": "2025-05-11",
+    "commentCount": "2",
+    "thumbnail": true
+  },
+
+  {
+    "id": "26",
+    "title": "National Title 1",
+    "content": "This is a sample content for national post 1.",
+    "category": "national",
+    "date": "2025-05-15",
+    "commentCount": "4",
+    "thumbnail": true
+  },
+  {
+    "id": "27",
+    "title": "National Title 2",
+    "content": "This is a sample content for national post 2.",
+    "category": "national",
+    "date": "2025-05-14",
+    "commentCount": "2",
+    "thumbnail": false
+  },
+  {
+    "id": "28",
+    "title": "National Title 3",
+    "content": "This is a sample content for national post 3.",
+    "category": "national",
+    "date": "2025-05-13",
+    "commentCount": "0",
+    "thumbnail": true
+  },
+  {
+    "id": "29",
+    "title": "National Title 4",
+    "content": "This is a sample content for national post 4.",
+    "category": "national",
+    "date": "2025-05-12",
+    "commentCount": "7",
+    "thumbnail": true
+  },
+  {
+    "id": "30",
+    "title": "National Title 5",
+    "content": "This is a sample content for national post 5.",
+    "category": "national",
+    "date": "2025-05-11",
+    "commentCount": "1",
+    "thumbnail": false
+  },
+
+  {
+    "id": "31",
+    "title": "Medical Title 1",
+    "content": "This is a sample content for medical post 1.",
+    "category": "medical",
+    "date": "2025-05-15",
+    "commentCount": "8",
+    "thumbnail": false
+  },
+  {
+    "id": "32",
+    "title": "Medical Title 2",
+    "content": "This is a sample content for medical post 2.",
+    "category": "medical",
+    "date": "2025-05-14",
+    "commentCount": "4",
+    "thumbnail": true
+  },
+  {
+    "id": "33",
+    "title": "Medical Title 3",
+    "content": "This is a sample content for medical post 3.",
+    "category": "medical",
+    "date": "2025-05-13",
+    "commentCount": "2",
+    "thumbnail": false
+  },
+  {
+    "id": "34",
+    "title": "Medical Title 4",
+    "content": "This is a sample content for medical post 4.",
+    "category": "medical",
+    "date": "2025-05-12",
+    "commentCount": "6",
+    "thumbnail": true
+  },
+  {
+    "id": "35",
+    "title": "Medical Title 5",
+    "content": "This is a sample content for medical post 5.",
+    "category": "medical",
+    "date": "2025-05-11",
+    "commentCount": "0",
+    "thumbnail": false
+  }
+]

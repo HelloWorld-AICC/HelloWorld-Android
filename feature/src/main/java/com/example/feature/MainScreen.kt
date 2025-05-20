@@ -104,8 +104,12 @@ fun MyNavigationHost(navController: NavHostController) {
             onWriteClick = navController::navigateToCommunityPostWrite,
             onPostClick = navController::navigateToCommunityPostDetail,
         )
-        communityPostDetailScreen()
-        communityPostWriteScreen()
+        communityPostDetailScreen(
+            onBackClick = navController::navigateUp
+        )
+        communityPostWriteScreen(
+            onBackClick = navController::navigateUp
+        )
     }
 }
 
