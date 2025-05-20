@@ -36,12 +36,6 @@ fun LanguageScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = {
-            BackHeader(
-                title = "",
-                onBackClick = { navController.popBackStack() }
-            )
-        },
         bottomBar = {
             BottomButton(
                 text = "확인",

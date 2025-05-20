@@ -2,6 +2,8 @@ package com.example.feature.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,7 +62,7 @@ fun AgreementScreen(navController: NavHostController) {
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(64.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.agreement_character),
@@ -86,24 +88,64 @@ fun AgreementScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Column(modifier = Modifier.fillMaxWidth()) {
-                AgreementCheckbox(text = "모두 동의", checked = allAgree, onCheckedChange = {
-                    allAgree = it
-                })
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                AgreementCheckbox(
+                    text = "모두 동의",
+                    checked = allAgree,
+                    onCheckedChange = {
+                        allAgree = it
+                    })
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AgreementCheckbox(text = "개인정보 처리방침", checked = agreePrivacy, onCheckedChange = {
-                    agreePrivacy = it
-                    allAgree = agreePrivacy && agreeTerms
-                })
+                AgreementCheckbox(
+                    text = "개인정보 처리방침",
+                    checked = agreePrivacy,
+                    onCheckedChange = {
+                        agreePrivacy = it
+                        allAgree = agreePrivacy && agreeTerms
+                    })
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AgreementCheckbox(text = "서비스 이용약관", checked = agreeTerms, onCheckedChange = {
-                    agreeTerms = it
-                    allAgree = agreePrivacy && agreeTerms
-                })
+                AgreementCheckbox(
+                    text = "서비스 이용약관",
+                    checked = agreeTerms,
+                    onCheckedChange = {
+                        agreeTerms = it
+                        allAgree = agreePrivacy && agreeTerms
+                    })
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "'모두 동의'는, 개별 약관을 모두 확인하고 동의하신 것으로 처리됩니다.",
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale300
+                )
+            }
+
+            if (!agreePrivacy || !agreeTerms) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = HelloWorldMain400,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(vertical = 9.dp, horizontal = 24.dp)
+                ) {
+                    Text(
+                        text = "이용약관 동의가 필요합니다",
+                        style = AppTypography.label01,
+                        color = HelloWorldGrayScale0
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -126,7 +168,12 @@ fun AgreementCheckbox(text: String, checked: Boolean, onCheckedChange: (Boolean)
         onClick = { onCheckedChange(!checked) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(52.dp)
+            .border(
+                width = 1.dp,
+                color = HelloWorldMain400,
+                shape = RoundedCornerShape(8.dp)
+            ),
         border = BorderStroke(1.dp, HelloWorldMain100),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = White)
