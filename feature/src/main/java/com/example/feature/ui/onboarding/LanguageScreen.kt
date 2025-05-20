@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.core.ui.component.BackHeader
+import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
@@ -51,7 +52,7 @@ fun LanguageScreen(navController: NavController) {
     // 헤더
     BackHeader(
         title = "",
-        onBackClick = {navController.popBackStack()}
+        onBackClick = { navController.popBackStack() }
     )
 
     // 뷰
@@ -139,22 +140,11 @@ fun LanguageScreen(navController: NavController) {
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-
-        Button(
+        BottomButton(
+            text = "확인",
             onClick = { navController.navigate("이용 동의") },
+            enabled = true,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = HelloWorldMain500)
-        ) {
-            Text(
-                text = "확인",
-                style = AppTypography.heading01,
-                color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
+        )
     }
 }
