@@ -1,9 +1,8 @@
-package com.example.feature.ui.onboarding
+package com.example.feature.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -13,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.core.ui.theme.*
+import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -32,9 +33,6 @@ fun AgreementScreen(navController: NavHostController) {
         if (allAgree) {
             agreeTerms = true
             agreePrivacy = true
-        } else {
-            agreeTerms = false
-            agreePrivacy = false
         }
     }
 
@@ -56,7 +54,7 @@ fun AgreementScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(48.dp))
 
         Image(
-            painter = painterResource(id = R.drawable.agreement_character),
+            painter = painterResource(id = R.drawable.language_character),
             contentDescription = "agreement character",
             modifier = Modifier.fillMaxWidth()
         )
@@ -77,18 +75,21 @@ fun AgreementScreen(navController: NavHostController) {
             color = HelloWorldGrayScale300
         )
 
-        Spacer(modifier = Modifier.height(32.dp),)
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Column(modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             AgreementCheckbox(text = "모두 동의", checked = allAgree, onCheckedChange = {
                 allAgree = it
             })
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             AgreementCheckbox(text = "개인정보 처리방침", checked = agreePrivacy, onCheckedChange = {
                 agreePrivacy = it
                 allAgree = agreePrivacy && agreeTerms
             })
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             AgreementCheckbox(text = "서비스 이용약관", checked = agreeTerms, onCheckedChange = {
                 agreeTerms = it
@@ -184,7 +185,7 @@ fun TermsModal(onDismiss: () -> Unit) {
                         onClick = {
                             agreed.value = true
                             coroutineScope.launch {
-                                delay(100)
+                                kotlinx.coroutines.delay(100)
                                 onDismiss()
                             }
                         },

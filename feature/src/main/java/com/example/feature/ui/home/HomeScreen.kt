@@ -2,6 +2,7 @@ package com.example.feature.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.feature.ui.home.header.LogoHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale500
@@ -25,7 +27,7 @@ import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     val scrollState = rememberScrollState();
 
     Column(
@@ -110,14 +112,18 @@ fun HomeScreen() {
                     subtitle = "24시간 고민 상담",
                     iconRes = R.drawable.ic_service_chat,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { navController.navigate("채팅 상담") }
                 )
                 HomeServiceCard(
                     title = "AI 자기소개서",
                     subtitle = "AI와 함께 쉽게 작성해요",
                     iconRes = R.drawable.ic_service_ai,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { navController.navigate("이력서 작성") }
                 )
             }
 
@@ -132,14 +138,18 @@ fun HomeScreen() {
                     subtitle = "상담이 필요할 때, 바로 여기",
                     iconRes = R.drawable.ic_service_location,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { navController.navigate("상담 센터") }
                 )
                 HomeServiceCard(
                     title = "커뮤니티",
                     subtitle = "함께 이야기하고 공감해요",
                     iconRes = R.drawable.ic_service_community,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { navController.navigate("커뮤니티") }
                 )
             }
 
@@ -172,7 +182,6 @@ fun HomeServiceCard(
             .graphicsLayer {
                 shadowElevation = 4.dp.toPx()
                 shape = RoundedCornerShape(8.dp)
-                clip = false
             }
             .background(
                 color = backgroundColor,

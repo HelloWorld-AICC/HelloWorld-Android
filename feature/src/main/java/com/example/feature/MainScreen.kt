@@ -10,12 +10,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import com.example.feature.onboarding.AgreementScreen
 import com.example.feature.ui.home.HomeScreen
-import com.example.feature.ui.onboarding.AgreementScreen
 import com.example.feature.ui.onboarding.LanguageScreen
 import com.example.feature.ui.onboarding.LoginScreen
 import com.example.feature.ui.splash.SplashScreen
-
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
 import com.example.feature.ui.community.navigation.communityPostWriteScreen
 import com.example.feature.ui.community.navigation.communityScreen
@@ -87,11 +86,17 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
-        composable("홈") { HomeScreen() }
+        composable("홈") { HomeScreen(navController) }
         composable("상담 센터") { ConsultationCenterScreen() }
         composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
-        communityScreen(
+        composable("커뮤니티") {
+            communityScreen (
+                onWriteClick = navController::navigateToCommunityPostWrite,
+                onPostClick = navController::navigateToCommunityPostDetail,
+                )
+        }
+        communityScreen (
             onWriteClick = navController::navigateToCommunityPostWrite,
             onPostClick = navController::navigateToCommunityPostDetail,
         )
