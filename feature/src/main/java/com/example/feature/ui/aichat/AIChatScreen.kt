@@ -23,6 +23,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,28 +41,13 @@ import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
 
-
-val sampleConversations = listOf(
-    ChatInfo(1, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(2, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(3, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(4, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(5, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(6, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(7, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(8, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(9, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(10, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(11, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(12, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(13, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(14, "기타", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(15, "직장 내 고충", "임금 체불과 직장 내 괴롭힘"),
-    ChatInfo(16, "기타", "임금 체불과 직장 내 괴롭힘")
-)
-
 @Composable
-fun AiChatScreen(viewModel: AIChatViewModel = hiltViewModel()) {
+internal fun AiChatScreen(
+    onPostClick: () -> Unit,
+    viewModel: AIChatViewModel = hiltViewModel()
+) {
+    val conversations by viewModel.conversations.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -70,16 +57,13 @@ fun AiChatScreen(viewModel: AIChatViewModel = hiltViewModel()) {
     ) {
         HeaderTitle()
         HorizontalDivider(color = HelloWorldMain200)
-
         Spacer(modifier = Modifier.height(24.dp))
-
         Banner()
-
         Spacer(modifier = Modifier.height(24.dp))
 
         RecentChatSection(
-            conversations = sampleConversations,
-            onChatSelected = { viewModel.selectChat(it) }
+            conversations = conversations,
+            onPostClick = onPostClick
         )
     }
 }
@@ -129,7 +113,7 @@ fun ChatNewButton(
 @Composable
 fun RecentChatSection(
     conversations: List<ChatInfo>,
-    onChatSelected: (ChatInfo) -> Unit
+    onPostClick: () -> Unit
 ) {
     Column {
         Row(
@@ -146,7 +130,7 @@ fun RecentChatSection(
             )
             ChatNewButton(
                 onClick = {
-
+                    onPostClick()
                 }
             )
         }
@@ -161,7 +145,7 @@ fun RecentChatSection(
             items(conversations) { conversation ->
                 ConversationItem(
                     conversation = conversation,
-                    onClick = { onChatSelected(conversation) }
+                    onPostClick = { onPostClick() }
                 )
             }
         }
@@ -171,13 +155,13 @@ fun RecentChatSection(
 @Composable
 fun ConversationItem(
     conversation: ChatInfo,
-    onClick: () -> Unit
+    onPostClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-            .clickable { onClick() }
+            .clickable { onPostClick() }
     ) {
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -216,9 +200,9 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .height(56.dp)
             .background(Color.Transparent)
             .padding(horizontal = 16.dp, vertical = 12.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
