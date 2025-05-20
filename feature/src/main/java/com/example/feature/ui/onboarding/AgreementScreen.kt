@@ -12,12 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.*
-import com.example.core.ui.theme.Pretendard
 import com.example.feature.R
 import kotlinx.coroutines.launch
 
@@ -38,7 +36,7 @@ fun AgreementScreen(navController: NavHostController) {
 
     LaunchedEffect(shouldNavigateToHome) {
         if (shouldNavigateToHome) {
-            navController.navigate("홈") {
+            navController.navigate("축하") {
                 popUpTo("이용 동의") { inclusive = true }
                 launchSingleTop = true
             }
