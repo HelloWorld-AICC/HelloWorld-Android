@@ -83,10 +83,12 @@ fun Banner() {
 @Composable
 fun ChatNewButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onPostClick: () -> Unit
 ) {
     OutlinedButton(
-        onClick = onClick,
+        onClick = {
+            onPostClick()
+        },
         modifier = modifier
             .defaultMinSize(minWidth = 0.dp, minHeight = 0.dp)
             .height(30.dp),
@@ -129,7 +131,7 @@ fun RecentChatSection(
                 color = Color.Black
             )
             ChatNewButton(
-                onClick = {
+                onPostClick = {
                     onPostClick(-1)
                 }
             )
