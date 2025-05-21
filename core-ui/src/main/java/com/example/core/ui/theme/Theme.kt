@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 // 라이트 테마
 private val LightColorScheme = lightColorScheme(
     background = HelloWorldMain0,
+    surface = HelloWorldMain0,
     error = HelloWorldError,
 )
 
