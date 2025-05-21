@@ -50,7 +50,11 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
+
+import kotlinx.serialization.Serializable
+
 import com.example.core.util.extension.truncateWithEllipsis
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

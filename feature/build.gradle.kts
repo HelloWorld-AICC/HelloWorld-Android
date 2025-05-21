@@ -89,6 +89,10 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
+
+    //animation
+    implementation("androidx.compose.animation:animation-core:1.6.1") // Compose 버전에 따라 조정
+
     // Gson
     implementation("com.google.code.gson:gson:2.11.0")
 }
