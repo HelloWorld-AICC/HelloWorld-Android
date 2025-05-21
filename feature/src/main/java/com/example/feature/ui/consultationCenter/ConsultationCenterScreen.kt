@@ -1,28 +1,18 @@
 package com.example.feature.ui.consultationCenter
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,10 +24,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.centerInfo.CenterInfo
+import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -55,13 +45,18 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
+
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview
 @Composable
-fun ConsultationCenterScreen() {
+fun ConsultationCenterScreen (
+    onBackClick: () -> Unit,
+    viewModel: CenterViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+
+    val selectedCenter by viewModel.selectedCenter.collectAsState()
 
     val centerList = listOf(
         CenterInfo(
@@ -151,48 +146,75 @@ fun ConsultationCenterScreen() {
     }
 
     // UI 영역
-    Box(Modifier.fillMaxSize()) {
-
-
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = locationPermissionState.status.isGranted
-            ),
-            uiSettings = MapUiSettings(
-                myLocationButtonEnabled = true
-            )
-        ) {
-            centerList.forEach { center ->
-                Marker(
-                    state = MarkerState(position = LatLng(center.latitude, center.longitude)),
-                    title = center.name
-                )
-            }
-        }
-
-        HeaderTitle(
-            modifier = Modifier
-                .align(Alignment.TopStart) // 위치 지정
+    Column(modifier = Modifier.fillMaxSize()) {
+        BackHeader(
+            title = "오프라인 상담센터",
+            onBackClick = { onBackClick() }
         )
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f) // 나머지 공간을 지도+오버레이가 채움
         ) {
-            ConsultationCenterListOverlay(centerList)
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    isMyLocationEnabled = locationPermissionState.status.isGranted
+                ),
+                uiSettings = MapUiSettings(
+                    myLocationButtonEnabled = true
+                ),
+                onMapClick = {
+                    viewModel.selectCenter(null)
+                }
+            ) {
+                centerList.forEach { center ->
+                    val markerState = remember(center) {
+                        MarkerState(position = LatLng(center.latitude, center.longitude))
+                    }
+
+                    Marker(
+                        state = markerState,
+                        title = center.name,
+                        onClick = {
+                            viewModel.selectCenter(center)
+                            false
+                        }
+                    )
+                }
+            }
+
+            // 지도 위에 오버레이
+            ConsultationCenterListOverlay(
+                centerList = centerList,
+                selectedCenter = selectedCenter,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+            )
         }
     }
 }
 
 @Composable
-fun ConsultationCenterListOverlay(centerList: List<CenterInfo>) {
+fun ConsultationCenterListOverlay(
+    centerList: List<CenterInfo>,
+    selectedCenter: CenterInfo?,
+    modifier: Modifier = Modifier
+) {
+
+    val targetHeight = if (selectedCenter != null) 373.dp else 200.dp
+
+    val animatedHeight by animateDpAsState(
+        targetValue = targetHeight,
+        label = "overlayHeight"
+    )
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(320.dp)
-            .height(373.dp)
+            .height(animatedHeight)
             .clip(RoundedCornerShape(24.dp))
             .background(Color.White)
     ) {
@@ -210,15 +232,16 @@ fun ConsultationCenterListOverlay(centerList: List<CenterInfo>) {
             LazyColumn(
                 modifier = Modifier
                     .width(281.dp)
-                    .heightIn(300.dp)
+                    .weight(1f) // 높이 자동 확장
             ) {
                 items(centerList) { center ->
-                    ConsultationCenterCard(center)
+                    ConsultationCenterCard(
+                        center = center
+                    )
                 }
             }
         }
 
-        // ▶ 하단 그라디언트 덮개 (블러처럼 보이게)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -282,34 +305,3 @@ fun ConsultationCenterCard(center: CenterInfo) {
         HorizontalDivider(color = Color(0xFFCFE3FD))
     }
 }
-
-
-@Preview
-@Composable
-fun HeaderTitle(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_arrow_left),
-            contentDescription = "뒤로가기",
-            tint = Color.Unspecified,
-            modifier = Modifier.padding(end = 12.dp).size(24.dp)
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = "오프라인 상담센터",
-            style = AppTypography.heading04,
-            textAlign = TextAlign.Start
-        )
-    }
-}
-

@@ -51,7 +51,13 @@ import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
 
+
+
 //import com.example.core.util.extension.truncateWithEllipsis
+
+import kotlinx.serialization.Serializable
+
+
 
 import com.example.core.util.extension.truncateWithEllipsis
 
