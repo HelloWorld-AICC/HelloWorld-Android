@@ -18,17 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,6 +52,7 @@ import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
+import com.example.feature.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,13 +89,14 @@ internal fun CommunityPostWrite(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                painter = painterResource(R.drawable.ic_arrow_left),
                 contentDescription = null,
                 tint = HelloWorldMain500,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
+                    .clip(CircleShape)
                     .clickable { onBackClick() }
                     .padding(8.dp)
+                    .size(24.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -139,25 +136,25 @@ internal fun CommunityPostWrite(
                 ) {
                     TabIconAndLabel(
                         title = "직장 내 고충",
-                        icon = Icons.Default.Build,
+                        icon = painterResource(R.drawable.ic_problem),
                         onIconClick = { viewModel.changeTab("problem") },
                         isSelected = selectedTab.value == "problem",
                     )
                     TabIconAndLabel(
                         title = "체류 및 비자",
-                        icon = Icons.Default.Call,
+                        icon = painterResource(R.drawable.ic_national),
                         onIconClick = { viewModel.changeTab("national") },
                         isSelected = selectedTab.value == "national",
                     )
                     TabIconAndLabel(
                         title = "산재 및 의료",
-                        icon = Icons.Default.Favorite,
+                        icon = painterResource(R.drawable.ic_medical),
                         onIconClick = { viewModel.changeTab("medical") },
                         isSelected = selectedTab.value == "medical",
                     )
                     TabIconAndLabel(
                         title = "기타",
-                        icon = Icons.Default.Info,
+                        icon = painterResource(R.drawable.ic_etc),
                         onIconClick = { viewModel.changeTab("etc") },
                         isSelected = selectedTab.value == "etc",
                     )
@@ -265,8 +262,11 @@ internal fun CommunityPostWrite(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                Icons.Default.Add,
-                                contentDescription = null
+                                painter = painterResource(R.drawable.ic_picture),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(16.dp)
                             )
                         }
                     }
