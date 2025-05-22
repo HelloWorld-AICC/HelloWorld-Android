@@ -53,6 +53,9 @@ android {
 
 dependencies {
 
+    // Lottie Compose
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+
     implementation(project(":core-ui"))
     implementation(project(":feature"))
 

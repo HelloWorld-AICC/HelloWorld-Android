@@ -51,7 +51,13 @@ import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
 
+
+
+//import com.example.core.util.extension.truncateWithEllipsis
+
 import kotlinx.serialization.Serializable
+
+
 
 import com.example.core.util.extension.truncateWithEllipsis
 
@@ -249,6 +255,23 @@ private fun CommunityPostItem(
                 modifier = Modifier
                     .weight(1f)
             ) {
+
+//                Text(
+//                    text = post.title.truncateWithEllipsis(20),
+//                    style = AppTypography.body02,
+//                    color = HelloWorldGrayScale800,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis,
+//                )
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Text(
+//                    text = post.content.truncateWithEllipsis(if (post.thumbnail) 30 else 40),
+//                    style = AppTypography.label01,
+//                    color = HelloWorldGrayScale500,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis,
+//                )
+
                 Text(
                     text = post.title.truncateWithEllipsis(20),
                     style = AppTypography.body02,
@@ -264,6 +287,7 @@ private fun CommunityPostItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+
             }
             if (post.thumbnail) {
                 Spacer(modifier = Modifier.width(40.dp))

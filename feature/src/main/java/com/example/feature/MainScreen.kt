@@ -10,14 +10,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.example.feature.R
-import com.example.feature.home.HomeScreen
 import com.example.feature.onboarding.AgreementScreen
+
+import com.example.feature.ui.home.HomeScreen
+import com.example.feature.ui.onboarding.LanguageScreen
+import com.example.feature.ui.onboarding.LoginScreen
+import com.example.feature.ui.splash.SplashScreen
+
 import com.example.feature.onboarding.LanguageScreen
 import com.example.feature.onboarding.LoginScreen
 import com.example.feature.splash.SplashScreen
 import com.example.feature.ui.aichat.AiChatScreen
 import kotlinx.coroutines.delay
+
 
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
 import com.example.feature.ui.community.navigation.communityPostWriteScreen
@@ -26,6 +31,8 @@ import com.example.feature.ui.community.navigation.navigateToCommunityPostDetail
 import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
 
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
+import com.example.feature.ui.mypage.MypageScreen
+import com.example.feature.ui.onboarding.CongratulationsScreen
 
 import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
 import com.example.feature.ui.aichat.navigation.aiChatScreen
@@ -94,6 +101,13 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
+
+        composable("축하") { CongratulationsScreen(navController) }
+        composable("홈") { HomeScreen(navController) }
+        composable("마이페이지") { MypageScreen() }
+        composable("상담 센터") { ConsultationCenterScreen() }
+        composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
+
         composable("홈") { HomeScreen() }
         composable("상담 센터") {
             ConsultationCenterScreen (
@@ -108,8 +122,15 @@ fun MyNavigationHost(navController: NavHostController) {
         aiChatDetailScreen(
             onBackClick = navController::navigateUp
         )
+
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
-        communityScreen(
+        composable("커뮤니티") {
+            communityScreen (
+                onWriteClick = navController::navigateToCommunityPostWrite,
+                onPostClick = navController::navigateToCommunityPostDetail,
+                )
+        }
+        communityScreen (
             onWriteClick = navController::navigateToCommunityPostWrite,
             onPostClick = navController::navigateToCommunityPostDetail,
         )

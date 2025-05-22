@@ -41,6 +41,9 @@ android {
 }
 
 dependencies {
+    // Lottie for Jetpack Compose 추가
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+
     implementation(project(":core-data"))
     implementation(project(":core-ui"))
 
