@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
@@ -72,6 +73,7 @@ internal fun CommunityPostDetail(
 
     // TODO viewmodel
     var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -137,7 +139,7 @@ internal fun CommunityPostDetail(
                     // TODO 분기처리
                     DropdownMenuItem(
                         text = { Text(text = "신고하기") },
-                        onClick = {}
+                        onClick = { showDialog = true }
                     )
                 }
             }
@@ -273,6 +275,16 @@ internal fun CommunityPostDetail(
                 }
             }
         }
+    }
+    if (showDialog) {
+        HWDialog(
+            title = "게시글을 신고하시겠어요?",
+            subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
+            dismiss = "돌아가기",
+            confirm = "신고하기",
+            onDismiss = { showDialog = false },
+            onConfirm = { showDialog = false },
+        )
     }
 }
 
