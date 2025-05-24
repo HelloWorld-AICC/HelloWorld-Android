@@ -76,7 +76,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 12.dp)
             .clip(RoundedCornerShape(8.dp))
     )
 }
