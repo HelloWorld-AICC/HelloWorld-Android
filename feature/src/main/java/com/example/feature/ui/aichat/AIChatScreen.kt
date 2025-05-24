@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.chatInfo.ChatInfo
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
+import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
@@ -142,7 +143,7 @@ fun RecentChatSection(
         LazyColumn(
             modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 14.dp)
         ) {
             items(conversations) { conversation ->
                 ConversationItem(
@@ -164,12 +165,15 @@ fun ConversationItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp)
+            .padding(start = 10.dp)
             .clickable { onPostClick() }
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_chat_item),
@@ -180,8 +184,9 @@ fun ConversationItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = conversation.category,
-                style = AppTypography.label01
+                text = conversation.date.toString(),
+                style = AppTypography.label01,
+                color = HelloWorldGrayScale300
             )
         }
 
