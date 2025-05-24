@@ -204,9 +204,8 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .height(48.dp)
+            .background(Color.Transparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
