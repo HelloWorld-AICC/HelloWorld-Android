@@ -1,5 +1,6 @@
 package com.example.feature.ui.aichat.chatting
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,21 +12,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,9 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +47,7 @@ import com.example.core.ui.theme.HelloWorldMain100
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.HelloWorldMain700
+import com.example.feature.R
 
 @Composable
 internal fun RecentChattingScreen(
@@ -94,7 +91,7 @@ internal fun RecentChattingScreen(
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 24.dp),
             reverseLayout = true
         ) {
             items(messages.reversed()) { msg ->
@@ -143,21 +140,30 @@ internal fun RecentChattingScreen(
                 }
 
                 /* 보내기 버튼 */
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
+                Image(
+                    painter = painterResource(id = R.drawable.ic_arrow_up),
                     contentDescription = "Send",
-                    tint = HelloWorldMain500,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.CenterEnd)
                         .padding(6.dp)
-                        .clickable {
-                            if (userInput.isNotBlank() && selectedChatId != null) {
-                                viewModel.sendUserMessage(selectedChatId!!, userInput)
-                                userInput = ""
-                                focusManager.clearFocus()
-                                keyboardController?.hide()
+                        .clickable(
+                            enabled = userInput.isNotBlank(),
+                            onClick = {
+                                if (userInput.isNotBlank() && selectedChatId != null) {
+                                    viewModel.sendUserMessage(selectedChatId!!, userInput)
+                                    userInput = ""
+                                    focusManager.clearFocus()
+                                    keyboardController?.hide()
+                                }
                             }
-                        }
+                        ),
+                    colorFilter = if (userInput.isNotBlank()) {
+                        // 활성화된 상태일 때 기본 색상 또는 원하는 색상 설정
+                        ColorFilter.tint(HelloWorldMain500)  // 예시로 HelloWorldMain500 색상
+                    } else {
+                        // 비활성화된 상태일 때 색상 변경
+                        ColorFilter.tint(HelloWorldGrayScale100)  // 예시로 비활성화 색상
+                    }
                 )
             }
         }
@@ -176,13 +182,13 @@ fun ChatBubble(msg: ChatMessage) {
             modifier = Modifier
                 .background(
                     if (msg.isUser) HelloWorldMain500 else HelloWorldMain100,
-                    RoundedCornerShape(12.dp)
+                    RoundedCornerShape(8.dp)
                 )
-                .padding(12.dp)
-                .widthIn(max = 280.dp)
+                .padding(horizontal = 16.dp, vertical = 11.dp)
         ) {
             Text(
                 msg.text,
+                style = AppTypography.body01,
                 color = if (msg.isUser) HelloWorldMain0 else HelloWorldMain700
             )
         }
