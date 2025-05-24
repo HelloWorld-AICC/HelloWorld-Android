@@ -9,59 +9,40 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imeNestedScroll
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
@@ -70,6 +51,7 @@ import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
+import com.example.feature.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -89,6 +71,10 @@ internal fun CommunityPostDetail(
         for (i in 0..12) posts.add(charRange.random().toString())
     }
 
+    // TODO viewmodel
+    var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -104,23 +90,59 @@ internal fun CommunityPostDetail(
                 .fillMaxWidth()
                 .height(48.dp)
                 .padding(start = 8.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = null,
-                tint = HelloWorldMain500,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable { onBackClick() }
-                    .padding(8.dp)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "커뮤니티",
-                style = AppTypography.heading04,
-                color = HelloWorldGrayScale800
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_left),
+                    contentDescription = null,
+                    tint = HelloWorldMain500,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { onBackClick() }
+                        .padding(8.dp)
+                        .size(24.dp)
+                )
+                Text(
+                    text = "커뮤니티",
+                    style = AppTypography.heading04,
+                    color = HelloWorldGrayScale800
+                )
+            }
+            Box() {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_vertical),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .clickable { expanded = true }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = "수정하기") },
+                        onClick = {}
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text(text = "삭제하기") },
+                        onClick = {}
+                    )
+                    // TODO 분기처리
+                    DropdownMenuItem(
+                        text = { Text(text = "신고하기") },
+                        onClick = { showDialog = true }
+                    )
+                }
+            }
         }
         HorizontalDivider(
             modifier = Modifier
@@ -240,12 +262,13 @@ internal fun CommunityPostDetail(
                         innerTextField()
                     }
                     Icon(
-                        Icons.Default.CheckCircle,
+                        painter = painterResource(R.drawable.ic_arrow_up),
                         contentDescription = null,
+                        tint = if (commentText.value.isEmpty()) HelloWorldGrayScale100 else Color.Unspecified,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(4.dp)
-                            .clip(RoundedCornerShape(50))
+                            .clip(CircleShape)
                             .clickable {}
                             .padding(4.dp)
                     )
@@ -253,12 +276,24 @@ internal fun CommunityPostDetail(
             }
         }
     }
+    if (showDialog) {
+        HWDialog(
+            title = "게시글을 신고하시겠어요?",
+            subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
+            dismiss = "돌아가기",
+            confirm = "신고하기",
+            onDismiss = { showDialog = false },
+            onConfirm = { showDialog = false },
+        )
+    }
 }
 
 @Composable
 private fun CommentItem(
     modifier: Modifier = Modifier,
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .padding(horizontal = 24.dp, vertical = 10.dp),
@@ -290,13 +325,35 @@ private fun CommentItem(
                     color = HelloWorldGrayScale300
                 )
             }
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = null,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable {}
-            )
+            Box() {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_vertical),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { expanded = true }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = "수정하기") },
+                        onClick = {}
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text(text = "삭제하기") },
+                        onClick = {}
+                    )
+                    // TODO 분기처리
+                    DropdownMenuItem(
+                        text = { Text(text = "신고하기") },
+                        onClick = {}
+                    )
+                }
+            }
         }
         Text(
             text = "무료로 상담해주는 기관도 많아요. 지역마다 외국인 근로자 지원세터도 있으니까 도움 받기 쉬우실 거에요!",

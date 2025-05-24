@@ -1,8 +1,10 @@
 package com.example.feature.ui.community
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,28 +20,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +60,7 @@ import kotlinx.serialization.Serializable
 
 
 import com.example.core.util.extension.truncateWithEllipsis
+import com.example.feature.R
 
 
 
@@ -130,25 +131,25 @@ internal fun Community(
             ) {
                 TabIconAndLabel(
                     title = "직장 내 고충",
-                    icon = Icons.Default.Build,
+                    icon = painterResource(R.drawable.ic_problem),
                     onIconClick = { viewModel.changeTab("problem") },
                     isSelected = selectedTab.value == "problem",
                 )
                 TabIconAndLabel(
                     title = "체류 및 비자",
-                    icon = Icons.Default.Call,
+                    icon = painterResource(R.drawable.ic_national),
                     onIconClick = { viewModel.changeTab("national") },
                     isSelected = selectedTab.value == "national",
                 )
                 TabIconAndLabel(
                     title = "산재 및 의료",
-                    icon = Icons.Default.Favorite,
+                    icon = painterResource(R.drawable.ic_medical),
                     onIconClick = { viewModel.changeTab("medical") },
                     isSelected = selectedTab.value == "medical",
                 )
                 TabIconAndLabel(
                     title = "기타",
-                    icon = Icons.Default.Info,
+                    icon = painterResource(R.drawable.ic_etc),
                     onIconClick = { viewModel.changeTab("etc") },
                     isSelected = selectedTab.value == "etc",
                 )
@@ -178,23 +179,17 @@ internal fun Community(
                 }
             }
         }
-        // FAB
-        IconButton(
-            onClick = { onWriteClick() },
+        Image(
+            painter = painterResource(R.drawable.ic_write),
+            contentDescription = null,
             modifier = Modifier
-                .padding(18.dp)
-                .border(1.dp, Color.LightGray, RoundedCornerShape(50))
-                .clip(RoundedCornerShape(50))
-                .background(Color.White)
                 .align(Alignment.BottomEnd)
-        ) {
-            Icon(
-                Icons.Default.Create,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-            )
-        }
+                .padding(24.dp)
+                .size(60.dp)
+                .clip(CircleShape)
+                .clickable { onWriteClick() }
+                .border(1.dp, Color(0x40000000), shape = CircleShape)
+        )
     }
 }
 
@@ -218,16 +213,22 @@ private fun CommunityTabContent(
             }
         }
     } else {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .clickable { onPostClick() },
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            // TODO (Bro) image 로 수정
-            Icon(
-                Icons.Default.Face,
+            Image(
+                painter = painterResource(R.drawable.ic_mascot_error),
                 contentDescription = null
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
+                style = AppTypography.label02,
+                color = HelloWorldGrayScale300,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -317,10 +318,10 @@ private fun CommunityPostItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    Icons.Default.MailOutline,
+                    painter = painterResource(R.drawable.ic_comment),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(12.dp),
+                        .size(10.dp),
                     tint = HelloWorldGrayScale500
                 )
                 Spacer(modifier = Modifier.width(2.dp))
@@ -337,23 +338,47 @@ private fun CommunityPostItem(
 @Composable
 internal fun TabIconAndLabel(
     modifier: Modifier = Modifier,
-    icon: ImageVector,
+    icon: Painter,
     title: String = "",
     onIconClick: () -> Unit,
     isSelected: Boolean = false,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                onIconClick()
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        IconButton(
-            onClick = { onIconClick() }
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null
-            )
+        key(isSelected) {
+            Card(
+                modifier = Modifier
+                    .size(60.dp),
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isSelected) Color.White else Color(0xFFF9FBFC)
+                ),
+                elevation = CardDefaults.elevatedCardElevation(
+                    defaultElevation = if (isSelected) 3.dp else 1.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = icon,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                    )
+                }
+            }
         }
         Text(
             text = title,
@@ -369,6 +394,30 @@ private fun CommunityPreview() {
     Community(
         onWriteClick = {},
         onPostClick = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TabIconAndLabelTruePreview() {
+    TabIconAndLabel(
+        title = "산재 및 의료",
+        icon = painterResource(R.drawable.ic_medical),
+        onIconClick = {  },
+        isSelected = true,
+    )
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TabIconAndLabelFalsePreview() {
+
+    TabIconAndLabel(
+        title = "산재 및 의료",
+        icon = painterResource(R.drawable.ic_medical),
+        onIconClick = {  },
+        isSelected = false,
     )
 }
 
