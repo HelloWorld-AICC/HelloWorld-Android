@@ -76,7 +76,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
+            .height(150.dp) // 원하는 만큼 조절
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -106,7 +106,7 @@ fun ChatNewButton(
         )
     ) {
         Text(
-            text = "+ 새 채팅",
+            text = "✚  새 채팅",
             style = AppTypography.label01,
             color = HelloWorldMain500 // 파란색
         )
@@ -122,7 +122,7 @@ fun RecentChatSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -203,7 +203,6 @@ fun ConversationItem(
     }
 }
 
-@Preview
 @Composable
 fun HeaderTitle(modifier: Modifier = Modifier) {
     Column(
