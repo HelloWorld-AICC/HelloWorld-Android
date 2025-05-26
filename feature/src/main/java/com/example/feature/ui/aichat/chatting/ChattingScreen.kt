@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,6 +87,7 @@ internal fun RecentChattingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
@@ -105,12 +107,13 @@ internal fun RecentChattingScreen(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 24.dp),
-            reverseLayout = true
+            reverseLayout = true,
+            verticalArrangement = Arrangement.Top
         ) {
 
             if (isTyping) {
                 item {
-                    TypingBubble()  // 👈 점 3개 말풍선 표시
+                    TypingBubble()
                 }
             }
 
@@ -119,12 +122,17 @@ internal fun RecentChattingScreen(
             }
         }
 
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
                 modifier = Modifier
                     .background(Color.White, RoundedCornerShape(8.dp))
                     .border(1.dp, HelloWorldGrayScale100, RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.CenterStart
             ) {
                 BasicTextField(
                     value = userInput,
@@ -144,8 +152,7 @@ internal fun RecentChattingScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end = 44.dp)       // 보내기 아이콘 자리 확보
-                        .padding(vertical = 8.dp, horizontal = 12.dp)
+                        .padding(start = 12.dp, end = 44.dp)
                 )
 
                 /* placeholder */
@@ -155,7 +162,7 @@ internal fun RecentChattingScreen(
                         style = AppTypography.label02,
                         color = HelloWorldGrayScale300,
                         modifier = Modifier
-                            .padding(start = 12.dp, top = 8.dp)
+                            .padding(start = 12.dp)
                     )
                 }
 
@@ -197,7 +204,7 @@ fun ChatBubble(msg: ChatMessage, viewModel : ChatViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(top = 16.dp),
         horizontalArrangement = if (msg.isUser) Arrangement.End else Arrangement.Start
     ) {
         Box(
@@ -246,7 +253,7 @@ fun TypingBubble() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(top = 16.dp),
         horizontalArrangement = Arrangement.Start
     ) {
         Image(
