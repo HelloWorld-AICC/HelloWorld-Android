@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,35 +51,24 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
-
-
-
-//import com.example.core.util.extension.truncateWithEllipsis
-
-import kotlinx.serialization.Serializable
-
-
-
 import com.example.core.util.extension.truncateWithEllipsis
 import com.example.feature.R
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun Community(
-    onWriteClick: () -> Unit,
-    onPostClick: () -> Unit,
+    onNavigateToCommunityPostWrite: () -> Unit,
+    onNavigateToCommunityPostDetail: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CommunityViewModel = hiltViewModel()
 ) {
-    val selectedTab = viewModel.selectedTab.collectAsState()
-    val problemPosts = viewModel.problemPosts.collectAsState()
-    val nationalPosts = viewModel.nationalPosts.collectAsState()
-    val medicalPosts = viewModel.medicalPosts.collectAsState()
-    val etcPosts = viewModel.etcPosts.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
+    val problemPosts by viewModel.problemPosts.collectAsState()
+    val nationalPosts by viewModel.nationalPosts.collectAsState()
+    val medicalPosts by viewModel.medicalPosts.collectAsState()
+    val etcPosts by viewModel.etcPosts.collectAsState()
 
-    val tabIndex = when (selectedTab.value) {
+    val tabIndex = when (selectedTab) {
         "problem" -> 0
         "national" -> 1
         "medical" -> 2
@@ -97,7 +87,7 @@ internal fun Community(
             3 -> viewModel.changeTab("etc")
         }
     }
-    LaunchedEffect(selectedTab.value) {
+    LaunchedEffect(selectedTab) {
         pagerState.animateScrollToPage(tabIndex)
     }
 
@@ -133,25 +123,25 @@ internal fun Community(
                     title = "직장 내 고충",
                     icon = painterResource(R.drawable.ic_problem),
                     onIconClick = { viewModel.changeTab("problem") },
-                    isSelected = selectedTab.value == "problem",
+                    isSelected = selectedTab == "problem",
                 )
                 TabIconAndLabel(
                     title = "체류 및 비자",
                     icon = painterResource(R.drawable.ic_national),
                     onIconClick = { viewModel.changeTab("national") },
-                    isSelected = selectedTab.value == "national",
+                    isSelected = selectedTab == "national",
                 )
                 TabIconAndLabel(
                     title = "산재 및 의료",
                     icon = painterResource(R.drawable.ic_medical),
                     onIconClick = { viewModel.changeTab("medical") },
-                    isSelected = selectedTab.value == "medical",
+                    isSelected = selectedTab == "medical",
                 )
                 TabIconAndLabel(
                     title = "기타",
                     icon = painterResource(R.drawable.ic_etc),
                     onIconClick = { viewModel.changeTab("etc") },
-                    isSelected = selectedTab.value == "etc",
+                    isSelected = selectedTab == "etc",
                 )
             }
             HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = HelloWorldMain200)
@@ -161,20 +151,20 @@ internal fun Community(
             ) { page ->
                 when (page) {
                     0 -> CommunityTabContent(
-                        posts = problemPosts.value,
-                        onPostClick = { onPostClick() },
+                        posts = problemPosts,
+                        onPostClick = { onNavigateToCommunityPostDetail() },
                     )
                     1 -> CommunityTabContent(
-                        posts = nationalPosts.value,
-                        onPostClick = { onPostClick() },
+                        posts = nationalPosts,
+                        onPostClick = { onNavigateToCommunityPostDetail() },
                     )
                     2 -> CommunityTabContent(
-                        posts = medicalPosts.value,
-                        onPostClick = { onPostClick() },
+                        posts = medicalPosts,
+                        onPostClick = { onNavigateToCommunityPostDetail() },
                     )
                     3 -> CommunityTabContent(
-                        posts = etcPosts.value,
-                        onPostClick = { onPostClick() },
+                        posts = etcPosts,
+                        onPostClick = { onNavigateToCommunityPostDetail() },
                     )
                 }
             }
@@ -187,7 +177,7 @@ internal fun Community(
                 .padding(24.dp)
                 .size(60.dp)
                 .clip(CircleShape)
-                .clickable { onWriteClick() }
+                .clickable { onNavigateToCommunityPostWrite() }
                 .border(1.dp, Color(0x40000000), shape = CircleShape)
         )
     }
@@ -208,7 +198,7 @@ private fun CommunityTabContent(
             items(posts) { post ->
                 CommunityPostItem(
                     post = post,
-                    onPostClick = onPostClick
+                    onPostClick = { onPostClick() }
                 )
             }
         }
@@ -235,7 +225,7 @@ private fun CommunityTabContent(
 }
 
 @Composable
-private fun CommunityPostItem(
+fun CommunityPostItem(
     post: CommunityPost,
     onPostClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -256,23 +246,6 @@ private fun CommunityPostItem(
                 modifier = Modifier
                     .weight(1f)
             ) {
-
-//                Text(
-//                    text = post.title.truncateWithEllipsis(20),
-//                    style = AppTypography.body02,
-//                    color = HelloWorldGrayScale800,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis,
-//                )
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Text(
-//                    text = post.content.truncateWithEllipsis(if (post.thumbnail) 30 else 40),
-//                    style = AppTypography.label01,
-//                    color = HelloWorldGrayScale500,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis,
-//                )
-
                 Text(
                     text = post.title.truncateWithEllipsis(20),
                     style = AppTypography.body02,
@@ -288,7 +261,6 @@ private fun CommunityPostItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-
             }
             if (post.thumbnail) {
                 Spacer(modifier = Modifier.width(40.dp))
@@ -392,8 +364,8 @@ internal fun TabIconAndLabel(
 @Composable
 private fun CommunityPreview() {
     Community(
-        onWriteClick = {},
-        onPostClick = {},
+        onNavigateToCommunityPostWrite = {},
+        onNavigateToCommunityPostDetail = {},
     )
 }
 

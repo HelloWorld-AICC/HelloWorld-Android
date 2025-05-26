@@ -27,15 +27,10 @@ import com.example.core.ui.theme.HelloWorldMain400
 
 @Composable
 fun HWDialog(
-    title: String = "",
-    subTitle: String = "",
-    dismiss: String = "",
-    confirm: String = "",
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit = {},
+    data: DialogData,
 ) {
     Dialog(
-        onDismissRequest = { onDismiss() }
+        onDismissRequest = { data.onDismiss() }
     ) {
         Column(
             modifier = Modifier
@@ -50,12 +45,12 @@ fun HWDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = title,
+                    text = data.title,
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale500,
                 )
                 Text(
-                    text = subTitle,
+                    text = data.subTitle,
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale300,
                 )
@@ -71,11 +66,11 @@ fun HWDialog(
                         .height(40.dp)
                         .weight(1f)
                         .background(HelloWorldGrayScale200)
-                        .clickable { onDismiss() },
+                        .clickable { data.onDismiss() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = dismiss,
+                        text = data.dismiss,
                         style = AppTypography.label01,
                         color = HelloWorldMain0,
                     )
@@ -85,11 +80,11 @@ fun HWDialog(
                         .height(40.dp)
                         .weight(1f)
                         .background(HelloWorldMain400)
-                        .clickable { onConfirm() },
+                        .clickable { data.onConfirm() },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = confirm,
+                        text = data.confirm,
                         style = AppTypography.label01,
                         color = HelloWorldMain0,
                     )
@@ -98,3 +93,12 @@ fun HWDialog(
         }
     }
 }
+
+data class DialogData(
+    val title: String = "",
+    val subTitle: String = "",
+    val dismiss: String = "취소",
+    val confirm: String = "확인",
+    val onDismiss: () -> Unit,
+    val onConfirm: () -> Unit = {},
+)
