@@ -1,6 +1,7 @@
 package com.example.feature.ui.community
 
 import androidx.lifecycle.ViewModel
+import com.example.core.ui.component.DialogData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,9 @@ class PostWriteViewModel @Inject constructor(
     private val _content = MutableStateFlow<String>("")
     val content: StateFlow<String> = _content
 
+    private val _dialogData = MutableStateFlow<DialogData?>(null)
+    val dialogData: StateFlow<DialogData?> = _dialogData
+
     fun changeTab(tab: String) {
         _selectedTab.value = tab
     }
@@ -31,4 +35,9 @@ class PostWriteViewModel @Inject constructor(
     fun updateContent(newContent: String) {
         _content.value = newContent
     }
+
+    fun updateDialogData(data: DialogData? = null) {
+        _dialogData.value = data
+    }
+
 }
