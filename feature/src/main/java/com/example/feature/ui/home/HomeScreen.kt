@@ -21,10 +21,14 @@ import androidx.navigation.NavController
 import com.example.feature.ui.home.header.LogoHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale500
+import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
+import com.example.feature.ui.mypage.navigation.myPageScreen
+import com.example.feature.ui.mypage.navigation.navigateToMyPage
+import com.example.feature.ui.mypage.screen.MyPage
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -32,7 +36,7 @@ fun HomeScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .background(color = Color(0xFFCFE3FD))
+            .background(color = HelloWorldMain200)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -54,10 +58,13 @@ fun HomeScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "나예은 ",
+                        text = "나예은",
                         style = AppTypography.title02,
                         color = HelloWorldMain700
                     )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
                     Text(
                         text = "님",
                         style = AppTypography.heading01,
@@ -75,7 +82,7 @@ fun HomeScreen(navController: NavController) {
                     style = AppTypography.label02,
                     color = HelloWorldMain600,
                     modifier = Modifier
-                        .clickable { navController.navigate("마이페이지") }
+                        .clickable { navController.navigateToMyPage() }
                 )
             }
             // 사용자 아바타
@@ -90,6 +97,7 @@ fun HomeScreen(navController: NavController) {
 
         // 서비스 카드들 (예시용 Row 2줄)
         Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .background(
                     Color.White,
@@ -103,8 +111,6 @@ fun HomeScreen(navController: NavController) {
                 color = HelloWorldGrayScale500
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -114,22 +120,16 @@ fun HomeScreen(navController: NavController) {
                     subtitle = "24시간 고민 상담",
                     iconRes = R.drawable.ic_service_chat,
                     backgroundColor = Color.White,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { navController.navigate("채팅 상담") }
+                    modifier = Modifier.weight(1f)
                 )
                 HomeServiceCard(
                     title = "AI 자기소개서",
                     subtitle = "AI와 함께 쉽게 작성해요",
                     iconRes = R.drawable.ic_service_ai,
                     backgroundColor = Color.White,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { navController.navigate("이력서 작성") }
+                    modifier = Modifier.weight(1f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -140,24 +140,18 @@ fun HomeScreen(navController: NavController) {
                     subtitle = "상담이 필요할 때, 바로 여기",
                     iconRes = R.drawable.ic_service_location,
                     backgroundColor = Color.White,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { navController.navigate("상담 센터") }
+                    modifier = Modifier.weight(1f)
                 )
                 HomeServiceCard(
                     title = "커뮤니티",
                     subtitle = "함께 이야기하고 공감해요",
                     iconRes = R.drawable.ic_service_community,
                     backgroundColor = Color.White,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { navController.navigate("커뮤니티") }
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 광고 배너 또는 HelloWorld
+            Spacer(modifier = Modifier.height(16.dp))
             Image(
                 painter = painterResource(id = R.drawable.banner_helloworld),
                 contentDescription = "HelloWorld Banner",
