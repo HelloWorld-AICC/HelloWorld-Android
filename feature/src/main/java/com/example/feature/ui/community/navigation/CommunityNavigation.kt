@@ -20,14 +20,14 @@ import kotlinx.serialization.Serializable
 fun NavController.navigateToCommunity(navOptions: NavOptions? = null) = navigate(route = "커뮤니티", navOptions)
 
 fun NavGraphBuilder.communityScreen(
-    onWriteClick: () -> Unit,
-    onPostClick: () -> Unit,
+    onNavigateToCommunityPostWrite: () -> Unit,
+    onNavigateToCommunityPostDetail: () -> Unit,
 ) {
 //    composable<Community> {
     composable("커뮤니티") {
         Community(
-            onWriteClick = onWriteClick,
-            onPostClick = onPostClick,
+            onNavigateToCommunityPostWrite = onNavigateToCommunityPostWrite,
+            onNavigateToCommunityPostDetail = onNavigateToCommunityPostDetail,
         )
     }
 }
@@ -35,11 +35,11 @@ fun NavGraphBuilder.communityScreen(
 fun NavController.navigateToCommunityPostDetail(navOptions: NavOptions? = null) = navigate(route = CommunityPostDetail, navOptions)
 
 fun NavGraphBuilder.communityPostDetailScreen(
-    onBackClick: () -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     composable<CommunityPostDetail> {
         CommunityPostDetail(
-            onBackClick = onBackClick
+            onNavigateBack = onNavigateBack
         )
     }
 }
@@ -47,11 +47,11 @@ fun NavGraphBuilder.communityPostDetailScreen(
 fun NavController.navigateToCommunityPostWrite(navOptions: NavOptions? = null) = navigate(route = CommunityPostWrite, navOptions)
 
 fun NavGraphBuilder.communityPostWriteScreen(
-    onBackClick: () -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     composable<CommunityPostWrite> {
         CommunityPostWrite(
-            onBackClick = onBackClick
+            onNavigateBack = onNavigateBack
         )
     }
 }

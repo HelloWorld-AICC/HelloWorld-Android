@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.component.DialogData
+import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
@@ -57,13 +60,14 @@ import com.example.feature.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommunityPostWrite(
-    onBackClick: () -> Unit,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostWriteViewModel = hiltViewModel()
 ) {
-    val selectedTab = viewModel.selectedTab.collectAsState()
-    val title = viewModel.title.collectAsState()
-    val content = viewModel.content.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
+    val title by viewModel.title.collectAsState()
+    val content by viewModel.content.collectAsState()
+    val dialogData by viewModel.dialogData.collectAsState()
 
     val posts = remember { mutableStateListOf<String>() }
     val charRange = ('A'..'Z')
@@ -89,12 +93,33 @@ internal fun CommunityPostWrite(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_arrow_left),
+                painter = painterResource(R.drawable.ic_keyboard_arrow_left),
                 contentDescription = null,
                 tint = HelloWorldMain500,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable { onBackClick() }
+                    .clickable {
+                        if (title.isBlank() && content.isBlank()) {
+                            onNavigateBack()
+                        } else {
+                            viewModel.updateDialogData(
+                                DialogData(
+                                    title = "앗, 잠시만요!",
+                                    subTitle = "지금 나가시면 입력한 정보는 모두 지워집니다.",
+                                    dismiss = "나가기",
+                                    confirm = "계속 작성하기",
+                                    onDismiss = {
+                                        viewModel.updateDialogData()
+                                        onNavigateBack()
+                                    },
+                                    onConfirm = {
+                                        // TODO api 추가
+                                        viewModel.updateDialogData()
+                                    }
+                                )
+                            )
+                        }
+                    }
                     .padding(8.dp)
                     .size(24.dp)
             )
@@ -138,38 +163,50 @@ internal fun CommunityPostWrite(
                         title = "직장 내 고충",
                         icon = painterResource(R.drawable.ic_problem),
                         onIconClick = { viewModel.changeTab("problem") },
-                        isSelected = selectedTab.value == "problem",
+                        isSelected = selectedTab == "problem",
                     )
                     TabIconAndLabel(
                         title = "체류 및 비자",
                         icon = painterResource(R.drawable.ic_national),
                         onIconClick = { viewModel.changeTab("national") },
-                        isSelected = selectedTab.value == "national",
+                        isSelected = selectedTab == "national",
                     )
                     TabIconAndLabel(
                         title = "산재 및 의료",
                         icon = painterResource(R.drawable.ic_medical),
                         onIconClick = { viewModel.changeTab("medical") },
-                        isSelected = selectedTab.value == "medical",
+                        isSelected = selectedTab == "medical",
                     )
                     TabIconAndLabel(
                         title = "기타",
                         icon = painterResource(R.drawable.ic_etc),
                         onIconClick = { viewModel.changeTab("etc") },
-                        isSelected = selectedTab.value == "etc",
+                        isSelected = selectedTab == "etc",
                     )
                 }
             }
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = "제목",
-                    style = AppTypography.label01,
-                    color = HelloWorldGrayScale800,
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "제목",
+                        style = AppTypography.label01,
+                        color = HelloWorldGrayScale800,
+                    )
+                    Text(
+                        text = "${title.length} / 50",
+                        style = AppTypography.label02,
+                        color = HelloWorldGrayScale500,
+                    )
+                }
                 BasicTextField(
-                    value = title.value,
+                    value = title,
                     onValueChange = { viewModel.updateTitle(it) },
                     singleLine = true,
                     textStyle = AppTypography.heading02.copy(color = HelloWorldGrayScale800),
@@ -187,7 +224,7 @@ internal fun CommunityPostWrite(
                             .padding(12.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        if (title.value.isEmpty()) {
+                        if (title.isBlank()) {
                             Text(
                                 text = "제목을 작성해 주세요 ( 최대 50자 )",
                                 style = AppTypography.heading02,
@@ -201,13 +238,26 @@ internal fun CommunityPostWrite(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = "내용",
-                    style = AppTypography.label01,
-                    color = HelloWorldGrayScale800,
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "내용",
+                        style = AppTypography.label01,
+                        color = HelloWorldGrayScale800,
+                    )
+                    Text(
+                        text = "${content.length} / 2000",
+                        style = AppTypography.label02,
+                        color = HelloWorldGrayScale500,
+                    )
+                }
+
                 BasicTextField(
-                    value = content.value,
+                    value = content,
                     onValueChange = { viewModel.updateContent(it) },
                     textStyle = AppTypography.body02.copy(color = HelloWorldGrayScale800),
                     modifier = Modifier
@@ -221,7 +271,7 @@ internal fun CommunityPostWrite(
                             .padding(12.dp),
                         contentAlignment = Alignment.TopStart
                     ) {
-                        if (content.value.isEmpty()) {
+                        if (content.isBlank()) {
                             Text(
                                 text = "게시글을 작성해 주세요 ( 최대 2000자 )",
                                 style = AppTypography.body02,
@@ -313,7 +363,22 @@ internal fun CommunityPostWrite(
             }
         }
         TextButton(
-            onClick = {},
+            onClick = {
+                // TODO isUpdate 관련 변수 필요
+                viewModel.updateDialogData(
+                    DialogData(
+                        title = "게시글을 게시하시겠어요?",
+                        subTitle = "게시 후에도 수정 하실 수 있습니다.",
+                        dismiss = "취소하기",
+                        confirm = "게시하기",
+                        onDismiss = { viewModel.updateDialogData() },
+                        onConfirm = {
+                            // TODO api 추가
+                            viewModel.updateDialogData()
+                        }
+                    )
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .advancedImePadding(),
@@ -323,6 +388,7 @@ internal fun CommunityPostWrite(
                 disabledContentColor = HelloWorldGrayScale500,
                 disabledContainerColor = HelloWorldGrayScale100,
             ),
+            enabled = title.isNotBlank() && content.isNotBlank() && (title.length <= 50) && (content.length <= 2000), // TODO viewmodel
             shape = RoundedCornerShape(0),
             contentPadding = PaddingValues(
                 top = 22.dp,
@@ -330,10 +396,14 @@ internal fun CommunityPostWrite(
             )
         ) {
             Text(
+                // TODO isUpdate 관련 변수 필요
                 text = "완료",
                 style = AppTypography.heading01,
             )
         }
+    }
+    dialogData?.let {
+        HWDialog(it)
     }
 }
 
@@ -341,6 +411,6 @@ internal fun CommunityPostWrite(
 @Composable
 private fun CommunityPostWritePreview() {
     CommunityPostWrite(
-        onBackClick = {}
+        onNavigateBack = {}
     )
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
@@ -56,7 +57,7 @@ import com.example.feature.R
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun CommunityPostDetail(
-    onBackClick: () -> Unit,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel()
 ) {
@@ -73,7 +74,7 @@ internal fun CommunityPostDetail(
 
     // TODO viewmodel
     var expanded by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
+    val dialogData by viewModel.dialogData.collectAsState()
 
     Column(
         modifier = modifier
@@ -98,12 +99,12 @@ internal fun CommunityPostDetail(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_arrow_left),
+                    painter = painterResource(R.drawable.ic_keyboard_arrow_left),
                     contentDescription = null,
                     tint = HelloWorldMain500,
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onBackClick() }
+                        .clickable { onNavigateBack() }
                         .padding(8.dp)
                         .size(24.dp)
                 )
@@ -134,12 +135,40 @@ internal fun CommunityPostDetail(
                     HorizontalDivider()
                     DropdownMenuItem(
                         text = { Text(text = "삭제하기") },
-                        onClick = {}
+                        onClick = {
+                            viewModel.updateDialogData(
+                                DialogData(
+                                    title = "게시글을 삭제하시겠어요?",
+                                    subTitle = "삭제된 게시글은 복구할 수 없습니다.",
+                                    dismiss = "돌아가기",
+                                    confirm = "신고하기",
+                                    onDismiss = { viewModel.updateDialogData() },
+                                    onConfirm = {
+                                        // TODO api 추가
+                                        viewModel.updateDialogData()
+                                    },
+                                )
+                            )
+                        }
                     )
                     // TODO 분기처리
                     DropdownMenuItem(
                         text = { Text(text = "신고하기") },
-                        onClick = { showDialog = true }
+                        onClick = {
+                            viewModel.updateDialogData(
+                                DialogData(
+                                    title = "게시글을 신고하시겠어요?",
+                                    subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
+                                    dismiss = "돌아가기",
+                                    confirm = "신고하기",
+                                    onDismiss = { viewModel.updateDialogData() },
+                                    onConfirm = {
+                                        // TODO api 추가
+                                        viewModel.updateDialogData()
+                                    },
+                                )
+                            )
+                        }
                     )
                 }
             }
@@ -220,7 +249,38 @@ internal fun CommunityPostDetail(
                 )
             }
             items(10) {
-                CommentItem()
+                CommentItem(
+                    onDeleteClick = {
+                        viewModel.updateDialogData(
+                            DialogData(
+                                title = "댓글을 삭제하시겠어요?",
+                                subTitle = "삭제된 댓글은 복구할 수 없습니다.",
+                                dismiss = "돌아가기",
+                                confirm = "삭제하기",
+                                onDismiss = { viewModel.updateDialogData() },
+                                onConfirm = {
+                                    // TODO api 추가
+                                    viewModel.updateDialogData()
+                                },
+                            )
+                        )
+                    },
+                    onReportClick = {
+                        viewModel.updateDialogData(
+                            DialogData(
+                                title = "댓글을 신고하시겠어요?",
+                                subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
+                                dismiss = "돌아가기",
+                                confirm = "신고하기",
+                                onDismiss = { viewModel.updateDialogData() },
+                                onConfirm = {
+                                    // TODO api 추가
+                                    viewModel.updateDialogData()
+                                },
+                            )
+                        )
+                    }
+                )
             }
         }
         Box(
@@ -247,7 +307,7 @@ internal fun CommunityPostDetail(
                         .padding(start = 12.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    if (commentText.value.isEmpty()) {
+                    if (commentText.value.isBlank()) {
                         Text(
                             text = "댓글을 남겨보세요",
                             style = AppTypography.label02,
@@ -264,33 +324,30 @@ internal fun CommunityPostDetail(
                     Icon(
                         painter = painterResource(R.drawable.ic_arrow_up),
                         contentDescription = null,
-                        tint = if (commentText.value.isEmpty()) HelloWorldGrayScale100 else Color.Unspecified,
+                        tint = if (commentText.value.isBlank()) HelloWorldGrayScale100 else Color.Unspecified,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(4.dp)
                             .clip(CircleShape)
-                            .clickable {}
+                            .clickable(
+                                enabled = commentText.value.isNotBlank()
+                            ) {  }
                             .padding(4.dp)
                     )
                 }
             }
         }
     }
-    if (showDialog) {
-        HWDialog(
-            title = "게시글을 신고하시겠어요?",
-            subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
-            dismiss = "돌아가기",
-            confirm = "신고하기",
-            onDismiss = { showDialog = false },
-            onConfirm = { showDialog = false },
-        )
+    dialogData?.let {
+        HWDialog(it)
     }
 }
 
 @Composable
 private fun CommentItem(
     modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit,
+    onReportClick: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -325,7 +382,7 @@ private fun CommentItem(
                     color = HelloWorldGrayScale300
                 )
             }
-            Box() {
+            Box {
                 Icon(
                     painter = painterResource(R.drawable.ic_more_vertical),
                     contentDescription = null,
@@ -345,12 +402,12 @@ private fun CommentItem(
                     HorizontalDivider()
                     DropdownMenuItem(
                         text = { Text(text = "삭제하기") },
-                        onClick = {}
+                        onClick = { onDeleteClick() }
                     )
                     // TODO 분기처리
                     DropdownMenuItem(
                         text = { Text(text = "신고하기") },
-                        onClick = {}
+                        onClick = { onReportClick() }
                     )
                 }
             }
@@ -367,6 +424,6 @@ private fun CommentItem(
 @Composable
 private fun CommunityPostDetailPreview() {
     CommunityPostDetail(
-        onBackClick = {}
+        onNavigateBack = {}
     )
 }
