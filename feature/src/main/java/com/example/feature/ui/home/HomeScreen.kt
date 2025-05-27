@@ -26,9 +26,7 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
-import com.example.feature.ui.mypage.navigation.myPageScreen
 import com.example.feature.ui.mypage.navigation.navigateToMyPage
-import com.example.feature.ui.mypage.screen.MyPage
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -152,6 +150,7 @@ fun HomeScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.banner_helloworld),
                 contentDescription = "HelloWorld Banner",

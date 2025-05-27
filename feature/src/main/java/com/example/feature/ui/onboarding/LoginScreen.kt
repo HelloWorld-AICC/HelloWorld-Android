@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldGoogleBorder
+import com.example.core.ui.theme.HelloWorldGoogleText
 import com.example.core.ui.theme.HelloWorldMain0
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.Pretendard
@@ -75,7 +77,7 @@ fun GoogleSignInButton(navController: NavController) {
         },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFD4D4D4)),
+        border = BorderStroke(1.dp, HelloWorldGoogleBorder),
         modifier = Modifier.height(48.dp)
     ) {
         Icon(
@@ -89,7 +91,7 @@ fun GoogleSignInButton(navController: NavController) {
             text = "Continue with Google",
             fontFamily = Pretendard,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0XFF1F1F1F),
+            color = HelloWorldGoogleText,
             fontSize = 14.sp
         )
     }
