@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "738692319153",
+    "project_id": "helloword-fd002",
+    "storage_bucket": "helloword-fd002.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738692319153:android:97bf42a76338bda5555f90",
+        "android_client_info": {
+          "package_name": "com.example.helloworld"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738692319153-kvaci7sji8e3m4s8kn1r475dnir1kauq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.helloworld",
+            "certificate_hash": "58a719d03add199635dac91d2952e79ff579e0b9"
+          }
+        },
+        {
+          "client_id": "738692319153-epcdh8hlodmmcogcvmg32h1sdjjbp4ub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXUp9cxM9wizFlQTICqHin8G45QXUso8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738692319153-epcdh8hlodmmcogcvmg32h1sdjjbp4ub.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

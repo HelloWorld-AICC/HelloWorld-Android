@@ -1,38 +1,32 @@
 package com.example.feature.ui.onboarding
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.core.ui.theme.AppTypography
-import com.example.core.ui.theme.HelloWorldGoogleBorder
-import com.example.core.ui.theme.HelloWorldGoogleText
-import com.example.core.ui.theme.HelloWorldMain0
-import com.example.core.ui.theme.HelloWorldMain500
-import com.example.core.ui.theme.Pretendard
+import com.example.core.ui.theme.*
 import com.example.feature.R
 import com.example.feature.ui.splash.SplashImg
 import com.example.feature.ui.splash.SplashLogo
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -48,7 +42,6 @@ fun LoginScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(100.dp))
 
-            // 상단 로고
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 SplashLogo()
                 Spacer(modifier = Modifier.height(10.dp))
@@ -59,10 +52,8 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            // 중단 Google 버튼
             GoogleSignInButton(navController = navController)
 
-            // 하단 일러스트
             SplashImg()
         }
     }
@@ -70,10 +61,40 @@ fun LoginScreen(navController: NavController) {
 
 @Composable
 fun GoogleSignInButton(navController: NavController) {
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("LOGIN", "Google 로그인 성공: ${auth.currentUser?.displayName}")
+                        navController.navigate("언어 설정")
+                    } else {
+                        Log.e("LOGIN", "로그인 실패: ${task.exception}")
+                    }
+                }
+        } catch (e: ApiException) {
+            Log.e("LOGIN", "Google sign in failed", e)
+        }
+    }
+
     Button(
         onClick = {
-            // 언어 설정 화면으로 이동
-            navController.navigate("언어 설정")
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("738692319153-epcdh8hlodmmcogcvmg32h1sdjjbp4ub.apps.googleusercontent.com")
+                .requestEmail()
+                .build()
+
+            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+            val signInIntent = googleSignInClient.signInIntent
+            launcher.launch(signInIntent)
         },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
