@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.chatInfo.ChatInfo
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
+import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
@@ -75,7 +76,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .height(150.dp) // 원하는 만큼 조절
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -83,10 +84,12 @@ fun Banner() {
 @Composable
 fun ChatNewButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onPostClick: () -> Unit
 ) {
     OutlinedButton(
-        onClick = onClick,
+        onClick = {
+            onPostClick()
+        },
         modifier = modifier
             .defaultMinSize(minWidth = 0.dp, minHeight = 0.dp)
             .height(30.dp),
@@ -103,7 +106,7 @@ fun ChatNewButton(
         )
     ) {
         Text(
-            text = "+ 새 채팅",
+            text = "✚  새 채팅",
             style = AppTypography.label01,
             color = HelloWorldMain500 // 파란색
         )
@@ -119,7 +122,7 @@ fun RecentChatSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -129,7 +132,7 @@ fun RecentChatSection(
                 color = Color.Black
             )
             ChatNewButton(
-                onClick = {
+                onPostClick = {
                     onPostClick(-1)
                 }
             )
@@ -140,7 +143,7 @@ fun RecentChatSection(
         LazyColumn(
             modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 14.dp)
         ) {
             items(conversations) { conversation ->
                 ConversationItem(
@@ -162,12 +165,15 @@ fun ConversationItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp)
+            .padding(start = 10.dp)
             .clickable { onPostClick() }
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_chat_item),
@@ -178,8 +184,9 @@ fun ConversationItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = conversation.category,
-                style = AppTypography.label01
+                text = conversation.date.toString(),
+                style = AppTypography.label01,
+                color = HelloWorldGrayScale300
             )
         }
 
@@ -196,15 +203,13 @@ fun ConversationItem(
     }
 }
 
-@Preview
 @Composable
 fun HeaderTitle(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .height(48.dp)
+            .background(Color.Transparent),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

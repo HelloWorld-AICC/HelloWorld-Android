@@ -1,42 +1,42 @@
 package com.example.feature
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.feature.onboarding.AgreementScreen
-
-import com.example.feature.ui.home.HomeScreen
-import com.example.feature.ui.onboarding.LanguageScreen
-import com.example.feature.ui.onboarding.LoginScreen
-import com.example.feature.ui.splash.SplashScreen
-
-import com.example.feature.onboarding.LanguageScreen
-import com.example.feature.onboarding.LoginScreen
-import com.example.feature.splash.SplashScreen
-import com.example.feature.ui.aichat.AiChatScreen
-import kotlinx.coroutines.delay
-
-
+import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
+import com.example.feature.ui.aichat.navigation.aiChatScreen
+import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
 import com.example.feature.ui.community.navigation.communityPostDetailScreen
 import com.example.feature.ui.community.navigation.communityPostWriteScreen
 import com.example.feature.ui.community.navigation.communityScreen
 import com.example.feature.ui.community.navigation.navigateToCommunityPostDetail
 import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
-
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
+import com.example.feature.ui.home.HomeScreen
 import com.example.feature.ui.mypage.MypageScreen
 import com.example.feature.ui.onboarding.CongratulationsScreen
-
-import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
-import com.example.feature.ui.aichat.navigation.aiChatScreen
-import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
+import com.example.feature.ui.onboarding.LanguageScreen
+import com.example.feature.ui.onboarding.LoginScreen
+import com.example.feature.ui.splash.SplashScreen
 
 
 // 아이콘 리소스 구성 (기본 / 클릭)
@@ -104,11 +104,6 @@ fun MyNavigationHost(navController: NavHostController) {
 
         composable("축하") { CongratulationsScreen(navController) }
         composable("홈") { HomeScreen(navController) }
-        composable("마이페이지") { MypageScreen() }
-        composable("상담 센터") { ConsultationCenterScreen() }
-        composable("채팅 상담") { Text("채팅 상담 화면", modifier = Modifier.padding(16.dp)) }
-
-        composable("홈") { HomeScreen() }
         composable("상담 센터") {
             ConsultationCenterScreen (
                 onBackClick = navController::navigateUp
@@ -122,6 +117,10 @@ fun MyNavigationHost(navController: NavHostController) {
         aiChatDetailScreen(
             onBackClick = navController::navigateUp
         )
+
+        composable("마이페이지") { MypageScreen() }
+
+
 
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
         composable("커뮤니티") {
