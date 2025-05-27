@@ -1,6 +1,5 @@
 package com.example.feature
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -32,12 +31,29 @@ import com.example.feature.ui.community.navigation.navigateToCommunityPostDetail
 import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
 import com.example.feature.ui.home.HomeScreen
-import com.example.feature.ui.mypage.MypageScreen
+import com.example.feature.ui.mypage.navigation.counselingDetailScreen
+import com.example.feature.ui.mypage.navigation.counselingSummaryScreen
+import com.example.feature.ui.mypage.navigation.myPageScreen
+import com.example.feature.ui.mypage.navigation.navigateToCounselingDetail
+import com.example.feature.ui.mypage.navigation.navigateToCounselingSummary
+import com.example.feature.ui.mypage.navigation.navigateToPostAndComments
+import com.example.feature.ui.mypage.navigation.navigateToPrivacyPolicy
+import com.example.feature.ui.mypage.navigation.navigateToProfileEdit
+import com.example.feature.ui.mypage.navigation.navigateToResume
+import com.example.feature.ui.mypage.navigation.navigateToTermsOfService
+import com.example.feature.ui.mypage.navigation.navigateToWithdraw
+import com.example.feature.ui.mypage.navigation.navigateToWithdrawComplete
+import com.example.feature.ui.mypage.navigation.postAndCommentsScreen
+import com.example.feature.ui.mypage.navigation.privacyPolicyScreen
+import com.example.feature.ui.mypage.navigation.profileEditScreen
+import com.example.feature.ui.mypage.navigation.resumeScreen
+import com.example.feature.ui.mypage.navigation.termsOfServiceScreen
+import com.example.feature.ui.mypage.navigation.withdrawCompleteScreen
+import com.example.feature.ui.mypage.navigation.withdrawScreen
 import com.example.feature.ui.onboarding.CongratulationsScreen
 import com.example.feature.ui.onboarding.LanguageScreen
 import com.example.feature.ui.onboarding.LoginScreen
 import com.example.feature.ui.splash.SplashScreen
-
 
 // 아이콘 리소스 구성 (기본 / 클릭)
 data class NavItem(
@@ -96,14 +112,14 @@ fun MyBottomNavigation(navController: NavHostController) {
 // 메인 네비게이션 호스트
 @Composable
 fun MyNavigationHost(navController: NavHostController) {
-    NavHost(navController, startDestination = "홈") {
+    NavHost(navController, startDestination = "스플래시") {
         composable("스플래시") { SplashScreen(navController) }
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
 
         composable("축하") { CongratulationsScreen(navController) }
-        composable("홈") { HomeScreen(navController) }
+        composable("홈") { HomeScreen(navController) } // TODO 마이페이지로 이동 경로 수정 해주세요
         composable("상담 센터") {
             ConsultationCenterScreen (
                 onBackClick = navController::navigateUp
@@ -118,27 +134,51 @@ fun MyNavigationHost(navController: NavHostController) {
             onBackClick = navController::navigateUp
         )
 
-        composable("마이페이지") { MypageScreen() }
-
-
-
         composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
-        composable("커뮤니티") {
-            communityScreen (
-                onWriteClick = navController::navigateToCommunityPostWrite,
-                onPostClick = navController::navigateToCommunityPostDetail,
-                )
-        }
-        communityScreen (
-            onWriteClick = navController::navigateToCommunityPostWrite,
-            onPostClick = navController::navigateToCommunityPostDetail,
+        communityScreen(
+            onNavigateToCommunityPostWrite = navController::navigateToCommunityPostWrite,
+            onNavigateToCommunityPostDetail = navController::navigateToCommunityPostDetail,
         )
         communityPostDetailScreen(
-            onBackClick = navController::navigateUp
+            onNavigateBack = navController::navigateUp
         )
         communityPostWriteScreen(
-            onBackClick = navController::navigateUp
+            onNavigateBack = navController::navigateUp
         )
+        myPageScreen(
+            onNavigateBack = navController::navigateUp,
+            onNavigateToProfileEdit = navController::navigateToProfileEdit,
+            onNavigateToCounselingSummary = navController::navigateToCounselingSummary,
+            onNavigateToResume = navController::navigateToResume,
+            onNavigateToPostAndComments = navController::navigateToPostAndComments,
+            onNavigateToTermsOfService = navController::navigateToTermsOfService,
+            onNavigateToPrivacyPolicy = navController::navigateToPrivacyPolicy,
+            onNavigateToWithdraw = navController::navigateToWithdraw,
+        )
+        profileEditScreen(
+            onNavigateBack = navController::navigateUp
+        )
+        counselingSummaryScreen(
+            onNavigateBack = navController::navigateUp,
+            onNavigateToCounselingDetail = navController::navigateToCounselingDetail
+        )
+        counselingDetailScreen(
+            onNavigateBack = navController::navigateUp,
+            onNavigateToAIChatDetail = navController::navigateToAIChatDetail
+        )
+        resumeScreen(
+            onNavigateBack = navController::navigateUp
+        )
+        postAndCommentsScreen(
+            onNavigateBack = navController::navigateUp
+        )
+        privacyPolicyScreen( onNavigateBack = navController::navigateUp )
+        termsOfServiceScreen( onNavigateBack = navController::navigateUp )
+        withdrawScreen(
+            onNavigateBack = navController::navigateUp,
+            onNavigateToWithdrawComplete = navController::navigateToWithdrawComplete,
+        )
+        withdrawCompleteScreen( onNavigateToLogin = {} ) // TODO Login 경로
     }
 }
 

@@ -5,6 +5,9 @@ plugins {
 
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+
+    // oss-licenses
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 val googleMapKey: String = if (project.hasProperty("google_map_key")) {
@@ -22,7 +25,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "\"${rootProject.extra["versionName"] ?: "1.0.0"}\""
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -106,4 +109,8 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // oss-licenses
+    implementation (libs.androidx.appcompat)
+    implementation(libs.play.services.oss.licenses)
 }

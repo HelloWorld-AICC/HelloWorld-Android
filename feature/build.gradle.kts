@@ -17,6 +17,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField(
+            type = "String",
+            name = "APP_VERSION_NAME",
+            value = "\"${rootProject.extra["versionName"] ?: "1.0.0"}\"",
+        )
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -98,4 +105,8 @@ dependencies {
 
     // Gson
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // oss-licenses
+    implementation(libs.androidx.appcompat)
+    implementation(libs.play.services.oss.licenses)
 }
