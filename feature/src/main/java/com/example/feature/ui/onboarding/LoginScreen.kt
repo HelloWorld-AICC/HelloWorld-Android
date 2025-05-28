@@ -27,6 +27,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.example.core.data.network.RetrofitInstance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -74,7 +79,27 @@ fun GoogleSignInButton(navController: NavController) {
             auth.signInWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        val idToken = account.idToken
                         Log.d("LOGIN", "Google 로그인 성공: ${auth.currentUser?.displayName}")
+                        // Retrofit API 호출 추가
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                val response = RetrofitInstance.authService.getToken(idToken!!)
+                                val atk = response.result.firstOrNull { it.types == "atk" }?.token
+                                val rtk = response.result.firstOrNull { it.types == "rtk" }?.token
+
+                                Log.d("TOKEN", "ATK: $atk")
+                                Log.d("TOKEN", "RTK: $rtk")
+
+                                // TODO: atk/rtk 저장 로직 (ex. DataStore, ViewModel 등)
+
+                                withContext(Dispatchers.Main) {
+                                    navController.navigate("언어 설정") // 성공 후 이동
+                                }
+                            } catch (e: Exception) {
+                                Log.e("TOKEN", "API 연동 실패: ${e.localizedMessage}")
+                            }
+                        }
                         navController.navigate("언어 설정")
                     } else {
                         Log.e("LOGIN", "로그인 실패: ${task.exception}")

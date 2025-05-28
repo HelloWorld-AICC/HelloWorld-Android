@@ -94,5 +94,10 @@ android {
         implementation("com.google.firebase:firebase-analytics")
         implementation(libs.firebase.auth)
         implementation(libs.play.services.auth)
+
+        implementation("com.squareup.retrofit2:retrofit:2.9.0")
+        implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+        implementation(project(":core-data"))
     }
 }
