@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale500
+import com.example.core.ui.theme.HelloWorldMain0
+import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain400
 
 @Composable
@@ -28,10 +30,9 @@ fun BottomButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(),
+            .fillMaxWidth(),
         colors = ButtonDefaults.textButtonColors(
-            contentColor = Color(0xFFF9FBFC),
+            contentColor = HelloWorldMain0,
             containerColor = HelloWorldMain400,
             disabledContentColor = HelloWorldGrayScale500,
             disabledContainerColor = HelloWorldGrayScale100,
