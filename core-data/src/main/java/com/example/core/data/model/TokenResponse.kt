@@ -2,17 +2,19 @@
 
 package com.example.core.data.model
 
-data class TokenItem (
+data class TokenItem(
     val types: String,
     val token: String,
-    val tokenExprirseTime: String,
+    val tokenExpriresTime: String
 )
 
-data class TokenResponse (
+data class TokenResult(
+    val tokenList: List<TokenItem>
+)
+
+data class TokenResponse(
     val isSuccess: Boolean,
     val code: String,
     val message: String,
-    val result: List<TokenItem>
+    val result: TokenResult
 )
-
-

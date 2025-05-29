@@ -80,13 +80,17 @@ fun GoogleSignInButton(navController: NavController) {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val idToken = account.idToken
+                        // idToken log 추가
+                        Log.d("TOKEN", "전송할 idToken: $idToken") 
                         Log.d("LOGIN", "Google 로그인 성공: ${auth.currentUser?.displayName}")
                         // Retrofit API 호출 추가
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
                                 val response = RetrofitInstance.authService.getToken(idToken!!)
-                                val atk = response.result.firstOrNull { it.types == "atk" }?.token
-                                val rtk = response.result.firstOrNull { it.types == "rtk" }?.token
+                                val atk =
+                                    response.result.tokenList.firstOrNull { it.types == "atk" }?.token
+                                val rtk =
+                                    response.result.tokenList.firstOrNull { it.types == "rtk" }?.token
 
                                 Log.d("TOKEN", "ATK: $atk")
                                 Log.d("TOKEN", "RTK: $rtk")
@@ -113,6 +117,7 @@ fun GoogleSignInButton(navController: NavController) {
     Button(
         onClick = {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                // 구글 웹 애플리케이션의 클라이언트 ID
                 .requestIdToken("738692319153-epcdh8hlodmmcogcvmg32h1sdjjbp4ub.apps.googleusercontent.com")
                 .requestEmail()
                 .build()

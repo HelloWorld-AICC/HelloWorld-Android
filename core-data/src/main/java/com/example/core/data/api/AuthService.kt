@@ -6,8 +6,7 @@ import com.example.core.data.model.TokenResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 interface AuthService {
-    @GET("/user/passwordMailAuthCheck")
-    suspend fun getToken(@Query("idToken") idToken: String): TokenResponse
+    @GET("api/v1/google/login")
+    suspend fun getToken(@Query("token") idToken: String): TokenResponse
 }
