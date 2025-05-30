@@ -118,7 +118,7 @@ fun GoogleSignInButton(navController: NavController) {
         onClick = {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 // 구글 웹 애플리케이션의 클라이언트 ID
-                .requestIdToken("738692319153-epcdh8hlodmmcogcvmg32h1sdjjbp4ub.apps.googleusercontent.com")
+                .requestIdToken("283350122061-8ppgu9tpteg5j2h9ouqtu87ov7vrvjjf.apps.googleusercontent.com")
                 .requestEmail()
                 .build()
 
