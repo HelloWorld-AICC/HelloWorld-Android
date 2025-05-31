@@ -26,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.example.core.data.network.RetrofitInstance
+import com.example.feature.ui.home.HomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,6 +111,10 @@ fun GoogleSignInButton(navController: NavController) {
 
                         Log.d("LOGIN", "ATK 발급 성공: $atk")
                         Log.d("LOGIN", "RTK 발급 성공: $rtk")
+
+                        withContext(Dispatchers.Main) {
+                            navController.navigate("홈")
+                        }
                     } catch (e: Exception) {
                         Log.e("LOGIN", "ART/RTK API 연동 실패: ", e)
                     }
