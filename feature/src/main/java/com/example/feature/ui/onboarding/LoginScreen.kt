@@ -73,34 +73,52 @@ fun GoogleSignInButton(navController: NavController) {
 
         try {
             val account = task.getResult(ApiException::class.java)
+
+            // serverAuthCode에서 authCode 꺼냄
             val authCode = account.serverAuthCode
+            Log.d("Login", "authCode: $authCode")
+
+            // idToken에서 idToken 꺼냄
             val idToken = account.idToken
+            Log.d("Login", "idToken: $idToken")
 
-            // 구글 로그인 인증코드 발급 확인
-            Log.d("LOGIN", "authCode: $authCode")
 
-            // 구글 로그인 토큰 발급 확인
-            Log.d("LOGIN", "idToken: $idToken")
-
-            // CoroutineScope: 필요 시에만 시작하고 완료 시 종료됨
-            // Dispatchers.IO: IO 작업 시 최적화됨
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    // idToken!!: idToken은 null이 아니라고 단언 (null 일 경우 NullPointerException 발생)
-                    val response = RetrofitInstance.authService.getToken(idToken!!)
-
-                    // firstOrNull {...}: ... 를 만족하는 첫번째 인자 반환 or 없을 시 null 반환
-                    val atk = response.result.tokenList.firstOrNull { it.types == "atk" }?.token
-                    val rtk = response.result.tokenList.firstOrNull { it.types == "rtk" }?.token
-
-                    Log.d("TOKEN", "ATK: $atk")
-                    Log.d("TOKEN", "RTK: $rtk")
-                } catch (e: Exception) {
-                    Log.e("Token", "API 연동 실패: ", e)
+            if (authCode != null) {
+                // CoroutineScope: 필요 시에만 시작하고 완료 시 종료됨
+                // Dispatchers.IO: IO 작업 시 최적화됨
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = RetrofitInstance.authService.getCode(authCode!!)
+                        Log.d("LOGIN", "AuthCode 발급 성공: $authCode")
+                    } catch (e: Exception) {
+                        Log.e("LOGIN", "AuthCode API 연동 실패: ", e)
+                    }
                 }
             }
+
+            if (idToken != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = RetrofitInstance.authService.getToken(idToken)
+                        Log.d("LOGIN", "Token 발급 전체 응답: $response")
+                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result}")
+                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result.tokenList}")
+
+
+                        val atk = response.result.tokenList.firstOrNull { it.types == "ATK" }?.token
+                        val rtk = response.result.tokenList.firstOrNull { it.types == "RTK" }?.token
+
+                        Log.d("LOGIN", "ATK 발급 성공: $atk")
+                        Log.d("LOGIN", "RTK 발급 성공: $rtk")
+                    } catch (e: Exception) {
+                        Log.e("LOGIN", "ART/RTK API 연동 실패: ", e)
+                    }
+                }
+            } else {
+                Log.e("LOGIN", "IdToken이 null입니다")
+            }
         } catch (e: ApiException) {
-            Log.e("Login", "Google sign in failed", e)
+            Log.e("LOGIN", "Google 로그인 실패", e)
         }
     }
 
