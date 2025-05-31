@@ -28,6 +28,7 @@ jetbrainsKotlinJvm = "2.1.10"
 ossLicensesPlugin = "0.10.6"
 playServicesOssLicenses = "17.1.0"
 playServicesMaps = "19.2.0"
+hilt = "2.50"
 
 
 [libraries]
@@ -62,6 +63,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 oss-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
 play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

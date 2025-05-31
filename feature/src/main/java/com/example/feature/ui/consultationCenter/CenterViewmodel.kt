@@ -1,7 +1,7 @@
 package com.example.feature.ui.consultationCenter
 
 import androidx.lifecycle.ViewModel
-import com.example.core.data.centerInfo.CenterInfo
+import com.example.core.data.consultation_center.CenterInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

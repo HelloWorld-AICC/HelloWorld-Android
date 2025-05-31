@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.centerInfo.CenterInfo
+import com.example.core.data.consultation_center.CenterInfo
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
