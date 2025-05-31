@@ -70,6 +70,10 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.material.android)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.firebase.auth)
+    implementation(libs.firebase.installations.interop)
+    implementation(libs.firebase.installations)
 
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)

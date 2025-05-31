@@ -1,38 +1,36 @@
 package com.example.feature.ui.onboarding
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.core.ui.theme.AppTypography
-import com.example.core.ui.theme.HelloWorldGoogleBorder
-import com.example.core.ui.theme.HelloWorldGoogleText
-import com.example.core.ui.theme.HelloWorldMain0
-import com.example.core.ui.theme.HelloWorldMain500
-import com.example.core.ui.theme.Pretendard
+import com.example.core.ui.theme.*
 import com.example.feature.R
 import com.example.feature.ui.splash.SplashImg
 import com.example.feature.ui.splash.SplashLogo
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.example.core.data.network.RetrofitInstance
+import com.example.feature.ui.home.HomeScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -48,7 +46,6 @@ fun LoginScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(100.dp))
 
-            // 상단 로고
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 SplashLogo()
                 Spacer(modifier = Modifier.height(10.dp))
@@ -59,10 +56,8 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            // 중단 Google 버튼
             GoogleSignInButton(navController = navController)
 
-            // 하단 일러스트
             SplashImg()
         }
     }
@@ -70,10 +65,86 @@ fun LoginScreen(navController: NavController) {
 
 @Composable
 fun GoogleSignInButton(navController: NavController) {
+    val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
+        try {
+            val account = task.getResult(ApiException::class.java)
+
+            // serverAuthCode에서 authCode 꺼냄
+            val authCode = account.serverAuthCode
+            Log.d("Login", "authCode: $authCode")
+
+            // idToken에서 idToken 꺼냄
+            val idToken = account.idToken
+            Log.d("Login", "idToken: $idToken")
+
+
+            if (authCode != null) {
+                // CoroutineScope: 필요 시에만 시작하고 완료 시 종료됨
+                // Dispatchers.IO: IO 작업 시 최적화됨
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = RetrofitInstance.authService.getCode(authCode!!)
+                        Log.d("LOGIN", "AuthCode 발급 성공: $authCode")
+                    } catch (e: Exception) {
+                        Log.e("LOGIN", "AuthCode API 연동 실패: ", e)
+                    }
+                }
+            }
+
+            if (idToken != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = RetrofitInstance.authService.getToken(idToken)
+                        Log.d("LOGIN", "Token 발급 전체 응답: $response")
+                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result}")
+                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result.tokenList}")
+
+
+                        val atk = response.result.tokenList.firstOrNull { it.types == "ATK" }?.token
+                        val rtk = response.result.tokenList.firstOrNull { it.types == "RTK" }?.token
+
+                        Log.d("LOGIN", "ATK 발급 성공: $atk")
+                        Log.d("LOGIN", "RTK 발급 성공: $rtk")
+
+                        withContext(Dispatchers.Main) {
+                            navController.navigate("홈")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("LOGIN", "ART/RTK API 연동 실패: ", e)
+                    }
+                }
+            } else {
+                Log.e("LOGIN", "IdToken이 null입니다")
+            }
+        } catch (e: ApiException) {
+            Log.e("LOGIN", "Google 로그인 실패", e)
+        }
+    }
+
     Button(
         onClick = {
-            // 언어 설정 화면으로 이동
-            navController.navigate("언어 설정")
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode(
+                    // Web Client Id
+                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com",
+                    true
+                )
+                .requestIdToken(
+                    // Web Client Id
+                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
+                )
+                .build()
+
+            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+            launcher.launch(googleSignInClient.signInIntent)
         },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
