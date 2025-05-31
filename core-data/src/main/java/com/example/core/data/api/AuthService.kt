@@ -7,6 +7,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface AuthService {
-    @GET("api/v1/google/login")
-    suspend fun getToken(@Query("token") idToken: String): TokenResponse
+    @GET("api/v1/google/code")
+    suspend fun getToken(@Query("code") authCode: String): TokenResponse
 }

@@ -25,8 +25,6 @@ import com.example.feature.ui.splash.SplashLogo
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.example.core.data.network.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +65,6 @@ fun LoginScreen(navController: NavController) {
 @Composable
 fun GoogleSignInButton(navController: NavController) {
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -75,40 +72,26 @@ fun GoogleSignInButton(navController: NavController) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            auth.signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val idToken = account.idToken
-                        // idToken log 추가
-                        Log.d("TOKEN", "전송할 idToken: $idToken") 
-                        Log.d("LOGIN", "Google 로그인 성공: ${auth.currentUser?.displayName}")
-                        // Retrofit API 호출 추가
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                val response = RetrofitInstance.authService.getToken(idToken!!)
-                                val atk =
-                                    response.result.tokenList.firstOrNull { it.types == "atk" }?.token
-                                val rtk =
-                                    response.result.tokenList.firstOrNull { it.types == "rtk" }?.token
+            val authCode = account.serverAuthCode  // OAuth 방식
 
-                                Log.d("TOKEN", "ATK: $atk")
-                                Log.d("TOKEN", "RTK: $rtk")
+            Log.d("LOGIN", "전송할 authCode: $authCode")
 
-                                // TODO: atk/rtk 저장 로직 (ex. DataStore, ViewModel 등)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = RetrofitInstance.authService.getToken(authCode!!)
+                    val atk = response.result.tokenList.firstOrNull { it.types == "atk" }?.token
+                    val rtk = response.result.tokenList.firstOrNull { it.types == "rtk" }?.token
 
-                                withContext(Dispatchers.Main) {
-                                    navController.navigate("언어 설정") // 성공 후 이동
-                                }
-                            } catch (e: Exception) {
-                                Log.e("TOKEN", "API 연동 실패: ${e.localizedMessage}")
-                            }
-                        }
+                    Log.d("TOKEN", "ATK: $atk")
+                    Log.d("TOKEN", "RTK: $rtk")
+
+                    withContext(Dispatchers.Main) {
                         navController.navigate("언어 설정")
-                    } else {
-                        Log.e("LOGIN", "로그인 실패: ${task.exception}")
                     }
+                } catch (e: Exception) {
+                    Log.e("TOKEN", "API 연동 실패: ${e.localizedMessage}")
                 }
+            }
         } catch (e: ApiException) {
             Log.e("LOGIN", "Google sign in failed", e)
         }
@@ -117,14 +100,13 @@ fun GoogleSignInButton(navController: NavController) {
     Button(
         onClick = {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                // 구글 웹 애플리케이션의 클라이언트 ID
-                .requestIdToken("283350122061-8ppgu9tpteg5j2h9ouqtu87ov7vrvjjf.apps.googleusercontent.com")
                 .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode("283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com", true)
                 .build()
 
             val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            val signInIntent = googleSignInClient.signInIntent
-            launcher.launch(signInIntent)
+            launcher.launch(googleSignInClient.signInIntent)
         },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),

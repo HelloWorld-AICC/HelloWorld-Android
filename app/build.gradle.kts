@@ -7,7 +7,6 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.android.gms.oss-licenses-plugin")
-    id("com.google.gms.google-services")
 }
 
 val googleMapKey: String = if (project.hasProperty("google_map_key")) {
@@ -17,11 +16,11 @@ val googleMapKey: String = if (project.hasProperty("google_map_key")) {
 }
 
 android {
-    namespace = "com.example.helloworld"
+    namespace = "com.example.hello_world_mvp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.helloworld"
+        applicationId = "com.example.hello_world_mvp"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -90,9 +89,6 @@ android {
         implementation(libs.androidx.appcompat)
         implementation(libs.play.services.oss.licenses)
 
-        implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
-        implementation("com.google.firebase:firebase-analytics")
-        implementation(libs.firebase.auth)
         implementation(libs.play.services.auth)
 
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
