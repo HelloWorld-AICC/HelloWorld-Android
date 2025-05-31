@@ -70,30 +70,37 @@ fun GoogleSignInButton(navController: NavController) {
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+
         try {
             val account = task.getResult(ApiException::class.java)
-            val authCode = account.serverAuthCode  // OAuth 방식
+            val authCode = account.serverAuthCode
+            val idToken = account.idToken
 
-            Log.d("LOGIN", "전송할 authCode: $authCode")
+            // 구글 로그인 인증코드 발급 확인
+            Log.d("LOGIN", "authCode: $authCode")
 
+            // 구글 로그인 토큰 발급 확인
+            Log.d("LOGIN", "idToken: $idToken")
+
+            // CoroutineScope: 필요 시에만 시작하고 완료 시 종료됨
+            // Dispatchers.IO: IO 작업 시 최적화됨
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val response = RetrofitInstance.authService.getToken(authCode!!)
+                    // idToken!!: idToken은 null이 아니라고 단언 (null 일 경우 NullPointerException 발생)
+                    val response = RetrofitInstance.authService.getToken(idToken!!)
+
+                    // firstOrNull {...}: ... 를 만족하는 첫번째 인자 반환 or 없을 시 null 반환
                     val atk = response.result.tokenList.firstOrNull { it.types == "atk" }?.token
                     val rtk = response.result.tokenList.firstOrNull { it.types == "rtk" }?.token
 
                     Log.d("TOKEN", "ATK: $atk")
                     Log.d("TOKEN", "RTK: $rtk")
-
-                    withContext(Dispatchers.Main) {
-                        navController.navigate("언어 설정")
-                    }
                 } catch (e: Exception) {
-                    Log.e("TOKEN", "API 연동 실패: ${e.localizedMessage}")
+                    Log.e("Token", "API 연동 실패: ", e)
                 }
             }
         } catch (e: ApiException) {
-            Log.e("LOGIN", "Google sign in failed", e)
+            Log.e("Login", "Google sign in failed", e)
         }
     }
 
@@ -102,7 +109,15 @@ fun GoogleSignInButton(navController: NavController) {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
-                .requestServerAuthCode("283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com", true)
+                .requestServerAuthCode(
+                    // Web Client Id
+                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com",
+                    true
+                )
+                .requestIdToken(
+                    // Web Client Id
+                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
+                )
                 .build()
 
             val googleSignInClient = GoogleSignIn.getClient(context, gso)
