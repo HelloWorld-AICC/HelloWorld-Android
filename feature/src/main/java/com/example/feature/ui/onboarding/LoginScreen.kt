@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.core.ui.theme.*
 import com.example.feature.R
@@ -29,6 +30,7 @@ import com.example.core.data.network.RetrofitInstance
 import com.example.feature.ui.home.HomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -74,53 +76,36 @@ fun GoogleSignInButton(navController: NavController) {
 
         try {
             val account = task.getResult(ApiException::class.java)
-
-            // serverAuthCode에서 authCode 꺼냄
-            val authCode = account.serverAuthCode
-            Log.d("Login", "authCode: $authCode")
-
-            // idToken에서 idToken 꺼냄
             val idToken = account.idToken
-            Log.d("Login", "idToken: $idToken")
-
-
-            if (authCode != null) {
-                // CoroutineScope: 필요 시에만 시작하고 완료 시 종료됨
-                // Dispatchers.IO: IO 작업 시 최적화됨
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        val response = RetrofitInstance.authService.getCode(authCode!!)
-                        Log.d("LOGIN", "AuthCode 발급 성공: $authCode")
-                    } catch (e: Exception) {
-                        Log.e("LOGIN", "AuthCode API 연동 실패: ", e)
-                    }
-                }
-            }
+            Log.d("LOGIN", "idToken: $idToken")
 
             if (idToken != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         val response = RetrofitInstance.authService.getToken(idToken)
-                        Log.d("LOGIN", "Token 발급 전체 응답: $response")
-                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result}")
-                        Log.d("LOGIN", "Token 발급 전체 응답: ${response.result.tokenList}")
 
+                        val tokenList = response.result?.tokenList.orEmpty()
+                        val atk = tokenList.firstOrNull { it.types == "ATK" }?.token
+                        val rtk = tokenList.firstOrNull { it.types == "RTK" }?.token
 
-                        val atk = response.result.tokenList.firstOrNull { it.types == "ATK" }?.token
-                        val rtk = response.result.tokenList.firstOrNull { it.types == "RTK" }?.token
+                        if (!atk.isNullOrBlank()) {
+                            RetrofitInstance.setAccessToken(atk)
+                            Log.d("LOGIN", "ATK 설정 성공: $atk")
 
-                        Log.d("LOGIN", "ATK 발급 성공: $atk")
-                        Log.d("LOGIN", "RTK 발급 성공: $rtk")
+                            withContext(Dispatchers.Main) {
+                                // RetrofitInstance 초기화 후 홈 화면 이동
+                                navController.navigate("홈")
+                            }
 
-                        withContext(Dispatchers.Main) {
-                            navController.navigate("홈")
+                        } else {
+                            Log.e("LOGIN", "ATK가 비어 있거나 없음")
                         }
                     } catch (e: Exception) {
-                        Log.e("LOGIN", "ART/RTK API 연동 실패: ", e)
+                        Log.e("LOGIN", "토큰 요청 실패", e)
                     }
                 }
             } else {
-                Log.e("LOGIN", "IdToken이 null입니다")
+                Log.e("LOGIN", "idToken이 null입니다")
             }
         } catch (e: ApiException) {
             Log.e("LOGIN", "Google 로그인 실패", e)
@@ -133,12 +118,10 @@ fun GoogleSignInButton(navController: NavController) {
                 .requestEmail()
                 .requestProfile()
                 .requestServerAuthCode(
-                    // Web Client Id
                     "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com",
                     true
                 )
                 .requestIdToken(
-                    // Web Client Id
                     "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
                 )
                 .build()
@@ -167,3 +150,4 @@ fun GoogleSignInButton(navController: NavController) {
         )
     }
 }
+
