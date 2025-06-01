@@ -32,18 +32,25 @@ import com.example.feature.ui.mypage.navigation.navigateToMyPage
 import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.core.data.network.RetrofitInstance
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState();
 
+    // 토큰 가져오기
+    val token = RetrofitInstance.getAccessToken()
+
+    // 토큰 가져온 이후 헤더에 자동 포함된 요청으로 API 호출
+    LaunchedEffect(token) {
+        if (token.isNotBlank()) {
+            viewModel.fetchUserInfoIfTokenExists()
+        }
+    }
+
     // 유저 정보 및 로딩 상태 조회
     val userInfo by viewModel.userInfo.collectAsState()
 
-    // 로그인 이후 토큰이 자동 포함된 요청으로 API 호출
-    LaunchedEffect(Unit) {
-        viewModel.fetchUserInfoIfTokenExists()
-    }
 
     Column(
         modifier = Modifier

@@ -1,5 +1,8 @@
 package com.example.core.data.network
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import com.example.core.data.api.AuthService
 import com.example.core.data.api.UserService
 import okhttp3.OkHttpClient
@@ -8,51 +11,32 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
 
-    private var accessToken: String = ""
+    private const val BASE_URL = "https://www.gotoend.store/mvc/"
+    private lateinit var prefs: SharedPreferences
 
-    private var retrofit: Retrofit? = null
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+        Log.d("Prefs", "Stored Token: ${prefs.getString("access_token", "NULL")}")
+    }
 
     fun setAccessToken(token: String) {
-        if (accessToken != token) {
-            accessToken = token
-            retrofit = null
-        }
+        prefs.edit().putString("access_token", token).apply()
     }
 
     fun getAccessToken(): String {
-        return accessToken
+        return prefs.getString("access_token", "") ?: ""
     }
 
-    private fun getClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor()) // accessToken 읽어옴
-            .build()
-    }
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor())
+        .build()
 
-    private fun createRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://www.gotoend.store/mvc/")
-            .client(getClient())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
-    // 항상 최신 토큰 반영을 위해 매번 새 인스턴스 생성
-    private fun getRetrofit(): Retrofit {
-        if (retrofit == null) {
-            retrofit = createRetrofit()
-        }
-
-        return retrofit!!
-    }
-
-    // AuthService는 로그인 전에만 사용되므로 lazy 사용해도 OK
-    val authService: AuthService by lazy {
-        getRetrofit().create(AuthService::class.java)
-    }
-
-    // UserService는 accessToken이 바뀌면 다시 만들어야 하므로 매번 새로 만들어야 함
-    fun userService(): UserService {
-        return getRetrofit().create(UserService::class.java)
-    }
+    val authService: AuthService = retrofit.create(AuthService::class.java)
+    val userService: UserService = retrofit.create(UserService::class.java)
 }

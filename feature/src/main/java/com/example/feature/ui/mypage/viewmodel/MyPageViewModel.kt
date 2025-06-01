@@ -44,8 +44,8 @@ class MyPageViewModel @Inject constructor(
     fun fetchUserInfo() {
         viewModelScope.launch {
             try {
-                val user = RetrofitInstance.userService().getMyPage()
-                Log.d("MyPageViewModel", "⚡ userService 호출 직후 accessToken: ${RetrofitInstance.getAccessToken()}")
+                val user = RetrofitInstance.userService.getMyPage()
+                Log.d("MyPageViewModel", "userService 호출 직후 accessToken: ${RetrofitInstance.getAccessToken()}")
                 _userInfo.value = user
                 Log.d("MyPageViewModel", "유저 정보 가져옴: ${user.result}")
             } catch (e: Exception) {

@@ -1,4 +1,4 @@
-// Retrofit 전역 설정 (모든 API 요청에 자동으로 Authorization 헤더 추가)
+// 헤더에 토큰 자동 추가 (SharedPreferences 기반)
 
 package com.example.core.data.network
 
@@ -13,18 +13,15 @@ class AuthInterceptor : Interceptor {
     // OkHttp가 API 호출 시 intercept() 호출
     // chain: 요청을 계속 이어주는 파이프라인 같은 것..
     override fun intercept(chain: Interceptor.Chain): Response {
+        val accessToken = RetrofitInstance.getAccessToken()
+        Log.d("AuthInterceptor", "access token: $accessToken")
 
         val requestBuilder = chain.request().newBuilder()
-
-        // 엑세스 토큰 꺼내서 저장
-        val accessToken = RetrofitInstance.getAccessToken()
-
-        //  원래 하려던 요청에 Header() 추가해서 새로운 요청 생성
-        if (!accessToken.isNullOrBlank()) {
-            requestBuilder.addHeader("Authorization", accessToken)
-            Log.d("AuthInterceptor", "Authorization 헤더 추가됨: $accessToken")
+        if (accessToken.isNotEmpty()) {
+            requestBuilder.addHeader("Authorization", "Bearer $accessToken")
+            Log.d("AuthInterceptor", "Authorization 헤더 추가됨: Bearer $accessToken")
         } else {
-            Log.w("AuthInterceptor", "AccessToken이 비어있어 Authorization 헤더를 추가하지 않음")
+            Log.w("AuthInterceptor", "Authorization 토큰이 비어있습니다.")
         }
 
         // 새로운 요청을 서버로 전송

@@ -1,3 +1,5 @@
+// 로그인 성공 후 토큰 저장 및 화면 전환
+
 package com.example.feature.ui.onboarding
 
 import android.util.Log
@@ -17,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.core.ui.theme.*
 import com.example.feature.R
@@ -27,15 +28,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.example.core.data.network.RetrofitInstance
-import com.example.feature.ui.home.HomeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
+    RetrofitInstance.init(context) // 앱 시작 시 초기화
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -84,19 +86,21 @@ fun GoogleSignInButton(navController: NavController) {
                     try {
                         val response = RetrofitInstance.authService.getToken(idToken)
 
-                        val tokenList = response.result?.tokenList.orEmpty()
-                        val atk = tokenList.firstOrNull { it.types == "ATK" }?.token
-                        val rtk = tokenList.firstOrNull { it.types == "RTK" }?.token
+                        val tokenList = response.result?.tokenList
+                        val atk = tokenList?.firstOrNull { it.types == "ATK" }?.token
+                        val rtk = tokenList?.firstOrNull { it.types == "RTK" }?.token
 
-                        if (!atk.isNullOrBlank()) {
+                        if(!atk.isNullOrBlank()) {
+                            // AccessToken 설정 (Retrofit 재생성 포함)
                             RetrofitInstance.setAccessToken(atk)
                             Log.d("LOGIN", "ATK 설정 성공: $atk")
 
                             withContext(Dispatchers.Main) {
-                                // RetrofitInstance 초기화 후 홈 화면 이동
-                                navController.navigate("홈")
+                                // ATK 설정 완료된 후에 홈 화면으로 이동
+                                navController.navigate("홈") {
+                                    popUpTo("Login") { inclusive = true }
+                                }
                             }
-
                         } else {
                             Log.e("LOGIN", "ATK가 비어 있거나 없음")
                         }
@@ -115,14 +119,14 @@ fun GoogleSignInButton(navController: NavController) {
     Button(
         onClick = {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(
+                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
+                )
                 .requestEmail()
                 .requestProfile()
                 .requestServerAuthCode(
                     "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com",
                     true
-                )
-                .requestIdToken(
-                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
                 )
                 .build()
 
@@ -150,4 +154,3 @@ fun GoogleSignInButton(navController: NavController) {
         )
     }
 }
-
