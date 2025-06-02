@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -62,6 +63,14 @@ fun MyPage(
 ) {
     val context = LocalContext.current
     val dialogData by viewModel.dialogData.collectAsState()
+
+    // 유저 정보 및 로딩 상태 조회
+    val userInfo by viewModel.userInfo.collectAsState()
+
+    // 로그인 이후 토큰이 자동 포함된 요청으로 API 호출
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserInfo()
+    }
 
     Column(
         modifier = Modifier
@@ -115,7 +124,10 @@ fun MyPage(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "NaYeEun",
+                    text = when {
+                        !userInfo?.result?.name.isNullOrBlank() -> userInfo?.result?.name ?: "이름 공백"
+                        else -> "이름 없음"
+                    },
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale800,
                 )
@@ -210,7 +222,12 @@ fun MyPage(
                         .fillMaxWidth()
                         .clickable {
                             OssLicensesMenuActivity.setActivityTitle("오픈소스 라이선스")
-                            context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                            context.startActivity(
+                                Intent(
+                                    context,
+                                    OssLicensesMenuActivity::class.java
+                                )
+                            )
                         },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -353,7 +370,7 @@ private fun MenuCard(
 private fun MyPagePreview() {
     MyPage(
         onNavigateBack = {},
-        onNavigateToProfileEdit = {  },
+        onNavigateToProfileEdit = { },
         onNavigateToCounselingSummary = {},
         onNavigateToResume = {},
         onNavigateToPostAndComments = {},

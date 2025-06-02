@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.feature.ui.home.header.LogoHeader
 import com.example.core.ui.theme.AppTypography
@@ -27,10 +29,28 @@ import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
 import com.example.feature.ui.mypage.navigation.navigateToMyPage
+import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.core.data.network.RetrofitInstance
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState();
+
+    // 토큰 가져오기
+    val token = RetrofitInstance.getAccessToken()
+
+    // 토큰 가져온 이후 헤더에 자동 포함된 요청으로 API 호출
+    LaunchedEffect(token) {
+        if (token.isNotBlank()) {
+            viewModel.fetchUserInfoIfTokenExists()
+        }
+    }
+
+    // 유저 정보 및 로딩 상태 조회
+    val userInfo by viewModel.userInfo.collectAsState()
+
 
     Column(
         modifier = Modifier
@@ -56,7 +76,12 @@ fun HomeScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "나예은",
+                        text = when {
+                            !userInfo?.result?.name.isNullOrBlank() -> userInfo?.result?.name
+                                ?: "이름 공백"
+
+                            else -> "이름 없음"
+                        },
                         style = AppTypography.title02,
                         color = HelloWorldMain700
                     )
