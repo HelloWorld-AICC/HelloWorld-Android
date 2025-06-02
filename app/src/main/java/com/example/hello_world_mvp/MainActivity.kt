@@ -1,4 +1,4 @@
-package com.example.helloworld
+package com.example.hello_world_mvp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
 import com.example.core.ui.theme.HelloWorldTheme
 import com.example.feature.MainScreen
 import dagger.hilt.android.AndroidEntryPoint

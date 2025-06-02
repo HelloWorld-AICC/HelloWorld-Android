@@ -70,6 +70,10 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.material.android)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.firebase.auth)
+    implementation(libs.firebase.installations.interop)
+    implementation(libs.firebase.installations)
 
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -109,4 +113,7 @@ dependencies {
     // oss-licenses
     implementation(libs.androidx.appcompat)
     implementation(libs.play.services.oss.licenses)
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
