@@ -78,50 +78,62 @@ fun LanguageScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(32.dp))
 
             // 드롭다운 메뉴
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.background(White)
+            Box (
+                modifier = Modifier
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, HelloWorldMain100, shape = RoundedCornerShape(8.dp))
             ) {
-                OutlinedTextField(
-                    value = selectedLanguage,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = HelloWorldMain100,
-                        unfocusedBorderColor = HelloWorldMain100
-                    )
-                )
-
-                ExposedDropdownMenu(
+                ExposedDropdownMenuBox(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    onExpandedChange = { expanded = !expanded },
                     modifier = Modifier
-                        .background(White)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
                         .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
-                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    languageList.forEach { language ->
-                        Surface(color = Color.White) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        language,
-                                        style = AppTypography.heading04
-                                    )
-                                },
-                                onClick = {
-                                    selectedLanguage = language
-                                    expanded = false
-                                }
-                            )
+                    OutlinedTextField(
+                        value = selectedLanguage,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = HelloWorldMain100,
+                            unfocusedBorderColor = HelloWorldMain100
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .background(White)
+                            .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        languageList.forEach { language ->
+                            Surface() {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            language,
+                                            style = AppTypography.heading04
+                                        )
+                                    },
+                                    onClick = {
+                                        selectedLanguage = language
+                                        expanded = false
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                            .background(Color.White)
+
+                                )
+                            }
                         }
                     }
                 }
