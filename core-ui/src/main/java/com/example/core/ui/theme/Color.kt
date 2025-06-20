@@ -26,7 +26,7 @@ val HelloWorldError = Color(0xFFED5858)
 val HelloWorldInfo = Color(0xFFFFCC32)
 
 // Main Colors
-val HelloWorldMain0 = Color(0xFFEFF6FE)
+val HelloWorldMain0 = Color(0xFFF9FBFC)
 val HelloWorldMain100 = Color(0xFFDFEDFD)
 val HelloWorldMain200 = Color(0xFFCFE3FD)
 val HelloWorldMain300 = Color(0xFFBFDAFC)
