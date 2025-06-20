@@ -1,4 +1,4 @@
-package com.example.feature.ui.onboarding
+package com.example.feature.ui.onboarding.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.core.ui.component.BackHeader
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
