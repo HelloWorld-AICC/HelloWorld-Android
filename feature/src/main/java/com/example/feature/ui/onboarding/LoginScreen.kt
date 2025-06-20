@@ -97,7 +97,7 @@ fun GoogleSignInButton(navController: NavController) {
 
                             withContext(Dispatchers.Main) {
                                 // ATK 설정 완료된 후에 홈 화면으로 이동
-                                navController.navigate("홈") {
+                                navController.navigate("언어 설정") {
                                     popUpTo("Login") { inclusive = true }
                                 }
                             }
