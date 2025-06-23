@@ -1,7 +1,6 @@
 package com.example.feature.ui.aichat
 
 import androidx.lifecycle.ViewModel
-import com.example.core.data.chatInfo.ChatInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

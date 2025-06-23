@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.consultation_center.CenterInfo
+import com.example.core.data.model.Center
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
@@ -57,41 +57,11 @@ fun ConsultationCenterScreen (
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
 
     val selectedCenter by viewModel.selectedCenter.collectAsState()
+    val centerList by viewModel.centerList.collectAsState()
 
-    val centerList = listOf(
-        CenterInfo(
-            name = "용인시 외국인 복지센터",
-            status = "영업 중",
-            phone = "010 - 0000 - 0000",
-            address = "경기도 용인시 처인구 금령로",
-            latitude = 37.582000,
-            longitude = 126.926000
-        ),
-        CenterInfo(
-            name = "서대문 외국인 센터",
-            status = "영업 종료",
-            phone = "010 - 1234 - 5678",
-            address = "서울특별시 서대문구 연희로",
-            latitude = 37.578500,
-            longitude = 126.924500
-        ),
-        CenterInfo(
-            name = "이대 상담소",
-            status = "영업 중",
-            phone = "02 - 9876 - 5432",
-            address = "서울특별시 서대문구 이화여대길",
-            latitude = 37.581200,
-            longitude = 126.920000
-        ),
-        CenterInfo(
-            name = "신촌 외국인 상담소",
-            status = "영업 중",
-            phone = "02 - 1234 - 5678",
-            address = "서울특별시 서대문구 신촌로",
-            latitude = 37.556000,
-            longitude = 126.935000
-        )
-    )
+    LaunchedEffect(Unit) {
+        viewModel.fetchCenterListIfTokenExists()
+    }
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -199,8 +169,8 @@ fun ConsultationCenterScreen (
 
 @Composable
 fun ConsultationCenterListOverlay(
-    centerList: List<CenterInfo>,
-    selectedCenter: CenterInfo?,
+    centerList: List<Center>,
+    selectedCenter: Center?,
     modifier: Modifier = Modifier
 ) {
 
@@ -261,7 +231,7 @@ fun ConsultationCenterListOverlay(
 
 
 @Composable
-fun ConsultationCenterCard(center: CenterInfo) {
+fun ConsultationCenterCard(center: Center) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -284,8 +254,8 @@ fun ConsultationCenterCard(center: CenterInfo) {
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(text = "•", style = AppTypography.label03)
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = center.phone, style = AppTypography.label03)
+//                    Spacer(modifier = Modifier.width(2.dp))
+//                    Text(text = center.phone, style = AppTypography.label03)
                 }
                 Spacer(modifier = Modifier.height(4.dp)) // ← 간격 추가
 
