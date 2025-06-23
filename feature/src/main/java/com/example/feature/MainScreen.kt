@@ -30,7 +30,7 @@ import com.example.feature.ui.community.navigation.communityScreen
 import com.example.feature.ui.community.navigation.navigateToCommunityPostDetail
 import com.example.feature.ui.community.navigation.navigateToCommunityPostWrite
 import com.example.feature.ui.consultationCenter.ConsultationCenterScreen
-import com.example.feature.ui.home.HomeScreen
+import com.example.feature.ui.home.screen.HomeScreen
 import com.example.feature.ui.mypage.navigation.counselingDetailScreen
 import com.example.feature.ui.mypage.navigation.counselingSummaryScreen
 import com.example.feature.ui.mypage.navigation.myPageScreen
@@ -50,10 +50,10 @@ import com.example.feature.ui.mypage.navigation.resumeScreen
 import com.example.feature.ui.mypage.navigation.termsOfServiceScreen
 import com.example.feature.ui.mypage.navigation.withdrawCompleteScreen
 import com.example.feature.ui.mypage.navigation.withdrawScreen
-import com.example.feature.ui.onboarding.CongratulationsScreen
-import com.example.feature.ui.onboarding.LanguageScreen
-import com.example.feature.ui.onboarding.LoginScreen
-import com.example.feature.ui.splash.SplashScreen
+import com.example.feature.ui.onboarding.screen.CongratulationsScreen
+import com.example.feature.ui.onboarding.screen.LanguageScreen
+import com.example.feature.ui.onboarding.screen.LoginScreen
+import com.example.feature.ui.splash.screen.SplashScreen
 
 // 아이콘 리소스 구성 (기본 / 클릭)
 data class NavItem(

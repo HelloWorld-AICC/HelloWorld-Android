@@ -1,4 +1,4 @@
-package com.example.feature.ui.splash
+package com.example.feature.ui.splash.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
 import androidx.navigation.NavController
 import com.example.core.ui.theme.HelloWorldMain0
+import com.example.feature.ui.splash.SplashImg
+import com.example.feature.ui.splash.SplashLogo
 import kotlinx.coroutines.delay
 
 @Composable

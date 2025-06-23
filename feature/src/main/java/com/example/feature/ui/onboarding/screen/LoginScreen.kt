@@ -1,6 +1,6 @@
 // 로그인 성공 후 토큰 저장 및 화면 전환
 
-package com.example.feature.ui.onboarding
+package com.example.feature.ui.onboarding.screen
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.core.ui.theme.*
 import com.example.feature.R
@@ -27,16 +29,25 @@ import com.example.feature.ui.splash.SplashLogo
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.example.feature.ui.onboarding.viewmodel.LoginViewModel
+import androidx.compose.runtime.getValue
 import com.example.core.data.network.RetrofitInstance
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
+    val viewModel: LoginViewModel = hiltViewModel()
+    val loginSuccess by viewModel.loginSuccess.collectAsState()
+
     RetrofitInstance.init(context) // 앱 시작 시 초기화
+
+    // 로그인 성공 시 화면 전환
+    if (loginSuccess) {
+        navController.navigate("언어 설정") {
+            popUpTo("Login") {inclusive}
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -60,7 +71,7 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            GoogleSignInButton(navController = navController)
+            GoogleSignInButton(onTokenReceived = {idToken -> viewModel.handleGoogleLogin(idToken)})
 
             SplashImg()
         }
@@ -68,7 +79,7 @@ fun LoginScreen(navController: NavController) {
 }
 
 @Composable
-fun GoogleSignInButton(navController: NavController) {
+fun GoogleSignInButton(onTokenReceived: (String?) -> Unit) {
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
@@ -80,37 +91,7 @@ fun GoogleSignInButton(navController: NavController) {
             val account = task.getResult(ApiException::class.java)
             val idToken = account.idToken
             Log.d("LOGIN", "idToken: $idToken")
-
-            if (idToken != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        val response = RetrofitInstance.authService.getToken(idToken)
-
-                        val tokenList = response.result?.tokenList
-                        val atk = tokenList?.firstOrNull { it.types == "ATK" }?.token
-                        val rtk = tokenList?.firstOrNull { it.types == "RTK" }?.token
-
-                        if(!atk.isNullOrBlank()) {
-                            // AccessToken 설정 (Retrofit 재생성 포함)
-                            RetrofitInstance.setAccessToken(atk)
-                            Log.d("LOGIN", "ATK 설정 성공: $atk")
-
-                            withContext(Dispatchers.Main) {
-                                // ATK 설정 완료된 후에 홈 화면으로 이동
-                                navController.navigate("홈") {
-                                    popUpTo("Login") { inclusive = true }
-                                }
-                            }
-                        } else {
-                            Log.e("LOGIN", "ATK가 비어 있거나 없음")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("LOGIN", "토큰 요청 실패", e)
-                    }
-                }
-            } else {
-                Log.e("LOGIN", "idToken이 null입니다")
-            }
+            onTokenReceived(idToken)
         } catch (e: ApiException) {
             Log.e("LOGIN", "Google 로그인 실패", e)
         }
