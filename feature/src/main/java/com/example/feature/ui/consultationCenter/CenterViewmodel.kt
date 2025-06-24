@@ -1,10 +1,19 @@
 package com.example.feature.ui.consultationCenter
 
 import androidx.lifecycle.ViewModel
-import com.example.core.data.centerInfo.CenterInfo
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+
+data class CenterInfo (
+    val name : String,
+    val status : String,
+    val address : String,
+    val latitude : Double,
+    val longitude : Double
+)
 
 class CenterViewModel : ViewModel() {
 
