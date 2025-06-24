@@ -1,34 +1,37 @@
 package com.example.feature.ui.aichat
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.core.data.chatInfo.ChatInfo
+import androidx.lifecycle.viewModelScope
+import com.example.core.data.model.ChattingRoom
+import com.example.core.data.model.ChattingRoomsResponse
+import com.example.core.data.network.RetrofitInstance
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.time.LocalDate
+import kotlinx.coroutines.launch
 
-class AIChatViewModel : ViewModel() {
+@HiltViewModel
+class AIChatViewModel @Inject constructor() : ViewModel() {
 
-    private val _conversations = MutableStateFlow<List<ChatInfo>>(emptyList())
-    val conversations: StateFlow<List<ChatInfo>> = _conversations.asStateFlow()
+    private val _chattingRooms = MutableStateFlow<List<ChattingRoom>>(emptyList())
+    val chattingRooms: StateFlow<List<ChattingRoom>> = _chattingRooms
 
-    init {
-        // 실제 앱에선 repository로부터 불러오게 됨
-        _conversations.value = listOf(
-            ChatInfo(1, LocalDate.parse("2025-04-01"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(2, LocalDate.parse("2025-04-02"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(3, LocalDate.parse("2025-04-03"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(4, LocalDate.parse("2025-04-04"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(5, LocalDate.parse("2025-04-05"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(6, LocalDate.parse("2025-04-06"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(7, LocalDate.parse("2025-04-07"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(8, LocalDate.parse("2025-04-08"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(9, LocalDate.parse("2025-04-09"), "임금 체불과 직장 내 괴롭힘"),
-            ChatInfo(10, LocalDate.parse("2025-04-10"), "임금 체불과 직장 내 괴롭힘")
-        )
-    }
-
-    fun startNewChat() {
-
+    fun getAIChattingRooms() {
+        val token = RetrofitInstance.getAccessToken()
+        if (token.isNotBlank()) {
+            viewModelScope.launch {
+                try {
+                    val response = RetrofitInstance.aiChatService.getAIChattingRooms()
+                    _chattingRooms.value = response.rooms
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        } else {
+            // 로그 출력
+            Log.w("AIChatViewModel", "토큰 없음 - 채팅방 목록 요청 보류")
+        }
     }
 }

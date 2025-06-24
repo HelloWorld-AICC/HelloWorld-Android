@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,10 +32,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.chatInfo.ChatInfo
+import com.example.core.data.model.ChattingRoom
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
@@ -44,10 +44,15 @@ import com.example.feature.R
 
 @Composable
 internal fun AiChatScreen(
-    onPostClick: (Int) -> Unit,
+    onPostClick: (String?) -> Unit,
     viewModel: AIChatViewModel = hiltViewModel()
 ) {
-    val conversations by viewModel.conversations.collectAsState()
+    val chattingRooms by viewModel.chattingRooms.collectAsState()
+
+    // 화면 진입 시 채팅방 목록 불러오기
+    LaunchedEffect(Unit) {
+        viewModel.getAIChattingRooms()
+    }
 
     Column(
         modifier = Modifier
@@ -61,11 +66,26 @@ internal fun AiChatScreen(
         Spacer(modifier = Modifier.height(24.dp))
         Banner()
         Spacer(modifier = Modifier.height(24.dp))
-
-        RecentChatSection(
-            conversations = conversations,
+        RecentChatSection (
             onPostClick = onPostClick
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 채팅방이 있을 때만 리스트 출력
+        if (!chattingRooms.isNullOrEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp)
+            ) {
+                items(chattingRooms) { room ->
+                    ConversationItem(
+                        chattingRoom = room,
+                        onPostClick = { onPostClick(room.roomId) }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -76,7 +96,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp) // 원하는 만큼 조절
+            .height(150.dp)
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -87,36 +107,28 @@ fun ChatNewButton(
     onPostClick: () -> Unit
 ) {
     OutlinedButton(
-        onClick = {
-            onPostClick()
-        },
+        onClick = onPostClick,
         modifier = modifier
             .defaultMinSize(minWidth = 0.dp, minHeight = 0.dp)
             .height(30.dp),
         border = BorderStroke(1.dp, HelloWorldGrayScale100),
         shape = RoundedCornerShape(8.dp),
         contentPadding = PaddingValues(
-            start = 14.dp,
-            end = 14.dp,
-            top = 4.dp,
-            bottom = 6.dp
+            start = 14.dp, end = 14.dp, top = 4.dp, bottom = 6.dp
         ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White
-        )
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
     ) {
         Text(
             text = "✚  새 채팅",
             style = AppTypography.label01,
-            color = HelloWorldMain500 // 파란색
+            color = HelloWorldMain500
         )
     }
 }
 
 @Composable
 fun RecentChatSection(
-    conversations: List<ChatInfo>,
-    onPostClick: (Int) -> Unit
+    onPostClick: (String?) -> Unit
 ) {
     Column {
         Row(
@@ -131,48 +143,26 @@ fun RecentChatSection(
                 style = AppTypography.heading04,
                 color = Color.Black
             )
-            ChatNewButton(
-                onPostClick = {
-                    onPostClick(-1)
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 14.dp)
-        ) {
-            items(conversations) { conversation ->
-                ConversationItem(
-                    conversation = conversation,
-                    onPostClick = {
-                        onPostClick(conversation.id)
-                    }
-                )
-            }
+            ChatNewButton { onPostClick("new") }
         }
     }
 }
 
 @Composable
 fun ConversationItem(
-    conversation: ChatInfo,
+    chattingRoom: ChattingRoom,
     onPostClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 10.dp)
-            .clickable { onPostClick() }
+            .clickable(onClick = onPostClick)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp),
-            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -184,7 +174,7 @@ fun ConversationItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = conversation.date.toString(),
+                text = "최근 상담", // TODO: 추후 날짜 필드 추가 시 교체
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale300
             )
@@ -193,7 +183,7 @@ fun ConversationItem(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = conversation.title,
+            text = chattingRoom.title,
             style = AppTypography.heading04,
             color = Color.Black
         )
@@ -208,8 +198,7 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .background(Color.Transparent),
+            .height(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
