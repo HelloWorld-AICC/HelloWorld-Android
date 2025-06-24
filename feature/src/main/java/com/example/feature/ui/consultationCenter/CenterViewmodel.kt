@@ -23,33 +23,44 @@ class CenterViewModel @Inject constructor() : ViewModel() {
     private val _centerList = MutableStateFlow<List<Center>>(emptyList())
     val centerList: StateFlow<List<Center>> = _centerList
 
-    // 유저 ID (필요한 경우)
-    private val _userId = MutableStateFlow<String?>(null)
-    val userId: StateFlow<String?> = _userId
-
     fun selectCenter(center: Center?) {
         _selectedCenter.value = center
     }
 
-    fun fetchCenterListIfTokenExists() {
+    fun fetchCenterListIfTokenExists(
+        page: Int = 0,
+        size: Int = 20,
+        latitude: Double,
+        longitude: Double
+    ) {
         val token = RetrofitInstance.getAccessToken()
         if (token.isNotBlank()) {
-            fetchCenterList()
+            fetchCenterList(page, size, latitude, longitude)
         } else {
             Log.w("CenterViewModel", "토큰 없음 - 센터 정보 요청 보류")
         }
     }
 
-    fun fetchCenterList() {
+    fun fetchCenterList(
+        page: Int = 0,
+        size: Int = 20,
+        latitude: Double,
+        longitude: Double
+    ) {
         viewModelScope.launch {
             try {
                 val response: ConsultationCenterResponse =
-                    RetrofitInstance.centerService.getCenterInfo()
+                    RetrofitInstance.centerService.getCenterInfo(
+                        page = page,
+                        size = size,
+                        latitude = latitude,
+                        longitude = longitude
+                    )
 
                 if (response.isSuccess) {
                     _centerList.value = response.result.centerMapList
-                    _userId.value = response.result.userId
                     Log.d("CenterViewModel", "센터 정보 성공적으로 로드됨: ${response.result.centerMapList.size}개")
+                    Log.d("CenterViewModel", "센터 정보 성공적으로 로드됨: ${response.result.centerMapList}")
                 } else {
                     Log.w("CenterViewModel", "센터 정보 응답 실패: ${response.message}")
                 }

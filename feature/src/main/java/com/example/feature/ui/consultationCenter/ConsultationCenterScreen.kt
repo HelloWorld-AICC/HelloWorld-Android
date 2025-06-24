@@ -1,8 +1,10 @@
 package com.example.feature.ui.consultationCenter
 
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,8 +36,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -55,12 +59,20 @@ fun ConsultationCenterScreen (
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var cameraMoved by remember { mutableStateOf(false) }
 
     val selectedCenter by viewModel.selectedCenter.collectAsState()
     val centerList by viewModel.centerList.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchCenterListIfTokenExists()
+    LaunchedEffect(userLocation) {
+        userLocation?.let { location ->
+            viewModel.fetchCenterListIfTokenExists(
+                page = 0,
+                size = 20,
+                latitude = location.latitude,
+                longitude = location.longitude
+            )
+        }
     }
 
     val locationPermissionState = rememberPermissionState(
@@ -92,11 +104,16 @@ fun ConsultationCenterScreen (
     DisposableEffect(locationPermissionState.status) {
         if (locationPermissionState.status.isGranted) {
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
-                override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+                override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
                         val latLng = LatLng(location.latitude, location.longitude)
                         userLocation = latLng
-                        cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+
+                        if (!cameraMoved) {
+                            cameraPositionState.position =
+                                CameraPosition.fromLatLngZoom(latLng, 15f)
+                            cameraMoved = true
+                        }
                     }
                 }
             }
@@ -112,6 +129,16 @@ fun ConsultationCenterScreen (
             }
         } else {
             onDispose {}
+        }
+    }
+
+    LaunchedEffect(selectedCenter) {
+        selectedCenter?.let { center ->
+            val latLng = LatLng(center.latitude, center.longitude)
+            val update = CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(latLng, 15f)
+            )
+            cameraPositionState.animate(update)
         }
     }
 
@@ -161,7 +188,9 @@ fun ConsultationCenterScreen (
                 selectedCenter = selectedCenter,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
+                onClick = { viewModel.selectCenter(it) }
+
             )
         }
     }
@@ -171,9 +200,9 @@ fun ConsultationCenterScreen (
 fun ConsultationCenterListOverlay(
     centerList: List<Center>,
     selectedCenter: Center?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (Center) -> Unit
 ) {
-
     val targetHeight = if (selectedCenter != null) 373.dp else 200.dp
 
     val animatedHeight by animateDpAsState(
@@ -206,7 +235,8 @@ fun ConsultationCenterListOverlay(
             ) {
                 items(centerList) { center ->
                     ConsultationCenterCard(
-                        center = center
+                        center = center,
+                        onClick = { onClick(center) } // 전달
                     )
                 }
             }
@@ -231,12 +261,16 @@ fun ConsultationCenterListOverlay(
 
 
 @Composable
-fun ConsultationCenterCard(center: Center) {
+fun ConsultationCenterCard(
+    center: Center,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp)
             .height(75.dp)
+            .clickable { onClick() } // <- 클릭 이벤트 추가
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
