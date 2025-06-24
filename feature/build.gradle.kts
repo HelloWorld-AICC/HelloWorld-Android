@@ -52,6 +52,7 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 
     implementation(project(":core-data"))
+    implementation(project(":core-domain"))
     implementation(project(":core-ui"))
 
     // Core Android dependencies
