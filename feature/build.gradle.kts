@@ -10,10 +10,10 @@ plugins {
 
 android {
     namespace = "com.example.feature"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 32
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -48,11 +48,15 @@ android {
 }
 
 dependencies {
+
+    // Module Inject
+    implementation(project(":core:model"))
+    implementation(project(":core-data"))
+    implementation(project(":core-ui"))
+
     // Lottie for Jetpack Compose 추가
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 
-    implementation(project(":core-data"))
-    implementation(project(":core-ui"))
 
     // Core Android dependencies
     implementation(libs.androidx.activity.compose)

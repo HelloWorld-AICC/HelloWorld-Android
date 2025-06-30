@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "com.example.core.ui"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 32
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
