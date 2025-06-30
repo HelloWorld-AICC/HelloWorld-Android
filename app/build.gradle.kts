@@ -9,11 +9,14 @@ plugins {
     id("com.google.android.gms.oss-licenses-plugin")
 }
 
-val googleMapKey: String = if (project.hasProperty("google_map_key")) {
-    (project.property("google_map_key") as String).replace("\"", "")
-} else {
-    ""
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        load(file.inputStream())
+    }
 }
+
+val googleMapKey = localProperties.getProperty("google_map_key") ?: ""
 
 android {
     namespace = "com.example.hello_world_mvp"

@@ -1,8 +1,10 @@
 package com.example.feature.ui.consultationCenter
 
+import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.centerInfo.CenterInfo
+import com.example.core.data.model.Center
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
@@ -34,8 +36,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -55,43 +59,21 @@ fun ConsultationCenterScreen (
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var cameraMoved by remember { mutableStateOf(false) }
 
     val selectedCenter by viewModel.selectedCenter.collectAsState()
+    val centerList by viewModel.centerList.collectAsState()
 
-    val centerList = listOf(
-        CenterInfo(
-            name = "용인시 외국인 복지센터",
-            status = "영업 중",
-            phone = "010 - 0000 - 0000",
-            address = "경기도 용인시 처인구 금령로",
-            latitude = 37.582000,
-            longitude = 126.926000
-        ),
-        CenterInfo(
-            name = "서대문 외국인 센터",
-            status = "영업 종료",
-            phone = "010 - 1234 - 5678",
-            address = "서울특별시 서대문구 연희로",
-            latitude = 37.578500,
-            longitude = 126.924500
-        ),
-        CenterInfo(
-            name = "이대 상담소",
-            status = "영업 중",
-            phone = "02 - 9876 - 5432",
-            address = "서울특별시 서대문구 이화여대길",
-            latitude = 37.581200,
-            longitude = 126.920000
-        ),
-        CenterInfo(
-            name = "신촌 외국인 상담소",
-            status = "영업 중",
-            phone = "02 - 1234 - 5678",
-            address = "서울특별시 서대문구 신촌로",
-            latitude = 37.556000,
-            longitude = 126.935000
-        )
-    )
+    LaunchedEffect(userLocation) {
+        userLocation?.let { location ->
+            viewModel.fetchCenterListIfTokenExists(
+                page = 0,
+                size = 20,
+                latitude = location.latitude,
+                longitude = location.longitude
+            )
+        }
+    }
 
     val locationPermissionState = rememberPermissionState(
         android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -122,11 +104,16 @@ fun ConsultationCenterScreen (
     DisposableEffect(locationPermissionState.status) {
         if (locationPermissionState.status.isGranted) {
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
-                override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+                override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
                         val latLng = LatLng(location.latitude, location.longitude)
                         userLocation = latLng
-                        cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+
+                        if (!cameraMoved) {
+                            cameraPositionState.position =
+                                CameraPosition.fromLatLngZoom(latLng, 15f)
+                            cameraMoved = true
+                        }
                     }
                 }
             }
@@ -142,6 +129,16 @@ fun ConsultationCenterScreen (
             }
         } else {
             onDispose {}
+        }
+    }
+
+    LaunchedEffect(selectedCenter) {
+        selectedCenter?.let { center ->
+            val latLng = LatLng(center.latitude, center.longitude)
+            val update = CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(latLng, 15f)
+            )
+            cameraPositionState.animate(update)
         }
     }
 
@@ -191,7 +188,9 @@ fun ConsultationCenterScreen (
                 selectedCenter = selectedCenter,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
+                onClick = { viewModel.selectCenter(it) }
+
             )
         }
     }
@@ -199,11 +198,11 @@ fun ConsultationCenterScreen (
 
 @Composable
 fun ConsultationCenterListOverlay(
-    centerList: List<CenterInfo>,
-    selectedCenter: CenterInfo?,
-    modifier: Modifier = Modifier
+    centerList: List<Center>,
+    selectedCenter: Center?,
+    modifier: Modifier = Modifier,
+    onClick: (Center) -> Unit
 ) {
-
     val targetHeight = if (selectedCenter != null) 373.dp else 200.dp
 
     val animatedHeight by animateDpAsState(
@@ -236,7 +235,8 @@ fun ConsultationCenterListOverlay(
             ) {
                 items(centerList) { center ->
                     ConsultationCenterCard(
-                        center = center
+                        center = center,
+                        onClick = { onClick(center) } // 전달
                     )
                 }
             }
@@ -261,12 +261,16 @@ fun ConsultationCenterListOverlay(
 
 
 @Composable
-fun ConsultationCenterCard(center: CenterInfo) {
+fun ConsultationCenterCard(
+    center: Center,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp)
             .height(75.dp)
+            .clickable { onClick() } // <- 클릭 이벤트 추가
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -284,8 +288,8 @@ fun ConsultationCenterCard(center: CenterInfo) {
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(text = "•", style = AppTypography.label03)
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = center.phone, style = AppTypography.label03)
+//                    Spacer(modifier = Modifier.width(2.dp))
+//                    Text(text = center.phone, style = AppTypography.label03)
                 }
                 Spacer(modifier = Modifier.height(4.dp)) // ← 간격 추가
 

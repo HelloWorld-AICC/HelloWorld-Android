@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.example.core.data.api.AuthService
+import com.example.core.data.api.ConsultationCenterService
 import com.example.core.data.api.UserService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -39,4 +40,5 @@ object RetrofitInstance {
 
     val authService: AuthService = retrofit.create(AuthService::class.java)
     val userService: UserService = retrofit.create(UserService::class.java)
+    val centerService : ConsultationCenterService = retrofit.create(ConsultationCenterService::class.java)
 }
