@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +48,9 @@ import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.BuildConfig
 import com.example.feature.R
+import com.example.feature.ui.mypage.viewmodel.MyPageUiState
 import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
+import com.example.model.mypage.MyPageResponse
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @Composable
@@ -61,16 +65,41 @@ fun MyPage(
     onNavigateToWithdraw: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val dialogData by viewModel.dialogData.collectAsState()
 
-    // 유저 정보 및 로딩 상태 조회
-    val userInfo by viewModel.userInfo.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    // 로그인 이후 토큰이 자동 포함된 요청으로 API 호출
-    LaunchedEffect(Unit) {
-        viewModel.fetchUserInfo()
-    }
+    MyPage(
+        onNavigateBack = onNavigateBack,
+        onNavigateToProfileEdit = onNavigateToProfileEdit,
+        onNavigateToCounselingSummary = onNavigateToCounselingSummary,
+        onNavigateToResume = onNavigateToResume,
+        onNavigateToPostAndComments = onNavigateToPostAndComments,
+        onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
+        onNavigateToTermsOfService= onNavigateToTermsOfService,
+        onNavigateToWithdraw = onNavigateToWithdraw,
+        uiState = uiState,
+        dialogData = dialogData,
+        updateDialogData = viewModel::updateDialogData
+    )
+
+}
+
+@Composable
+private fun MyPage(
+    onNavigateBack: () -> Unit = {},
+    onNavigateToProfileEdit: () -> Unit = {},
+    onNavigateToCounselingSummary: () -> Unit = {},
+    onNavigateToResume: () -> Unit = {},
+    onNavigateToPostAndComments: () -> Unit = {},
+    onNavigateToPrivacyPolicy: () -> Unit = {},
+    onNavigateToTermsOfService: () -> Unit = {},
+    onNavigateToWithdraw: () -> Unit = {},
+    uiState: MyPageUiState = MyPageUiState.Loading,
+    dialogData: DialogData? = null,
+    updateDialogData: (DialogData?) -> Unit,
+) {
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -100,236 +129,173 @@ fun MyPage(
                 color = HelloWorldGrayScale800
             )
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 38.dp, vertical = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box {
-                Image(
-                    painter = painterResource(R.drawable.ic_mascot_normal_profile),
-                    contentDescription = null
-                )
-                Icon(
-                    Icons.Default.Email,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(24.dp)
-                )
+        when (uiState) {
+            is MyPageUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = when {
-                        !userInfo?.result?.name.isNullOrBlank() -> userInfo?.result?.name ?: "이름 공백"
-                        else -> "이름 없음"
-                    },
-                    style = AppTypography.heading01,
-                    color = HelloWorldGrayScale800,
-                )
-                Text(
-                    text = "오늘도 낯선 땅에서 열심히 살아가는 당신을, 헬로월드가 항상 응원하고 있어요",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.W500,
-                    color = HelloWorldGrayScale300,
-                    lineHeight = 12.sp
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            MenuCard(
-                title = "프로필 변경",
-                onClick = onNavigateToProfileEdit,
-            )
-            MenuCard(
-                title = "내 상담 요약",
-                onClick = onNavigateToCounselingSummary,
-            )
-            MenuCard(
-                title = "이력서\n/ 자기소개서",
-                spacing = 6.dp,
-                onClick = onNavigateToResume,
-            )
-            MenuCard(
-                title = "게시글 / 댓글",
-                onClick = onNavigateToPostAndComments,
-            )
-        }
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Column {
-                Text(
-                    text = "Hello World 정보",
-                    style = AppTypography.body01,
-                    color = HelloWorldMain500,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                )
+            is MyPageUiState.Success -> {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onNavigateToTermsOfService() },
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .height(128.dp)
+                        .padding(horizontal = 38.dp, vertical = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "서비스 이용약관",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
+                    Box(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                    )
+                            .size(80.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_mascot_normal_profile), // TODO ima 경로 연결
+                            contentDescription = null
+                        )
+                        Icon(
+                            Icons.Default.Email,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(24.dp)
+                        )
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = uiState.userInfo.name,
+                            style = AppTypography.heading01,
+                            color = HelloWorldGrayScale800,
+                        )
+                        Text(
+                            text = "오늘도 낯선 땅에서 열심히 살아가는 당신을, 헬로월드가 항상 응원하고 있어요",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.W500,
+                            color = HelloWorldGrayScale300,
+                            lineHeight = 12.sp
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onNavigateToPrivacyPolicy() },
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "개인정보 처리방침",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
+                    MenuCard(
+                        title = "프로필 변경",
+                        onClick = onNavigateToProfileEdit,
                     )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
+                    MenuCard(
+                        title = "내 상담 요약",
+                        onClick = onNavigateToCounselingSummary,
+                    )
+                    MenuCard(
+                        title = "이력서\n/ 자기소개서",
+                        spacing = 6.dp,
+                        onClick = onNavigateToResume,
+                    )
+                    MenuCard(
+                        title = "게시글 / 댓글",
+                        onClick = onNavigateToPostAndComments,
                     )
                 }
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            OssLicensesMenuActivity.setActivityTitle("오픈소스 라이선스")
-                            context.startActivity(
-                                Intent(
-                                    context,
-                                    OssLicensesMenuActivity::class.java
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "Hello World 정보",
+                            style = AppTypography.body01,
+                            color = HelloWorldMain500,
+                            modifier = Modifier
+                                .height(35.dp)
+                                .padding(vertical = 8.dp),
+                        )
+                        MenuListItem(
+                            title = "서비스 이용약관",
+                            onClick = { onNavigateToTermsOfService() }
+                        )
+                        MenuListItem(
+                            title = "개인정보 처리방침",
+                            onClick = { onNavigateToPrivacyPolicy() }
+                        )
+                        MenuListItem(
+                            title = "오픈소스 라이선스",
+                            onClick = {
+                                OssLicensesMenuActivity.setActivityTitle("오픈소스 라이선스")
+                                context.startActivity(
+                                    Intent(
+                                        context,
+                                        OssLicensesMenuActivity::class.java
+                                    )
                                 )
+                            }
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "앱 버전",
+                                style = AppTypography.body02,
+                                color = HelloWorldGrayScale800,
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
                             )
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "오픈소스 라이선스",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "앱 버전",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                    )
-                    Text(
-                        text = BuildConfig.APP_VERSION_NAME,
-                        style = AppTypography.body02,
-                        color = HelloWorldMain500,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                    )
-                }
-            }
-            Column {
-                Text(
-                    text = "계정",
-                    style = AppTypography.body01,
-                    color = HelloWorldMain500,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            viewModel.updateDialogData(
-                                DialogData(
-                                    title = "로그아웃 하시겠어요?",
-                                    subTitle = "다음에 다시 만나요!",
-                                    dismiss = "취소",
-                                    confirm = "로그아웃",
-                                    onDismiss = { viewModel.updateDialogData() },
-                                    onConfirm = {
-                                        // TODO 로그아웃 처리
-                                        viewModel.updateDialogData()
-                                    }
+                            Text(
+                                text = BuildConfig.APP_VERSION_NAME,
+                                style = AppTypography.body02,
+                                color = HelloWorldMain500,
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                            )
+                        }
+                    }
+                    Column {
+                        Text(
+                            text = "계정",
+                            style = AppTypography.body01,
+                            color = HelloWorldMain500,
+                            modifier = Modifier
+                                .height(35.dp)
+                                .padding(vertical = 8.dp)
+                        )
+                        MenuListItem(
+                            title = "로그아웃",
+                            onClick = {
+                                updateDialogData(
+                                    DialogData(
+                                        title = "로그아웃 하시겠어요?",
+                                        subTitle = "다음에 다시 만나요!",
+                                        dismiss = "취소",
+                                        confirm = "로그아웃",
+                                        onDismiss = { updateDialogData(null) },
+                                        onConfirm = {
+                                            // TODO 로그아웃 처리
+                                            updateDialogData(null)
+                                        }
+                                    )
                                 )
-                            )
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "로그아웃",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onNavigateToWithdraw() },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "탈퇴하기",
-                        style = AppTypography.body02,
-                        color = HelloWorldGrayScale800,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                    )
-                    Icon(
-                        painter = painterResource(R.drawable.ic_keyboard_arrow_right),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                    )
+                            }
+                        )
+                        MenuListItem(
+                            title = "탈퇴하기",
+                            onClick = { onNavigateToWithdraw() }
+                        )
+                    }
                 }
             }
+            is MyPageUiState.Error -> TODO()
         }
     }
 
@@ -365,7 +331,33 @@ private fun MenuCard(
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+private fun MenuListItem(
+    title: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = AppTypography.body02,
+            color = HelloWorldGrayScale800,
+        )
+        Icon(
+            painter = painterResource(R.drawable.ic_keyboard_arrow_right),
+            contentDescription = null,
+            tint = Color.Unspecified,
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
 @Composable
 private fun MyPagePreview() {
     MyPage(
@@ -377,5 +369,12 @@ private fun MyPagePreview() {
         onNavigateToPrivacyPolicy = {},
         onNavigateToTermsOfService = {},
         onNavigateToWithdraw = {},
+        uiState = MyPageUiState.Success(
+            MyPageResponse(
+                name = "JParkBro",
+                userImg = "",
+            )
+        ),
+        updateDialogData = {}
     )
 }

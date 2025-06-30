@@ -17,11 +17,11 @@ val googleMapKey: String = if (project.hasProperty("google_map_key")) {
 
 android {
     namespace = "com.example.hello_world_mvp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.hello_world_mvp"
-        minSdk = 26
+        minSdk = 32
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -58,9 +58,15 @@ android {
     }
 
     dependencies {
-        implementation("com.airbnb.android:lottie-compose:6.1.0")
+
+        // Module Inject
+        implementation(project(":core:model"))
+        implementation(project(":core:network"))
+        implementation(project(":core-data"))
         implementation(project(":core-ui"))
         implementation(project(":feature"))
+
+        implementation("com.airbnb.android:lottie-compose:6.1.0")
         implementation(libs.androidx.navigation.compose)
 
         val composeBom = platform("androidx.compose:compose-bom:2025.02.00")
@@ -94,6 +100,5 @@ android {
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-        implementation(project(":core-data"))
     }
 }

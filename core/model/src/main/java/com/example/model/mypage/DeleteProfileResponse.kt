@@ -1,0 +1,10 @@
+package com.example.model.mypage
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class DeleteProfileResponse(
+    @SerialName("message")
+    val message: String,
+)

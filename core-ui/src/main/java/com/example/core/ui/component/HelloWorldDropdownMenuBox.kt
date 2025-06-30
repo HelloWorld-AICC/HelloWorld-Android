@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import com.example.core.ui.theme.HelloWorldMain100
 @Composable
 fun <T> HWDropdownMenuBox(
     modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(12.dp),
     selectedItem: T? = null,
     items: List<T> = emptyList(),
     iconPosition: IconPosition = IconPosition.RIGHT,
@@ -49,22 +51,22 @@ fun <T> HWDropdownMenuBox(
     Column(
         modifier = modifier
             .border(2.dp, HelloWorldMain100, RoundedCornerShape(8.dp))
-            .background(Color.White),
-    ) {
+            .background(Color.White, RoundedCornerShape(8.dp)),
+        ) {
         Row(
             modifier = modifier
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) { onExpandedChange() }
-                .padding(12.dp),
+                .padding(padding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (iconPosition == IconPosition.LEFT) {
                 Icon(
                     painter = painterResource(
-                        if (expanded) R.drawable.ic_keyboard_arrow_down else R.drawable.ic_keyboard_arrow_up
+                        if (expanded) R.drawable.ic_keyboard_arrow_up else R.drawable.ic_keyboard_arrow_down
                     ),
                     contentDescription = null,
                     tint = Color.Unspecified,
@@ -83,7 +85,7 @@ fun <T> HWDropdownMenuBox(
             if (iconPosition == IconPosition.RIGHT) {
                 Icon(
                     painter = painterResource(
-                        if (expanded) R.drawable.ic_keyboard_arrow_down else R.drawable.ic_keyboard_arrow_up
+                        if (expanded) R.drawable.ic_keyboard_arrow_up else R.drawable.ic_keyboard_arrow_down
                     ),
                     contentDescription = null,
                     tint = Color.Unspecified,
@@ -112,7 +114,7 @@ fun <T> HWDropdownMenuBox(
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() }
                                 ) { onClick(item) }
-                                .padding(12.dp),
+                                .padding(padding),
                             horizontalArrangement = if (iconPosition == IconPosition.LEFT) {
                                 Arrangement.End
                             } else {

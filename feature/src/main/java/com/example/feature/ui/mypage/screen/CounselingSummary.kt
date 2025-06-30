@@ -3,6 +3,7 @@ package com.example.feature.ui.mypage.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,18 +30,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
+import com.example.feature.ui.mypage.viewmodel.CounselingSummaryUiState
+import com.example.feature.ui.mypage.viewmodel.CounselingSummaryViewModel
 
 @Composable
 fun CounselingSummary(
     onNavigateBack: () -> Unit,
     onNavigateToCounselingDetail: () -> Unit,
+    viewModel: CounselingSummaryViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    CounselingSummary(
+        onNavigateBack = onNavigateBack,
+        onNavigateToCounselingDetail = onNavigateToCounselingDetail,
+        uiState = uiState,
+        getAllSummary = viewModel::getAllSummary
+    )
+}
+
+@Composable
+private fun CounselingSummary(
+    onNavigateBack: () -> Unit,
+    onNavigateToCounselingDetail: () -> Unit,
+    uiState: CounselingSummaryUiState,
+    getAllSummary: (page: Int, size: Int) -> Unit,
+) {
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -65,15 +92,30 @@ fun CounselingSummary(
                 color = HelloWorldGrayScale800
             )
         }
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-        ) {
-            items(20) {
-                ChatItem(
-                    onClick = { onNavigateToCounselingDetail() }
-                )
+        when (uiState) {
+            is CounselingSummaryUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
+            is CounselingSummaryUiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                ) {
+                    // TODO 빈 리스트일때 띄울 컴포넌트 작성 필요
+                    items(uiState.result) {
+                        ChatItem(
+                            onClick = { onNavigateToCounselingDetail() }
+                        )
+                    }
+                }
+            }
+            is CounselingSummaryUiState.Error -> TODO()
         }
     }
 }

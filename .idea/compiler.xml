@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="11">
+      <module name="HelloWorld.app" target="21" />
+      <module name="HelloWorld.core-data" target="21" />
+      <module name="HelloWorld.core-domain" target="21" />
+      <module name="HelloWorld.core-ui" target="21" />
+      <module name="HelloWorld.core.network" target="21" />
+      <module name="HelloWorld.feature" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -57,13 +57,13 @@ fun HWDialog(
             }
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(48.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .height(40.dp)
                         .weight(1f)
                         .background(HelloWorldGrayScale200)
                         .clickable { data.onDismiss() },
@@ -77,7 +77,6 @@ fun HWDialog(
                 }
                 Box(
                     modifier = Modifier
-                        .height(40.dp)
                         .weight(1f)
                         .background(HelloWorldMain400)
                         .clickable { data.onConfirm() },
