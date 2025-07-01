@@ -1,45 +1,89 @@
 package com.example.feature.ui.mypage.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.feature.R
-import com.example.feature.ui.community.CommunityPost
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import androidx.lifecycle.viewModelScope
+import com.example.core.data.mypage.MyPageRepository
+import com.example.model.mypage.AllCommentResponse
+import com.example.model.mypage.AllCommunityResponse
+import com.example.model.mypage.Comment
+import com.example.model.mypage.Community
+import com.example.model.mypage.PageSizeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PostAndCommentsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val myPageRepository: MyPageRepository,
 ) : ViewModel() {
 
-    private val _selectedMenu = MutableStateFlow<String>("게시글")
-    val selectedMenu: StateFlow<String> = _selectedMenu
+    private val _uiState = MutableStateFlow<MyPostAndCommentUiState>(MyPostAndCommentUiState.Loading)
+    val uiState: StateFlow<MyPostAndCommentUiState> = _uiState.asStateFlow()
 
-    private val _posts = MutableStateFlow<List<CommunityPost>>(emptyList())
-    val posts: StateFlow<List<CommunityPost>> = _posts
+    private val _selectedMenu = MutableStateFlow<String>("게시글")
+    val selectedMenu: StateFlow<String> = _selectedMenu.asStateFlow()
+
+    private val _posts = MutableStateFlow<List<Community>>(emptyList())
+    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
 
     init {
-        loadData(context)
+        loadData()
     }
 
     fun changeMenu(menu: String) {
         _selectedMenu.value = menu
+        _posts.value = emptyList()
+        _comments.value = emptyList()
+        loadData(menu)
     }
 
-    private fun loadData(context: Context) {
-        val inputStream = context.resources.openRawResource(R.raw.dummy_community)
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-
-        val gson = Gson()
-        val listType = object : TypeToken<List<CommunityPost>>() {}.type
-        val allPosts: List<CommunityPost> = gson.fromJson(jsonString, listType)
-
-        _posts.value = allPosts.filter { it.category == "problem" }
+    fun loadData(type: String = "게시글", page: Int = 0, size: Int = 10) {
+        viewModelScope.launch {
+            MyPostAndCommentUiState.Loading
+            when (type) {
+                "게시글" -> {
+                    myPageRepository.getAllMyCommunity(
+                        PageSizeRequest(
+                            page = page,
+                            size = size,
+                        )
+                    ).fold(
+                        onSuccess = {
+                            _posts.value += it.allMyCommunityList
+                            _uiState.value = MyPostAndCommentUiState.Success(_posts.value)
+                        },
+                        onFailure = {
+                            _uiState.value = MyPostAndCommentUiState.Error("${it.message}")
+                        }
+                    )
+                }
+                "댓글" -> {
+                    myPageRepository.getAllMyComment(
+                        PageSizeRequest(
+                            page = page,
+                            size = size,
+                        )
+                    ).fold(
+                        onSuccess = {
+                            _comments.value += it.allMyCommentList
+                            _uiState.value = MyPostAndCommentUiState.Success(_comments.value)
+                        },
+                        onFailure = {
+                            _uiState.value = MyPostAndCommentUiState.Error("${it.message}")
+                        }
+                    )
+                }
+            }
+        }
     }
 
+}
+
+sealed interface MyPostAndCommentUiState {
+    data object Loading: MyPostAndCommentUiState
+    data class Success<T>(val result: List<T>): MyPostAndCommentUiState
+    data class Error(val msg: String): MyPostAndCommentUiState
 }

@@ -174,7 +174,7 @@ fun ConversationItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = "최근 상담", // TODO: 추후 날짜 필드 추가 시 교체
+                text = "최근 상담",
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale300
             )

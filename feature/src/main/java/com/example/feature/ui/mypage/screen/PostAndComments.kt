@@ -1,10 +1,12 @@
 package com.example.feature.ui.mypage.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -38,26 +43,47 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.component.HWDropdownMenuBox
 import com.example.core.ui.component.IconPosition
 import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldGrayScale200
 import com.example.core.ui.theme.HelloWorldGrayScale300
+import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain500
+import com.example.core.util.extension.truncateWithEllipsis
 import com.example.feature.R
 import com.example.feature.ui.community.CommunityPostItem
+import com.example.feature.ui.mypage.viewmodel.MyPostAndCommentUiState
 import com.example.feature.ui.mypage.viewmodel.PostAndCommentsViewModel
+import com.example.model.mypage.Comment
+import com.example.model.mypage.Community
 
 @Composable
-fun PostAndComments(
+internal fun PostAndComments(
     onNavigateBack: () -> Unit,
     viewModel: PostAndCommentsViewModel = hiltViewModel()
 ) {
     val selectedMenu by viewModel.selectedMenu.collectAsState()
-    val posts by viewModel.posts.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val density = LocalDensity.current
+    PostAndComments(
+        onNavigateBack = onNavigateBack,
+        selectedMenu = selectedMenu,
+        uiState = uiState,
+        changeMenu = viewModel::changeMenu
+    )
 
-    // TODO viewmodel
+}
+
+@Composable
+private fun PostAndComments(
+    onNavigateBack: () -> Unit,
+    selectedMenu: String = "게시글",
+    uiState: MyPostAndCommentUiState = MyPostAndCommentUiState.Loading,
+    changeMenu: (String) -> Unit,
+) {
     val options: List<String> = listOf("게시글", "댓글")
     var expanded by remember { mutableStateOf(false) }
+
+    val density = LocalDensity.current
 
     Column(
         modifier = Modifier
@@ -96,6 +122,7 @@ fun PostAndComments(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 HWDropdownMenuBox(
+                    padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     selectedItem = selectedMenu,
                     items = options,
                     iconPosition = IconPosition.LEFT,
@@ -103,7 +130,7 @@ fun PostAndComments(
                     iconSize = 12.dp,
                     onExpandedChange = { expanded = !expanded },
                     onClick = {
-                        viewModel.changeMenu(it)
+                        changeMenu(it)
                         expanded = false
                     },
                     modifier = Modifier
@@ -129,47 +156,165 @@ fun PostAndComments(
                     hideSelectedItem = true
                 )
             }
-            if (posts.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = (
-                                with(density) {
-                                    48.dp + AppTypography.label01.fontSize.toDp()
-                                }
-                        ))
-                ) {
-                    items(posts) { post ->
-                        CommunityPostItem(
-                            post = post,
-                            onPostClick = {  }
-                        )
-                        // TODO 댓글 용 composable 만들기
+            when (uiState) {
+                is MyPostAndCommentUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_mascot_error),
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
-                        style = AppTypography.label02,
-                        color = HelloWorldGrayScale300,
-                        textAlign = TextAlign.Center
-                    )
+
+                is MyPostAndCommentUiState.Success<*> -> {
+                    if (uiState.result.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 24.dp)
+                                .padding(
+                                    top = (with(density) {
+                                        48.dp + AppTypography.label01.fontSize.toDp()
+                                    })
+                                )
+                        ) {
+                            items(uiState.result) { item ->
+                                when (item) {
+                                    is Community -> {
+                                        CommunityItem(
+                                            item = item,
+                                            onItemClick = {}
+                                        )
+                                    }
+
+                                    is Comment -> {
+                                        CommentItem(
+                                            item = item,
+                                            onItemClick = {}
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_mascot_error),
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale300,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
+
+                is MyPostAndCommentUiState.Error -> TODO()
             }
         }
     }
+}
+
+@Composable
+private fun CommunityItem(
+    item: Community,
+    modifier: Modifier = Modifier,
+    onItemClick: (Long) -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onItemClick(item.communityId) }
+            .padding(vertical = 20.dp)
+    ) {
+        /*Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Text(
+                    text = item.title.truncateWithEllipsis(20),
+                    style = AppTypography.body02,
+                    color = HelloWorldGrayScale800,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = item.content.truncateWithEllipsis(if (item.thumbnail) 30 else 40),
+                    style = AppTypography.label01,
+                    color = HelloWorldGrayScale500,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if (item.thumbnail) {
+                Spacer(modifier = Modifier.width(40.dp))
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(HelloWorldGrayScale200)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 카테고리, 날짜
+            Text(
+                text = "${item.category} • ${item.uploadedAt}",
+                style = AppTypography.label03,
+                color = HelloWorldGrayScale500
+            )
+            // 댓글
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_comment),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(10.dp),
+                    tint = HelloWorldGrayScale500
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = item.commentCount,
+                    style = AppTypography.label03,
+                    color = HelloWorldGrayScale500
+                )
+            }
+        }*/
+    }
+}
+
+@Composable
+private fun CommentItem(
+    item: Comment,
+    modifier: Modifier = Modifier,
+    onItemClick: (Long) -> Unit,
+) {
+
 }
 
 @Preview(showBackground = true)
