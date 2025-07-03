@@ -46,7 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.domain.model.ChatLog
+import com.example.core.data.model.aichat.AIChatMessage
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
@@ -111,7 +111,7 @@ internal fun RecentChattingScreen(
         }
 
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 10.dp, bottom = 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -181,10 +181,10 @@ internal fun RecentChattingScreen(
 
 
 @Composable
-fun ChatBubble(msg: ChatLog, viewModel: ChatViewModel) {
+fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
-    val isUser = msg.sender == "USER"
+    val isUser = msg.sender == "user"
 
     Row(
         modifier = Modifier
@@ -209,7 +209,7 @@ fun ChatBubble(msg: ChatLog, viewModel: ChatViewModel) {
                 )
             }
 
-            if (!isUser && msg.showSummaryIcon) {
+            if (!isUser && msg.sender.lowercase() == "bot") {
                 Image(
                     painter = painterResource(id = R.drawable.ic_summary),
                     contentDescription = "Summarize",

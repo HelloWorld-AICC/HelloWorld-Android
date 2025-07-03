@@ -34,7 +34,7 @@ fun NavGraphBuilder.aiChatDetailScreen(
         val roomId = backStackEntry.arguments?.getString("roomId") ?: return@composable
 
         // "new"인 경우 새 채팅 로직
-        if (roomId == "new") {
+        if (roomId == "new_chat") {
             // 예: ViewModel에서 새로운 roomId 생성 및 상태 준비
         }
 

@@ -1,4 +1,4 @@
-package com.example.core.data.model
+package com.example.core.data.model.aichat
 
 data class AIChatLogResponse(
     val roomId : String,

@@ -1,7 +1,8 @@
 package com.example.core.data.api
 
-import com.example.core.data.model.AIChatLogResponse
-import com.example.core.data.model.ChattingRoomsResponse
+import com.example.core.data.model.aichat.AIChatLogResponse
+import com.example.core.data.model.aichat.ChattingRoom
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -22,11 +23,11 @@ interface AIChatService {
     @Streaming
     suspend fun askToAI(
         @Query("roomId") roomId : String,
-        @Body request: String
+        @Body request: RequestBody
     ) : Response<ResponseBody>
 
     @GET("user/room-list")
-    suspend fun getAIChattingRooms() : ChattingRoomsResponse
+    suspend fun getAIChattingRooms() : List<ChattingRoom>
 
     @GET("chat/room-log")
     suspend fun getAIChatLog(

@@ -3,8 +3,7 @@ package com.example.feature.ui.aichat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.data.model.ChattingRoom
-import com.example.core.data.model.ChattingRoomsResponse
+import com.example.core.data.model.aichat.ChattingRoom
 import com.example.core.data.network.RetrofitInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -24,13 +23,13 @@ class AIChatViewModel @Inject constructor() : ViewModel() {
             viewModelScope.launch {
                 try {
                     val response = RetrofitInstance.aiChatService.getAIChattingRooms()
-                    _chattingRooms.value = response.rooms
+                    _chattingRooms.value = response.reversed()
+                    Log.d("AIChatViewModel", "채팅방 목록: ${_chattingRooms.value}")
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("AIChatViewModel", "채팅방 목록 로드 실패: ${e.message}", e)
                 }
             }
         } else {
-            // 로그 출력
             Log.w("AIChatViewModel", "토큰 없음 - 채팅방 목록 요청 보류")
         }
     }

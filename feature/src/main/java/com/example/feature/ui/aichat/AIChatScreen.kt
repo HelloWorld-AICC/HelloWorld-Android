@@ -34,7 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.model.ChattingRoom
+import com.example.core.data.model.aichat.ChattingRoom
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
@@ -143,7 +143,7 @@ fun RecentChatSection(
                 style = AppTypography.heading04,
                 color = Color.Black
             )
-            ChatNewButton { onPostClick("new") }
+            ChatNewButton { onPostClick("new_chat") }
         }
     }
 }
