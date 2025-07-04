@@ -198,5 +198,17 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun summarizeMessage(text: String): Boolean = true
+    fun summarizeMessage() {
+        val roomId = _selectedChatId.value ?: return
+
+        viewModelScope.launch {
+            try {
+                Log.d("ChatViewModel", "📌 요약 요청: roomId=$roomId")
+                RetrofitInstance.aiChatService.summaryAIChat(roomId)
+                Log.d("ChatViewModel", "✅ 요약 요청 성공")
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "❌ 요약 요청 실패", e)
+            }
+        }
+    }
 }

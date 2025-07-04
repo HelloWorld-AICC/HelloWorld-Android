@@ -217,7 +217,8 @@ fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel) {
                         .size(20.dp)
                         .offset(x = 23.dp)
                         .clickable {
-                            showDialog = viewModel.summarizeMessage(msg.content)
+                            viewModel.summarizeMessage()
+                            showDialog = true
                         }
                 )
             }
