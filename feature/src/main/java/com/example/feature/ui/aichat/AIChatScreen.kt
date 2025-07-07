@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,6 +42,7 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
+
 
 @Composable
 internal fun AiChatScreen(
@@ -85,6 +87,22 @@ internal fun AiChatScreen(
                     )
                 }
             }
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.ic_chat_empty),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp, start = 24.dp, end = 24.dp)
+                    .height(200.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(id = R.string.no_chat_content),
+                style = AppTypography.label01,
+                color = HelloWorldGrayScale300,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -118,8 +136,14 @@ fun ChatNewButton(
         ),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_plus),
+            contentDescription = "새 채팅 아이콘",
+            modifier = Modifier.size(12.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "✚  새 채팅",
+            text = "새 채팅",
             style = AppTypography.label01,
             color = HelloWorldMain500
         )
