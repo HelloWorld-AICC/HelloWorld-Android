@@ -23,7 +23,7 @@ class AIChatViewModel @Inject constructor() : ViewModel() {
             viewModelScope.launch {
                 try {
                     val response = RetrofitInstance.aiChatService.getAIChattingRooms()
-                    _chattingRooms.value = response.reversed()
+                    _chattingRooms.value = response
                     Log.d("AIChatViewModel", "채팅방 목록: ${_chattingRooms.value}")
                 } catch (e: Exception) {
                     Log.e("AIChatViewModel", "채팅방 목록 로드 실패: ${e.message}", e)

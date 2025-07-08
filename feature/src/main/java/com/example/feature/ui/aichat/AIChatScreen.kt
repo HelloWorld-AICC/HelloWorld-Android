@@ -42,7 +42,8 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
-
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 internal fun AiChatScreen(
@@ -114,7 +115,7 @@ fun Banner() {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
+            .height(145.dp)
             .clip(RoundedCornerShape(8.dp))
     )
 }
@@ -198,7 +199,7 @@ fun ConversationItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = "최근 상담",
+                text = formatUpdatedAt(chattingRoom.updatedAt),
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale300
             )
@@ -233,3 +234,13 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
         )
     }
 }
+
+fun formatUpdatedAt(updatedAt: String?): String {
+    return try {
+        val parsedDate = LocalDateTime.parse(updatedAt, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        parsedDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+    } catch (e: Exception) {
+        "날짜 정보 없음"
+    }
+}
+
