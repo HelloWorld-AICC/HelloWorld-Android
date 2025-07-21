@@ -1,23 +1,27 @@
 package com.example.network.mypage
 
+import android.net.Uri
 import com.example.model.mypage.AllCommentResponse
 import com.example.model.mypage.AllCommunityResponse
 import com.example.model.mypage.AllSummaryResponse
 import com.example.model.mypage.DeleteProfileResponse
 import com.example.model.mypage.DetailSummaryRequest
 import com.example.model.mypage.DetailSummaryResponse
-import com.example.model.mypage.MyPageResponse
+import com.example.model.mypage.UserInfo
 import com.example.model.mypage.PageSizeRequest
 import com.example.model.mypage.UpdateProfileResponse
-import java.io.File
 
 interface MyPageDataSource {
-    suspend fun getMyPage(): Result<MyPageResponse>
+    suspend fun getMyPage(): Result<UserInfo>
 
     suspend fun setProfile(
         nickName: String,
-        file: File?
+        userImg: ByteArray?,
     ): Result<UpdateProfileResponse>
+
+    suspend fun setLanguage(
+        language: Long,
+    ): Result<Unit>
 
     suspend fun getAllSummary(
         request: PageSizeRequest

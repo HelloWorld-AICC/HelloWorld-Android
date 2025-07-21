@@ -41,6 +41,7 @@ dependencies {
     // Module Inject
     implementation(project(":core:network"))
     implementation(project(":core:model"))
+    implementation(project(":core:datastore"))
 
     // Hilt
     implementation(libs.hilt.android)

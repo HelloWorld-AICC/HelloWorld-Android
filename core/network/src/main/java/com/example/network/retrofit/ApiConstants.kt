@@ -10,4 +10,11 @@ object ApiConstants {
     const val DELETE_PROFILE = "myPage/delete"              // DELETE   회원 탈퇴
     const val ALL_MY_COMMUNITY = "myPage/AllMyCommunity"    // GET      본인 작성 글 조회
     const val ALL_MY_COMMENT = "myPage/AllMyComment"        // GET      본인 작성 댓글 조회
+
+    const val GET_COMMUNITY_POST_LIST = "community/{category_id}/list"                      // GET
+    const val CREATE_COMMUNITY_POST = "community/{category_id}/create"                      // POST
+    const val GET_COMMUNITY_POST_DETAIL = "community/{category_id}/detail/{community_id}"   // GET
+    const val CREATE_COMMUNITY_COMMENT = "community/{community_id}/comment"                 // POST
+
+    const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST
 }
