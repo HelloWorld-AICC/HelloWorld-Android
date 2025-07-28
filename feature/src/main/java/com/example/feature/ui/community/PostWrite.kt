@@ -1,5 +1,11 @@
 package com.example.feature.ui.community
 
+import android.R.attr.mimeType
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,16 +40,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.video.videoFrameMillis
+import com.airbnb.lottie.animation.content.Content
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
@@ -61,19 +75,57 @@ import com.example.feature.R
 @Composable
 internal fun CommunityPostWrite(
     onNavigateBack: () -> Unit,
+    onCommunityUpdated: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostWriteViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val selectedTab by viewModel.selectedTab.collectAsState()
     val title by viewModel.title.collectAsState()
     val content by viewModel.content.collectAsState()
     val dialogData by viewModel.dialogData.collectAsState()
-
-    val posts = remember { mutableStateListOf<String>() }
-    val charRange = ('A'..'Z')
+    val images by viewModel.images.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
+
+    // 이미지 결과 처리 함수
+    fun handleImageResult(uri: List<Uri>) {
+        viewModel.addImages(uri)
+    }
+    fun filterMediaByCount(uris: List<Uri>, maxImages: Int, maxVideos: Int): List<Uri> {
+        val imageUris = mutableListOf<Uri>()
+        val videoUris = mutableListOf<Uri>()
+
+        uris.forEach { uri ->
+            val mimeType = context.contentResolver.getType(uri)
+            when {
+                mimeType?.startsWith("image/") == true && imageUris.size < maxImages -> {
+                    imageUris.add(uri)
+                }
+                mimeType?.startsWith("video/") == true && videoUris.size < maxVideos -> {
+                    videoUris.add(uri)
+                }
+            }
+        }
+
+        return imageUris + videoUris
+    }
+    // 갤러리 런처
+    /*val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 12)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            val filteredUris = filterMediaByCount(uris, maxImages = 10, maxVideos = 2)
+            handleImageResult(filteredUris)
+        }
+    }*/
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10)
+    ) { uri ->
+        handleImageResult(uri)
+    }
 
     Column(
         modifier = modifier
@@ -162,26 +214,26 @@ internal fun CommunityPostWrite(
                     TabIconAndLabel(
                         title = "직장 내 고충",
                         icon = painterResource(R.drawable.ic_problem),
-                        onIconClick = { viewModel.changeTab("problem") },
-                        isSelected = selectedTab == "problem",
+                        onIconClick = { viewModel.changeTab(0) },
+                        isSelected = selectedTab == 0,
                     )
                     TabIconAndLabel(
                         title = "체류 및 비자",
                         icon = painterResource(R.drawable.ic_national),
-                        onIconClick = { viewModel.changeTab("national") },
-                        isSelected = selectedTab == "national",
+                        onIconClick = { viewModel.changeTab(1) },
+                        isSelected = selectedTab == 1,
                     )
                     TabIconAndLabel(
                         title = "산재 및 의료",
                         icon = painterResource(R.drawable.ic_medical),
-                        onIconClick = { viewModel.changeTab("medical") },
-                        isSelected = selectedTab == "medical",
+                        onIconClick = { viewModel.changeTab(2) },
+                        isSelected = selectedTab == 2,
                     )
                     TabIconAndLabel(
                         title = "기타",
                         icon = painterResource(R.drawable.ic_etc),
-                        onIconClick = { viewModel.changeTab("etc") },
-                        isSelected = selectedTab == "etc",
+                        onIconClick = { viewModel.changeTab(3) },
+                        isSelected = selectedTab == 3,
                     )
                 }
             }
@@ -299,15 +351,16 @@ internal fun CommunityPostWrite(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    if (posts.size < 12) {
+                    if (images.size < 12) {
                         Box(
                             modifier = Modifier
                                 .size(50.dp)
                                 .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable {
-                                    val randomChar = charRange.random().toString()
-                                    posts.add(randomChar)
+//                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -320,17 +373,12 @@ internal fun CommunityPostWrite(
                             )
                         }
                     }
-                    // TODO Image 추가
-                    posts.forEachIndexed { index, item ->
-                        Box(
-                            modifier = Modifier
-                                .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
-                                .size(50.dp)
-                                .clickable {
-                                    posts.removeAt(index)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) { Text(text = item) }
+                    images.forEach { imageUri ->
+                        MediaContentBox(
+                            context = context,
+                            imageUri = imageUri,
+                            onRemoveMedia = viewModel::removeImage
+                        )
                     }
                 }
             }
@@ -345,11 +393,11 @@ internal fun CommunityPostWrite(
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale300,
                 )
-                Text(
+/*                Text(
                     text = "영상은 최대 2개까지 업로드 가능합니다",
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale300,
-                )
+                )*/
                 Text(
                     text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
                     style = AppTypography.label03,
@@ -364,7 +412,7 @@ internal fun CommunityPostWrite(
         }
         TextButton(
             onClick = {
-                // TODO isUpdate 관련 변수 필요
+                focusManager.clearFocus()
                 viewModel.updateDialogData(
                     DialogData(
                         title = "게시글을 게시하시겠어요?",
@@ -373,8 +421,8 @@ internal fun CommunityPostWrite(
                         confirm = "게시하기",
                         onDismiss = { viewModel.updateDialogData() },
                         onConfirm = {
-                            // TODO api 추가
                             viewModel.updateDialogData()
+                            viewModel.submitCommunityPost(context, onResult = { result -> if (result) { onCommunityUpdated() } })
                         }
                     )
                 )
@@ -396,7 +444,6 @@ internal fun CommunityPostWrite(
             )
         ) {
             Text(
-                // TODO isUpdate 관련 변수 필요
                 text = "완료",
                 style = AppTypography.heading01,
             )
@@ -407,10 +454,62 @@ internal fun CommunityPostWrite(
     }
 }
 
+@Composable
+private fun MediaContentBox(
+    context: Context,
+    imageUri: Uri,
+    onRemoveMedia: (Uri) -> Unit,
+) {
+    val mimeType = remember(imageUri) {
+        context.contentResolver.getType(imageUri)
+    }
+
+    var showDeleteIcon by remember { mutableStateOf(false) }
+
+    Box {
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(imageUri)
+                .apply {
+                    if (mimeType?.startsWith("video/") == true) {
+                        videoFrameMillis(500)
+                    }
+                }
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .size(50.dp)
+                .clickable { showDeleteIcon = true }
+        )
+        if (showDeleteIcon) {
+            Box(
+                modifier = Modifier
+                    .background(Color(0x4D0C0C0C), RoundedCornerShape(8.dp))
+                    .size(50.dp)
+                    .clickable {
+                        onRemoveMedia(imageUri)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(28.dp),
+                    tint = Color.Unspecified
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun CommunityPostWritePreview() {
     CommunityPostWrite(
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onCommunityUpdated = {},
     )
 }

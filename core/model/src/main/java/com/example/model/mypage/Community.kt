@@ -9,10 +9,16 @@ data class Community(
     val communityId: Long,
     @SerialName("title")
     val title: String,
+    @SerialName("content")
+    val content: String,
     @SerialName("uploadedAt")
     val uploadedAt: String,
     @SerialName("category")
     val category: String,
+    @SerialName("commentCnt")
+    val commentCnt: Int,
+    @SerialName("imageUrl")
+    val imageUrl: String? = null,
 )
 
 @Serializable

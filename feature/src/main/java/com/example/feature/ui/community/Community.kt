@@ -1,7 +1,7 @@
 package com.example.feature.ui.community
 
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -39,56 +42,67 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.example.core.ui.theme.AppTypography
-import com.example.core.ui.theme.HelloWorldGrayScale200
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
+import com.example.core.ui.theme.HelloWorldMain500
+import com.example.core.util.extension.toCategoryName
+import com.example.core.util.extension.toFormattedDate
 import com.example.core.util.extension.truncateWithEllipsis
 import com.example.feature.R
+import com.example.model.community.Post
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun Community(
-    onNavigateToCommunityPostWrite: () -> Unit,
-    onNavigateToCommunityPostDetail: () -> Unit,
+    onNavigateToCommunityPostWrite: (Int) -> Unit,
+    onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
+    onCheckCommunityUpdate: () -> Boolean,
+    onClearCommunityUpdate: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CommunityViewModel = hiltViewModel()
 ) {
     val selectedTab by viewModel.selectedTab.collectAsState()
+
     val problemPosts by viewModel.problemPosts.collectAsState()
     val nationalPosts by viewModel.nationalPosts.collectAsState()
     val medicalPosts by viewModel.medicalPosts.collectAsState()
     val etcPosts by viewModel.etcPosts.collectAsState()
 
-    val tabIndex = when (selectedTab) {
-        "problem" -> 0
-        "national" -> 1
-        "medical" -> 2
-        "etc" -> 3
-        else -> 0
-    }
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val pagerState = rememberPagerState(
-        initialPage = tabIndex,
+        initialPage = selectedTab,
         pageCount = { 4 }
     )
-    LaunchedEffect(pagerState.currentPage) {
-        when (pagerState.currentPage) {
-            0 -> viewModel.changeTab("problem")
-            1 -> viewModel.changeTab("national")
-            2 -> viewModel.changeTab("medical")
-            3 -> viewModel.changeTab("etc")
+
+    LaunchedEffect(selectedTab) {
+        if (pagerState.currentPage != selectedTab) {
+            pagerState.scrollToPage(selectedTab)
         }
     }
-    LaunchedEffect(selectedTab) {
-        pagerState.animateScrollToPage(tabIndex)
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != selectedTab) {
+            viewModel.changeTab(pagerState.currentPage)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val isUpdate = onCheckCommunityUpdate()
+        if (isUpdate) {
+            viewModel.loadMorePosts(selectedTab, 0)
+            onClearCommunityUpdate()
+        }
     }
 
     Box(
@@ -122,26 +136,26 @@ internal fun Community(
                 TabIconAndLabel(
                     title = "직장 내 고충",
                     icon = painterResource(R.drawable.ic_problem),
-                    onIconClick = { viewModel.changeTab("problem") },
-                    isSelected = selectedTab == "problem",
+                    onIconClick = { viewModel.changeTab(0) },
+                    isSelected = pagerState.currentPage == 0,
                 )
                 TabIconAndLabel(
                     title = "체류 및 비자",
                     icon = painterResource(R.drawable.ic_national),
-                    onIconClick = { viewModel.changeTab("national") },
-                    isSelected = selectedTab == "national",
+                    onIconClick = { viewModel.changeTab(1) },
+                    isSelected = pagerState.currentPage == 1,
                 )
                 TabIconAndLabel(
                     title = "산재 및 의료",
                     icon = painterResource(R.drawable.ic_medical),
-                    onIconClick = { viewModel.changeTab("medical") },
-                    isSelected = selectedTab == "medical",
+                    onIconClick = { viewModel.changeTab(2) },
+                    isSelected = pagerState.currentPage == 2,
                 )
                 TabIconAndLabel(
                     title = "기타",
                     icon = painterResource(R.drawable.ic_etc),
-                    onIconClick = { viewModel.changeTab("etc") },
-                    isSelected = selectedTab == "etc",
+                    onIconClick = { viewModel.changeTab(3) },
+                    isSelected = pagerState.currentPage == 3,
                 )
             }
             HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = HelloWorldMain200)
@@ -152,19 +166,27 @@ internal fun Community(
                 when (page) {
                     0 -> CommunityTabContent(
                         posts = problemPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail() },
+                        onPostClick = { onNavigateToCommunityPostDetail(0, it) },
+                        onLoadMore = { viewModel.loadMorePosts(0) },
+                        isLoading = isLoading,
                     )
                     1 -> CommunityTabContent(
                         posts = nationalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail() },
+                        onPostClick = { onNavigateToCommunityPostDetail(1, it) },
+                        onLoadMore = { viewModel.loadMorePosts(1) },
+                        isLoading = isLoading,
                     )
                     2 -> CommunityTabContent(
                         posts = medicalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail() },
+                        onPostClick = { onNavigateToCommunityPostDetail(2, it) },
+                        onLoadMore = { viewModel.loadMorePosts(2) },
+                        isLoading = isLoading,
                     )
                     3 -> CommunityTabContent(
                         posts = etcPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail() },
+                        onPostClick = { onNavigateToCommunityPostDetail(3, it) },
+                        onLoadMore = { viewModel.loadMorePosts(3) },
+                        isLoading = isLoading,
                     )
                 }
             }
@@ -177,7 +199,7 @@ internal fun Community(
                 .padding(24.dp)
                 .size(60.dp)
                 .clip(CircleShape)
-                .clickable { onNavigateToCommunityPostWrite() }
+                .clickable { onNavigateToCommunityPostWrite(selectedTab) }
                 .border(1.dp, Color(0x40000000), shape = CircleShape)
         )
     }
@@ -185,12 +207,30 @@ internal fun Community(
 
 @Composable
 private fun CommunityTabContent(
-    posts: List<CommunityPost>,
-    onPostClick: () -> Unit,
+    posts: List<Post>,
+    onPostClick: (Int) -> Unit,
+    onLoadMore: () -> Unit,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     if (posts.isNotEmpty()) {
+        val listState = rememberLazyListState()
+
+        val shouldLoadMore by remember {
+            derivedStateOf {
+                val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                val totalItemsCount = listState.layoutInfo.totalItemsCount
+
+                lastVisibleItemIndex >= totalItemsCount - 2 && !isLoading
+            }
+        }
+
+        LaunchedEffect(shouldLoadMore) {
+            if (shouldLoadMore) { onLoadMore() }
+        }
+
         LazyColumn(
+            state = listState,
             modifier = modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
@@ -198,35 +238,63 @@ private fun CommunityTabContent(
             items(posts) { post ->
                 CommunityPostItem(
                     post = post,
-                    onPostClick = { onPostClick() }
+                    onPostClick = { onPostClick(post.postId) }
                 )
+            }
+            if (isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp),
+                            color = HelloWorldMain500
+                        )
+                    }
+                }
             }
         }
     } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_mascot_error),
-                contentDescription = null
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
-                style = AppTypography.label02,
-                color = HelloWorldGrayScale300,
-                textAlign = TextAlign.Center
-            )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = HelloWorldMain500
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_mascot_error),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale300,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
 
 @Composable
 fun CommunityPostItem(
-    post: CommunityPost,
+    post: Post,
     onPostClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -255,20 +323,22 @@ fun CommunityPostItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = post.content.truncateWithEllipsis(if (post.thumbnail) 30 else 40),
+                    text = post.content.truncateWithEllipsis(if (post.imageUrl != null) 30 else 40),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            if (post.thumbnail) {
+            if (post.imageUrl != null) {
                 Spacer(modifier = Modifier.width(40.dp))
-                Box(
+                AsyncImage(
+                    model = post.imageUrl,
+                    contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(HelloWorldGrayScale200)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
                 )
             }
         }
@@ -281,7 +351,7 @@ fun CommunityPostItem(
         ) {
             // 카테고리, 날짜
             Text(
-                text = "${post.category} • ${post.date}",
+                text = "${post.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
                 style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )
@@ -298,7 +368,7 @@ fun CommunityPostItem(
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = post.commentCount,
+                    text = "${post.commentNum}",
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale500
                 )
@@ -359,80 +429,3 @@ internal fun TabIconAndLabel(
         )
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-private fun CommunityPreview() {
-    Community(
-        onNavigateToCommunityPostWrite = {},
-        onNavigateToCommunityPostDetail = {},
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TabIconAndLabelTruePreview() {
-    TabIconAndLabel(
-        title = "산재 및 의료",
-        icon = painterResource(R.drawable.ic_medical),
-        onIconClick = {  },
-        isSelected = true,
-    )
-
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TabIconAndLabelFalsePreview() {
-
-    TabIconAndLabel(
-        title = "산재 및 의료",
-        icon = painterResource(R.drawable.ic_medical),
-        onIconClick = {  },
-        isSelected = false,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PostItemAndImagePreview() {
-    CommunityPostItem(
-        post = CommunityPost(
-            id = "1",
-            title = "월급이 제대로 안 들어 온 것 같아요",
-            content = "이번 달 일을 했는데 제가 계산한 돈과 월급이 다르게 들어 온 것 같아요",
-            category = "problem",
-            date = "25.05.06",
-            commentCount = "30",
-            thumbnail = true
-        ),
-        onPostClick = {},
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PostItemAndPreview() {
-    CommunityPostItem(
-        post = CommunityPost(
-            id = "1",
-            title = "월급이 제대로 안 들어 온 것 같아요",
-            content = "이번 달 일을 했는데 제가 계산한 돈과 월급이 다르게 들어 온 것 같아요",
-            category = "problem",
-            date = "25.05.06",
-            commentCount = "30",
-            thumbnail = false
-        ),
-        onPostClick = {},
-    )
-}
-
-data class CommunityPost(
-    val id: String,
-    val title: String,
-    val content: String,
-    val category: String,
-    val date: String,
-    val commentCount: String,
-    val thumbnail: Boolean, // TODO (Bro) Thumbnail
-)

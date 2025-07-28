@@ -1,5 +1,8 @@
 package com.example.feature.ui.mypage.screen
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,11 +41,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.component.HWDropdownMenuBox
@@ -57,23 +64,42 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
+import com.example.model.common.Language
+import kotlin.collections.forEach
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileEdit(
     onNavigateBack: () -> Unit,
+    onProfileUpdated: () -> Unit,
     viewModel: ProfileEditViewModel = hiltViewModel()
 ) {
-    val newNickname by viewModel.newNickname.collectAsState()
+    val context = LocalContext.current
+
+    val initUser = viewModel.initUser
+    val editingNickName by viewModel.editingNickName.collectAsState()
+    val editingUserImg by viewModel.editingUserImg.collectAsState()
+    val editingLanguage by viewModel.editingLanguage.collectAsState()
     val dialogData by viewModel.dialogData.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
 
-    // TODO viewmodel
-    val options: List<String> = listOf("대한민국", "United States", "日本", "中國")
-    var selectedLanguage by remember { mutableStateOf(options[0]) }
+    val languages: List<Language> = Language.entries
     var expanded by remember { mutableStateOf(false) }
+
+    // 이미지 결과 처리 함수
+    fun handleImageResult(uri: Uri) {
+        viewModel.updateUserImg(uri)
+    }
+    // 갤러리 런처
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            handleImageResult(uri)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -99,7 +125,7 @@ fun ProfileEdit(
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable {
-                        if (newNickname.isBlank()) {
+                        if (editingNickName.isBlank()) {
                             onNavigateBack()
                         } else {
                             viewModel.updateDialogData(
@@ -134,18 +160,45 @@ fun ProfileEdit(
             horizontalArrangement = Arrangement.spacedBy(32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box {
-                Image(
-                    painter = painterResource(R.drawable.ic_mascot_normal_profile),
-                    contentDescription = null,
-                )
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        galleryLauncher.launch("image/jpeg")
+                    }
+            ) {
+                if (editingUserImg != null) {
+                    AsyncImage(
+                        model = editingUserImg,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                    )
+                } else if (initUser.userImg != null) {
+                    AsyncImage(
+                        model = initUser.userImg,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.ic_mascot_normal_profile),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .align(Alignment.Center)
                         .clip(CircleShape)
                         .background(Color(0x4D0C0C0C))
-                        .clickable {}
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_picture),
@@ -156,16 +209,15 @@ fun ProfileEdit(
                             .size(16.dp)
                     )
                 }
-                Icon(
-                    Icons.Default.Email,
-                    contentDescription = null,
+                Text(
+                    text = "${initUser.language?.flag}",
+                    fontSize = 28.sp,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .size(24.dp),
                 )
             }
             Text(
-                text = "NaYeEun",
+                text = initUser.name,
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale800,
             )
@@ -186,7 +238,7 @@ fun ProfileEdit(
                     color = HelloWorldGrayScale800,
                 )
                 BasicTextField(
-                    value = newNickname,
+                    value = editingNickName,
                     onValueChange = { viewModel.updateNickname(it) },
                     singleLine = true,
                     textStyle = AppTypography.heading04.copy(color = HelloWorldGrayScale800),
@@ -205,9 +257,9 @@ fun ProfileEdit(
                             .fillMaxSize(),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        if (newNickname.isBlank()) {
+                        if (editingNickName.isBlank()) {
                             Text(
-                                text = "Na YeEun",
+                                text = initUser.name,
                                 style = AppTypography.heading04,
                                 color = HelloWorldGrayScale300,
                             )
@@ -227,35 +279,56 @@ fun ProfileEdit(
                 HWDropdownMenuBox(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    selectedItem = selectedLanguage,
-                    items = options,
+                    selectedItem = if (editingLanguage == null) initUser.language else editingLanguage,
+                    items = languages,
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
                     onClick = {
-                        selectedLanguage = it
+                        viewModel.updateLanguage(it)
                         expanded = false
                     },
                     selectedContent = { item ->
-                        // TODO Row 로 수정, + Image
-                        Text(
-                            text = item.toString(),
-                            style = AppTypography.heading04,
-                            color = HelloWorldGrayScale800,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${item?.flag}",
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                text = "${item?.displayName}",
+                                style = AppTypography.heading04,
+                                color = HelloWorldGrayScale800,
+                            )
+                        }
                     },
                     itemContent = { item, isSelected ->
-                        // TODO Row 로 수정, + Image
-                        Text(
-                            text = item,
-                            style = AppTypography.heading04,
-                            color = HelloWorldGrayScale800,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = item.flag,
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                text = item.displayName,
+                                style = AppTypography.heading04,
+                                color = HelloWorldGrayScale800,
+                            )
+                        }
                     }
                 )
             }
         }
         TextButton(
-            onClick = {  },
+            onClick = {
+                viewModel.setProfile(
+                    context = context,
+                    onResult = { success -> if (success) { onProfileUpdated() } }
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.textButtonColors(
@@ -269,7 +342,7 @@ fun ProfileEdit(
                 top = 22.dp,
                 bottom = 36.dp,
             ),
-            enabled = newNickname.length <= 15
+            enabled = editingNickName.length <= 15
         ) {
             Text(
                 text = "완료",
@@ -286,6 +359,7 @@ fun ProfileEdit(
 @Composable
 private fun ProfileEditPreview() {
     ProfileEdit(
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onProfileUpdated = {}
     )
 }

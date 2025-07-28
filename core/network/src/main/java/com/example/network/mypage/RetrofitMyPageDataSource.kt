@@ -7,14 +7,15 @@ import com.example.model.mypage.AllSummaryResponse
 import com.example.model.mypage.DeleteProfileResponse
 import com.example.model.mypage.DetailSummaryRequest
 import com.example.model.mypage.DetailSummaryResponse
-import com.example.model.mypage.MyPageResponse
 import com.example.model.mypage.PageSizeRequest
 import com.example.model.mypage.UpdateProfileResponse
+import com.example.model.mypage.UserInfo
+import com.example.network.util.compressImage
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
-import java.io.File
 import javax.inject.Inject
 
 class RetrofitMyPageDataSource @Inject constructor(
@@ -24,7 +25,7 @@ class RetrofitMyPageDataSource @Inject constructor(
         private const val TAG = "RetrofitMyPageDataSource"
     }
 
-    override suspend fun getMyPage(): Result<MyPageResponse> {
+    override suspend fun getMyPage(): Result<UserInfo> {
         Log.d(TAG, "getMyPage() called")
 
         return try {
@@ -38,18 +39,18 @@ class RetrofitMyPageDataSource @Inject constructor(
                 // retrofit error (200번대 이외)
                 !response.isSuccessful -> {
                     Log.e(TAG, "getMyPage() HTTP error - code: ${response.code()}, message: ${response.message()}")
-                    Result.failure<MyPageResponse>(HttpException(response))
+                    Result.failure(HttpException(response))
                 }
 
                 apiResponse?.isSuccess == true && apiResponse.result != null -> {
                     Log.d(TAG, "getMyPage() success - result: ${apiResponse.result}")
-                    Result.success<MyPageResponse>(apiResponse.result)
+                    Result.success(apiResponse.result)
                 }
 
                 // isSuccess = false, result == null
                 else -> {
                     Log.e(TAG, "getMyPage() API error - code: ${apiResponse?.code}")
-                    Result.failure<MyPageResponse>(Exception("${apiResponse?.code}"))
+                    Result.failure(Exception("${apiResponse?.code}"))
                 }
             }
         } catch (e: Exception) {
@@ -58,16 +59,23 @@ class RetrofitMyPageDataSource @Inject constructor(
         }
     }
 
-    override suspend fun setProfile(nickName: String, file: File?): Result<UpdateProfileResponse> {
+    override suspend fun setProfile(nickName: String, userImg: ByteArray?): Result<UpdateProfileResponse> {
         Log.d(TAG, "setProfile() called")
 
         return try {
-            val filePart = file?.let {
-                val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("file", it.name, requestFile)
+            val namePart = nickName.toRequestBody("text/plain".toMediaTypeOrNull())
+            val imagePart = userImg?.let { bytes ->
+                val compressedBytes = compressImage(bytes, maxSizeKB = 500)
+
+                val requestBody = compressedBytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData(
+                    "file",
+                    "image.jpg",
+                    requestBody
+                )
             }
 
-            val response = myPageApi.setProfile(nickName, filePart)
+            val response = myPageApi.setProfile(namePart, imagePart)
             Log.d(TAG, "setProfile() response received - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
 
             val apiResponse = response.body()
@@ -77,24 +85,28 @@ class RetrofitMyPageDataSource @Inject constructor(
                 // retrofit error (200번대 이외)
                 !response.isSuccessful -> {
                     Log.e(TAG, "setProfile() HTTP error - code: ${response.code()}, message: ${response.message()}")
-                    Result.failure<UpdateProfileResponse>(HttpException(response))
+                    Result.failure(HttpException(response))
                 }
 
                 apiResponse?.isSuccess == true && apiResponse.result != null -> {
                     Log.d(TAG, "setProfile() success - result: ${apiResponse.result}")
-                    Result.success<UpdateProfileResponse>(apiResponse.result)
+                    Result.success(apiResponse.result)
                 }
 
                 // isSuccess = false, result == null
                 else -> {
                     Log.e(TAG, "setProfile() API error - code: ${apiResponse?.code}")
-                    Result.failure<UpdateProfileResponse>(Exception("${apiResponse?.code}"))
+                    Result.failure(Exception("${apiResponse?.code}"))
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "setProfile() exception", e)
             Result.failure(e)
         }
+    }
+
+    override suspend fun setLanguage(language: Long): Result<Unit> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getAllSummary(request: PageSizeRequest): Result<AllSummaryResponse> {

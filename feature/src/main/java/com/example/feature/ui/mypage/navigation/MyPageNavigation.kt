@@ -1,9 +1,11 @@
 package com.example.feature.ui.mypage.navigation
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.feature.ui.mypage.screen.CounselingDetail
 import com.example.feature.ui.mypage.screen.CounselingSummary
 import com.example.feature.ui.mypage.screen.MyPage
@@ -14,11 +16,14 @@ import com.example.feature.ui.mypage.screen.Resume
 import com.example.feature.ui.mypage.screen.TermsOfService
 import com.example.feature.ui.mypage.screen.Withdraw
 import com.example.feature.ui.mypage.screen.WithdrawComplete
+import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
+import com.example.model.common.Language
+import com.example.model.mypage.UserInfo
 import kotlinx.serialization.Serializable
 
 @Serializable data object MyPage
 
-@Serializable data object ProfileEdit
+@Serializable data class ProfileEdit(val name: String, val userImg: String?, val language: Language?)
 
 @Serializable data object CounselingSummary
 
@@ -40,13 +45,15 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) = navigate(My
 
 fun NavGraphBuilder.myPageScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToProfileEdit: () -> Unit,
+    onNavigateToProfileEdit: (String, String?, Language?) -> Unit,
     onNavigateToCounselingSummary: () -> Unit,
     onNavigateToResume: () -> Unit,
     onNavigateToPostAndComments: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
     onNavigateToTermsOfService: () -> Unit,
     onNavigateToWithdraw: () -> Unit,
+    onCheckProfileUpdate: () -> Boolean,
+    onClearProfileUpdate: () -> Unit,
 ) {
     composable<MyPage> {
         MyPage(
@@ -57,19 +64,32 @@ fun NavGraphBuilder.myPageScreen(
             onNavigateToPostAndComments = onNavigateToPostAndComments,
             onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
             onNavigateToTermsOfService = onNavigateToTermsOfService,
-            onNavigateToWithdraw = onNavigateToWithdraw
+            onNavigateToWithdraw = onNavigateToWithdraw,
+            onCheckProfileUpdate = onCheckProfileUpdate,
+            onClearProfileUpdate = onClearProfileUpdate,
         )
     }
 }
 
-fun NavController.navigateToProfileEdit(navOptions: NavOptions? = null) = navigate(ProfileEdit, navOptions)
+fun NavController.navigateToProfileEdit(name: String, userImg: String?, language: Language?, navOptions: NavOptions? = null) = navigate(ProfileEdit(name, userImg, language), navOptions)
 
 fun NavGraphBuilder.profileEditScreen(
     onNavigateBack: () -> Unit,
+    onProfileUpdated: () -> Unit,
 ) {
-    composable<ProfileEdit> {
+    composable<ProfileEdit> { entry ->
+        val route = entry.toRoute<ProfileEdit>()
+
+        val userInfo = UserInfo(name = route.name, userImg = route.userImg, language = route.language)
+
         ProfileEdit(
             onNavigateBack = onNavigateBack,
+            onProfileUpdated = onProfileUpdated,
+            viewModel = hiltViewModel<ProfileEditViewModel, ProfileEditViewModel.Factory>(
+                key = route.name
+            ) { factory ->
+                factory.create(userInfo)
+            }
         )
     }
 }
@@ -117,10 +137,12 @@ fun NavController.navigateToPostAndComments(navOptions: NavOptions? = null) = na
 
 fun NavGraphBuilder.postAndCommentsScreen(
     onNavigateBack: () -> Unit,
+    onNavigateCommunity: (Int, Int) -> Unit,
 ) {
     composable<PostAndComments> {
         PostAndComments(
-            onNavigateBack = onNavigateBack
+            onNavigateBack = onNavigateBack,
+            onNavigateCommunity = onNavigateCommunity,
         )
     }
 }
