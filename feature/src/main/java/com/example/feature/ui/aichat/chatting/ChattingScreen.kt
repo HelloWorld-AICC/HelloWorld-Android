@@ -8,8 +8,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,18 +34,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.model.aichat.AIChatMessage
@@ -59,6 +68,7 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
+import kotlin.math.max
 
 @Composable
 internal fun RecentChattingScreen(
@@ -84,7 +94,7 @@ internal fun RecentChattingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .imePadding()
+            .advancedImePadding()
             .pointerInput(Unit) {
                 detectTapGestures {
                     focusManager.clearFocus()
@@ -292,7 +302,14 @@ fun SummaryCompletedDialog(onDismiss: () -> Unit) {
     }
 }
 
-
-
-
+fun Modifier.advancedImePadding() = composed {
+    var consumePadding by remember { mutableIntStateOf(0) }
+    onGloballyPositioned { coordinates ->
+        val rootHeight = coordinates.findRootCoordinates().size.height
+        val componentBottom = (coordinates.positionInWindow().y + coordinates.size.height).toInt()
+        consumePadding = max(0, rootHeight - componentBottom)
+    }.consumeWindowInsets(
+        PaddingValues(bottom = with(LocalDensity.current) { consumePadding.toDp() })
+    ).imePadding()
+}
 
