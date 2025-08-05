@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.model.aichat.ChattingRoom
@@ -244,3 +245,27 @@ fun formatUpdatedAt(updatedAt: String?): String {
     }
 }
 
+@Preview(showBackground = true, heightDp = 800)
+@Composable
+fun AiChatScreenPreview() {
+    // Preview에서는 실제 ViewModel을 사용하지 않음
+    Column {
+        HeaderTitle()
+        HorizontalDivider(color = HelloWorldMain200)
+        Spacer(modifier = Modifier.height(24.dp))
+        Banner()
+        Spacer(modifier = Modifier.height(24.dp))
+        RecentChatSection(
+            onPostClick = {}
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        ConversationItem(
+            chattingRoom = ChattingRoom(
+                roomId = "room123",
+                title = "비자 관련 상담",
+                updatedAt = "2025-08-04T12:34:56"
+            ),
+            onPostClick = {}
+        )
+    }
+}
