@@ -39,6 +39,20 @@ class LoginViewModel : ViewModel() {
                 } else {
                     Log.e("LOGIN", "ATK가 비어 있거나 없음")
                 }
+
+                // 저장 완료 후 자동 로그인 시도
+                if (!rtk.isNullOrBlank()) {
+                    val success = RetrofitInstance.tryAutoLogin()
+                    if (success) {
+                        Log.d("AUTO_LOGIN ", "자동 로그인 성공")
+                        _loginSuccess.value = true
+                    } else {
+                        Log.w("AUTO_LOGIN ", "자동 로그인 실패")
+                    }
+                } else {
+                    Log.w("AUTO_LOGIN ", "RTK가 없어 자동 로그인 생략")
+                }
+
             } catch (e: Exception) {
                 Log.e("LOGIN", "토큰 요청 실패", e)
             }
