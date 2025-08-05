@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -31,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
@@ -50,19 +49,22 @@ import com.example.feature.BuildConfig
 import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.MyPageUiState
 import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
-import com.example.model.mypage.MyPageResponse
+import com.example.model.common.Language
+import com.example.model.mypage.UserInfo
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @Composable
 fun MyPage(
     onNavigateBack: () -> Unit,
-    onNavigateToProfileEdit: () -> Unit,
+    onNavigateToProfileEdit: (String, String?, Language?) -> Unit,
     onNavigateToCounselingSummary: () -> Unit,
     onNavigateToResume: () -> Unit,
     onNavigateToPostAndComments: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
     onNavigateToTermsOfService: () -> Unit,
     onNavigateToWithdraw: () -> Unit,
+    onCheckProfileUpdate: () -> Boolean,
+    onClearProfileUpdate: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
     val dialogData by viewModel.dialogData.collectAsState()
@@ -78,9 +80,12 @@ fun MyPage(
         onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
         onNavigateToTermsOfService= onNavigateToTermsOfService,
         onNavigateToWithdraw = onNavigateToWithdraw,
+        onCheckProfileUpdate = onCheckProfileUpdate,
+        onClearProfileUpdate = onClearProfileUpdate,
         uiState = uiState,
         dialogData = dialogData,
-        updateDialogData = viewModel::updateDialogData
+        updateDialogData = viewModel::updateDialogData,
+        onChangeUserInfo = viewModel::getUserInfo
     )
 
 }
@@ -88,18 +93,29 @@ fun MyPage(
 @Composable
 private fun MyPage(
     onNavigateBack: () -> Unit = {},
-    onNavigateToProfileEdit: () -> Unit = {},
+    onNavigateToProfileEdit: (String, String?, Language?) -> Unit,
     onNavigateToCounselingSummary: () -> Unit = {},
     onNavigateToResume: () -> Unit = {},
     onNavigateToPostAndComments: () -> Unit = {},
     onNavigateToPrivacyPolicy: () -> Unit = {},
     onNavigateToTermsOfService: () -> Unit = {},
     onNavigateToWithdraw: () -> Unit = {},
+    onCheckProfileUpdate: () -> Boolean,
+    onClearProfileUpdate: () -> Unit,
     uiState: MyPageUiState = MyPageUiState.Loading,
     dialogData: DialogData? = null,
     updateDialogData: (DialogData?) -> Unit,
+    onChangeUserInfo: () -> Unit = {},
 ) {
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val isUpdate = onCheckProfileUpdate()
+        if (isUpdate) {
+            onChangeUserInfo()
+            onClearProfileUpdate()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -151,16 +167,26 @@ private fun MyPage(
                         modifier = Modifier
                             .size(80.dp)
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_mascot_normal_profile), // TODO ima 경로 연결
-                            contentDescription = null
-                        )
-                        Icon(
-                            Icons.Default.Email,
-                            contentDescription = null,
+                        if (uiState.userInfo.userImg != null) {
+                            AsyncImage(
+                                model = uiState.userInfo.userImg,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.ic_mascot_normal_profile),
+                                contentDescription = null
+                            )
+                        }
+                        Text(
+                            text = "${uiState.userInfo.language?.flag}",
+                            fontSize = 28.sp,
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .size(24.dp)
                         )
                     }
                     Column(
@@ -188,20 +214,20 @@ private fun MyPage(
                 ) {
                     MenuCard(
                         title = "프로필 변경",
-                        onClick = onNavigateToProfileEdit,
+                        onClick = { onNavigateToProfileEdit(uiState.userInfo.name, uiState.userInfo.userImg, uiState.userInfo.language) }, // TODO language
                     )
                     MenuCard(
                         title = "내 상담 요약",
-                        onClick = onNavigateToCounselingSummary,
+                        onClick = { onNavigateToCounselingSummary() },
                     )
                     MenuCard(
                         title = "이력서\n/ 자기소개서",
                         spacing = 6.dp,
-                        onClick = onNavigateToResume,
+                        onClick = { onNavigateToResume() },
                     )
                     MenuCard(
                         title = "게시글 / 댓글",
-                        onClick = onNavigateToPostAndComments,
+                        onClick = { onNavigateToPostAndComments() },
                     )
                 }
                 Column(
@@ -295,7 +321,7 @@ private fun MyPage(
                     }
                 }
             }
-            is MyPageUiState.Error -> TODO()
+            is MyPageUiState.Error -> {} // TODO
         }
     }
 
@@ -362,7 +388,7 @@ private fun MenuListItem(
 private fun MyPagePreview() {
     MyPage(
         onNavigateBack = {},
-        onNavigateToProfileEdit = { },
+        onNavigateToProfileEdit = { _, _, _ -> },
         onNavigateToCounselingSummary = {},
         onNavigateToResume = {},
         onNavigateToPostAndComments = {},
@@ -370,11 +396,14 @@ private fun MyPagePreview() {
         onNavigateToTermsOfService = {},
         onNavigateToWithdraw = {},
         uiState = MyPageUiState.Success(
-            MyPageResponse(
+            UserInfo(
                 name = "JParkBro",
                 userImg = "",
+                language = Language.KOREAN
             )
         ),
-        updateDialogData = {}
+        updateDialogData = {},
+        onCheckProfileUpdate = { false },
+        onClearProfileUpdate = {},
     )
 }

@@ -32,6 +32,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            buildConfigField(
+                type = "String",
+                name = "APP_VERSION_NAME",
+                value = "\"${rootProject.extra["versionName"] ?: "1.0.0"}\"",
+            )
         }
     }
     compileOptions {
@@ -54,6 +60,7 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":core-domain"))
     implementation(project(":core-ui"))
+    implementation(project(":core:domain"))
 
     // Lottie for Jetpack Compose 추가
     implementation("com.airbnb.android:lottie-compose:6.1.0")
@@ -118,6 +125,16 @@ dependencies {
     // oss-licenses
     implementation(libs.androidx.appcompat)
     implementation(libs.play.services.oss.licenses)
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.video)
+
+    // Exoplayer
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.ui.compose)
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")

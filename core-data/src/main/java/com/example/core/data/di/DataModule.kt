@@ -1,5 +1,9 @@
 package com.example.core.data.di
 
+import com.example.core.data.common.LanguageRepository
+import com.example.core.data.common.LanguageRepositoryImpl
+import com.example.core.data.community.CommunityRepository
+import com.example.core.data.community.CommunityRepositoryImpl
 import com.example.core.data.mypage.MyPageRepository
 import com.example.core.data.mypage.MyPageRepositoryImpl
 import com.example.core.data.token.TokenRepositoryImpl
@@ -22,4 +26,14 @@ abstract class DataModule {
     abstract fun bindsMyPageRepository(
         myPageRepositoryImpl: MyPageRepositoryImpl
     ): MyPageRepository
+
+    @Binds
+    abstract fun bindsCommunityRepository(
+        communityRepositoryImpl: CommunityRepositoryImpl
+    ): CommunityRepository
+
+    @Binds
+    abstract fun bindsLanguageRepository(
+        languageRepositoryImpl: LanguageRepositoryImpl
+    ): LanguageRepository
 }

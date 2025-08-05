@@ -1,13 +1,14 @@
 
 package com.example.feature.ui.mypage.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.data.mypage.MyPageRepository
 import com.example.core.ui.component.DialogData
-import com.example.model.mypage.MyPageResponse
+import com.example.domain.UserInfoUseCase
+import com.example.model.common.Result
+import com.example.model.mypage.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val myPageRepository: MyPageRepository
+    private val userInfoUseCase: UserInfoUseCase,
 ) : ViewModel() {
 
     private val _dialogData = MutableStateFlow<DialogData?>(null)
@@ -39,8 +40,13 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = MyPageUiState.Loading
             try {
-                val userInfo = myPageRepository.getMyPage().getOrThrow()
-                _uiState.value = MyPageUiState.Success(userInfo)
+                userInfoUseCase().collect {
+                    when (it) {
+                        is Result.Loading -> _uiState.value = MyPageUiState.Loading
+                        is Result.Success<UserInfo> -> _uiState.value = MyPageUiState.Success(it.data)
+                        is Result.Error -> _uiState.value = MyPageUiState.Error(it.exception.message.toString())
+                    }
+                }
             } catch (e: Exception) {
                 _uiState.value = MyPageUiState.Error("${e.message}")
             }
@@ -50,6 +56,6 @@ class MyPageViewModel @Inject constructor(
 
 sealed interface MyPageUiState {
     data object Loading: MyPageUiState
-    data class Success(val userInfo: MyPageResponse): MyPageUiState
+    data class Success(val userInfo: UserInfo): MyPageUiState
     data class Error(val msg: String): MyPageUiState
 }

@@ -138,12 +138,18 @@ fun MyNavigationHost(navController: NavHostController) {
         communityScreen(
             onNavigateToCommunityPostWrite = navController::navigateToCommunityPostWrite,
             onNavigateToCommunityPostDetail = navController::navigateToCommunityPostDetail,
+            onCheckCommunityUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("community_update") ?: false },
+            onClearCommunityUpdate = { navController.previousBackStackEntry?.savedStateHandle?.set("community_update", false) }
         )
         communityPostDetailScreen(
             onNavigateBack = navController::navigateUp
         )
         communityPostWriteScreen(
-            onNavigateBack = navController::navigateUp
+            onNavigateBack = navController::navigateUp,
+            onCommunityUpdated = {
+                navController.previousBackStackEntry?.savedStateHandle?.set("community_update", true)
+                navController.popBackStack()
+            }
         )
         myPageScreen(
             onNavigateBack = navController::navigateUp,
@@ -154,9 +160,15 @@ fun MyNavigationHost(navController: NavHostController) {
             onNavigateToTermsOfService = navController::navigateToTermsOfService,
             onNavigateToPrivacyPolicy = navController::navigateToPrivacyPolicy,
             onNavigateToWithdraw = navController::navigateToWithdraw,
+            onCheckProfileUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("profile_updated") ?: false },
+            onClearProfileUpdate = { navController.previousBackStackEntry?.savedStateHandle?.set("profile_updated", false) }
         )
         profileEditScreen(
-            onNavigateBack = navController::navigateUp
+            onNavigateBack = navController::navigateUp,
+            onProfileUpdated = {
+                navController.previousBackStackEntry?.savedStateHandle?.set("profile_updated", true)
+                navController.popBackStack()
+            }
         )
         counselingSummaryScreen(
             onNavigateBack = navController::navigateUp,
@@ -170,7 +182,8 @@ fun MyNavigationHost(navController: NavHostController) {
             onNavigateBack = navController::navigateUp
         )
         postAndCommentsScreen(
-            onNavigateBack = navController::navigateUp
+            onNavigateBack = navController::navigateUp,
+            onNavigateCommunity = navController::navigateToCommunityPostDetail,
         )
         privacyPolicyScreen( onNavigateBack = navController::navigateUp )
         termsOfServiceScreen( onNavigateBack = navController::navigateUp )

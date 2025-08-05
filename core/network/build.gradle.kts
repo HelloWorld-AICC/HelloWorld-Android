@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
+    // EXIF 정보 읽기 (Image)
+    implementation(libs.androidx.exifinterface)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
