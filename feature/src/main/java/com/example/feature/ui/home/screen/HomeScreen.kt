@@ -1,16 +1,18 @@
 package com.example.feature.ui.home.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -29,28 +31,30 @@ import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
 import com.example.feature.ui.mypage.navigation.navigateToMyPage
-import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import com.example.feature.ui.home.viewmodel.HomeViewModel
 import com.example.core.data.network.RetrofitInstance
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltViewModel()) {
-    val scrollState = rememberScrollState();
-
-    // 토큰 가져오기
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val scrollState = rememberScrollState()
     val token = RetrofitInstance.getAccessToken()
 
-    // 토큰 가져온 이후 헤더에 자동 포함된 요청으로 API 호출
+    // 토큰 상태 로그
+    Log.d("홈화면", "저장된 액세스 토큰: $token")
+
     LaunchedEffect(token) {
         if (token.isNotBlank()) {
+            Log.d("홈화면", "토큰이 존재하므로 사용자 정보 요청 시작")
             viewModel.fetchUserInfoIfTokenExists()
+        } else {
+            Log.w("홈화면", "토큰이 없습니다. 로그인 필요")
         }
     }
 
-    // 유저 정보 및 로딩 상태 조회
     val userInfo by viewModel.userInfo.collectAsState()
-
 
     Column(
         modifier = Modifier
@@ -59,10 +63,9 @@ fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltVi
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         LogoHeader()
 
-        // 상단 사용자 정보
+        // 상단 사용자 정보 영역
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,23 +74,13 @@ fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltVi
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = when {
-                            !userInfo?.result?.name.isNullOrBlank() -> userInfo?.result?.name
-                                ?: "이름 공백"
-
-                            else -> "이름 없음"
-                        },
+                        text = userInfo?.name ?: "이름 없음",
                         style = AppTypography.title02,
                         color = HelloWorldMain700
                     )
-
                     Spacer(modifier = Modifier.width(4.dp))
-
                     Text(
                         text = "님",
                         style = AppTypography.heading01,
@@ -104,28 +97,27 @@ fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltVi
                     text = "마이페이지 가기 →",
                     style = AppTypography.label02,
                     color = HelloWorldMain600,
-                    modifier = Modifier
-                        .clickable { navController.navigateToMyPage() }
+                    modifier = Modifier.clickable {
+                        Log.d("홈화면", "마이페이지로 이동 클릭")
+                        navController.navigateToMyPage()
+                    }
                 )
             }
-            // 사용자 아바타
+
             Image(
                 painter = painterResource(id = R.drawable.avatar_character),
-                contentDescription = "User Avatar",
+                contentDescription = "사용자 아바타",
                 modifier = Modifier.size(140.dp)
             )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 서비스 카드들 (예시용 Row 2줄)
+        // 서비스 카드 목록
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .background(
-                    Color.White,
-                    shape = RoundedCornerShape(32.dp, 32.dp, 0.dp, 0.dp)
-                )
+                .background(Color.White, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                 .padding(24.dp, 30.dp, 24.dp, 19.dp)
         ) {
             Text(
@@ -178,7 +170,7 @@ fun HomeScreen(navController: NavController, viewModel: MyPageViewModel = hiltVi
 
             Image(
                 painter = painterResource(id = R.drawable.banner_helloworld),
-                contentDescription = "HelloWorld Banner",
+                contentDescription = "HelloWorld 배너",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp)
@@ -203,15 +195,8 @@ fun HomeServiceCard(
                 shadowElevation = 4.dp.toPx()
                 shape = RoundedCornerShape(8.dp)
             }
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .shadow(
-                elevation = 1.dp,
-                ambientColor = shadowColor,
-                spotColor = shadowColor
-            )
+            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
+            .shadow(elevation = 1.dp, ambientColor = shadowColor, spotColor = shadowColor)
             .padding(12.dp, 16.dp, 12.dp, 8.dp),
     ) {
         Column {
@@ -234,7 +219,7 @@ fun HomeServiceCard(
             ) {
                 Image(
                     painter = painterResource(id = iconRes),
-                    contentDescription = null,
+                    contentDescription = "$title 아이콘",
                     modifier = Modifier.size(60.dp)
                 )
             }
