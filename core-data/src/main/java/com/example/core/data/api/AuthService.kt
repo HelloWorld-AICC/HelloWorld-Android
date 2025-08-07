@@ -13,4 +13,7 @@ interface AuthService {
 
     @GET("api/v1/google/login")
     suspend fun getToken(@Query("token") idToken: String): LoginTokenResponse
+
+    @GET("api/v1/google/login/reissue")
+    suspend fun reissueToken(@Query("RTK") refreshToken: String): LoginTokenResponse
 }
