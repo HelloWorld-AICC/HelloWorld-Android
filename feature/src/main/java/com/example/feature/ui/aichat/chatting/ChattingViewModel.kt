@@ -7,8 +7,10 @@ import com.example.core.data.model.aichat.AIChatMessage
 import com.example.core.data.network.RetrofitInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -28,6 +30,9 @@ class ChatViewModel @Inject constructor() : ViewModel() {
 
     private val _isTyping = MutableStateFlow(false)
     val isTyping: StateFlow<Boolean> = _isTyping
+
+    private val _summaryCompleted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val summaryCompleted = _summaryCompleted.asSharedFlow()
 
     fun loadChatLog(roomId: String) {
         viewModelScope.launch {
@@ -204,8 +209,15 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d("ChatViewModel", "📌 요약 요청: roomId=$roomId")
-                RetrofitInstance.aiChatService.summaryAIChat(roomId)
-                Log.d("ChatViewModel", "✅ 요약 요청 성공")
+                val body = RetrofitInstance.aiChatService.summaryAIChat(roomId)
+                val result = body.use { it.string() }  // 꼭 close 되도록 use 사용
+                Log.d("ChatViewModel", "✅ 요약 요청 성공: $result")
+
+                if (result.trim().equals("complete", ignoreCase = true)) {
+                    _summaryCompleted.tryEmit(Unit) // UI에서 다이얼로그 표시
+                } else {
+                    Log.w("ChatViewModel", "⚠️ 예상 외 응답: $result")
+                }
             } catch (e: Exception) {
                 Log.e("ChatViewModel", "❌ 요약 요청 실패", e)
             }

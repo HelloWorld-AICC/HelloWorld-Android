@@ -91,6 +91,16 @@ internal fun RecentChattingScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    var showSummaryDialog by remember { mutableStateOf(false) }
+
+    val lastBotMessage = messages.lastOrNull { it.sender.equals("bot", ignoreCase = true) }
+
+    LaunchedEffect(Unit) {
+        viewModel.summaryCompleted.collect {
+            showSummaryDialog = true
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -116,7 +126,11 @@ internal fun RecentChattingScreen(
                 item { TypingBubble() }
             }
             items(messages.reversed()) { msg ->
-                ChatBubble(msg, viewModel)
+                ChatBubble(
+                    msg = msg,
+                    viewModel = viewModel,
+                    showSummaryIcon = (msg === lastBotMessage) // 같은 객체라서 참조 비교 OK
+                )
             }
         }
 
@@ -187,13 +201,15 @@ internal fun RecentChattingScreen(
             }
         }
     }
+    if (showSummaryDialog) {
+        SummaryCompletedDialog(onDismiss = { showSummaryDialog = false })
+    }
 }
 
 
 @Composable
-fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel) {
-    var showDialog by remember { mutableStateOf(false) }
-
+fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel, showSummaryIcon: Boolean
+) {
     val isUser = msg.sender == "user"
 
     Row(
@@ -219,22 +235,16 @@ fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel) {
                 )
             }
 
-            if (!isUser && msg.sender.lowercase() == "bot") {
+            // 마지막 봇 메시지에만 아이콘 노출
+            if (!isUser && msg.sender.equals("bot", true) && showSummaryIcon) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_summary),
                     contentDescription = "Summarize",
                     modifier = Modifier
                         .size(20.dp)
                         .offset(x = 23.dp)
-                        .clickable {
-                            viewModel.summarizeMessage()
-                            showDialog = true
-                        }
+                        .clickable { viewModel.summarizeMessage() }
                 )
-            }
-
-            if (showDialog) {
-                SummaryCompletedDialog(onDismiss = { showDialog = false })
             }
         }
     }

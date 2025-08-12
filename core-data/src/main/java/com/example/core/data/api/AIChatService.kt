@@ -17,7 +17,7 @@ interface AIChatService {
     @POST("summary")
     suspend fun summaryAIChat(
         @Query("roomId") roomId : String
-    )
+    ) : ResponseBody
 
     @POST("chat/ask")
     @Streaming
