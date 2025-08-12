@@ -6,16 +6,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.AppTypography
@@ -24,21 +21,27 @@ import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain100
 import com.example.core.ui.theme.White
 import com.example.feature.R
+import com.example.feature.ui.onboarding.viewmodel.LanguageViewModel
+import com.example.model.common.Language
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LanguageScreen(navController: NavController) {
-    val defaultLanguage = "대한민국"
-    val languageList = listOf(defaultLanguage, "United States", "日本", "中國")
+fun LanguageScreen(
+    navController: NavController,
+    viewModel: LanguageViewModel = hiltViewModel()
+) {
+    var selectedLanguage by remember { mutableStateOf(Language.KOREAN) } // 기본값
 
-    var selectedLanguage by remember { mutableStateOf(defaultLanguage) }
     var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
             BottomButton(
                 text = "확인",
-                onClick = { navController.navigate("이용 동의") },
+                onClick = {
+                    viewModel.setLanguage(selectedLanguage) // 언어 설정
+                    navController.navigate("이용 동의")     // 다음 화면
+                },
                 enabled = true,
             )
         }
@@ -61,7 +64,7 @@ fun LanguageScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "어떤 언어가 편하신가요?",
+                text = "Which language do you prefer?",
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale800
             )
@@ -69,15 +72,14 @@ fun LanguageScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "사용할 언어를 선택해 주세요",
+                text = "Please select your language",
                 style = AppTypography.body02,
                 color = HelloWorldGrayScale300
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 드롭다운 메뉴
-            Box (
+            Box(
                 modifier = Modifier
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
                     .border(1.dp, HelloWorldMain100, shape = RoundedCornerShape(8.dp))
@@ -90,7 +92,7 @@ fun LanguageScreen(navController: NavController) {
                         .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
                 ) {
                     OutlinedTextField(
-                        value = selectedLanguage,
+                        value = "${selectedLanguage.flag} ${selectedLanguage.displayName}",
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = {
@@ -114,25 +116,22 @@ fun LanguageScreen(navController: NavController) {
                             .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        languageList.forEach { language ->
-                            Surface() {
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            language,
-                                            style = AppTypography.heading04
-                                        )
-                                    },
-                                    onClick = {
-                                        selectedLanguage = language
-                                        expanded = false
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                            .background(Color.White)
-
-                                )
-                            }
+                        Language.entries.forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "${language.flag} ${language.displayName}",
+                                        style = AppTypography.heading04
+                                    )
+                                },
+                                onClick = {
+                                    selectedLanguage = language
+                                    expanded = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                            )
                         }
                     }
                 }

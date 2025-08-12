@@ -23,12 +23,52 @@ object RetrofitInstance {
         Log.d("Prefs", "Stored Token: ${prefs.getString("access_token", "NULL")}")
     }
 
+    // 엑세스 토큰
     fun setAccessToken(token: String) {
         prefs.edit().putString("access_token", token).apply()
     }
 
     fun getAccessToken(): String {
         return prefs.getString("access_token", "") ?: ""
+    }
+
+    // 리프레시 토큰
+    fun setRefreshToken(token: String) {
+        prefs.edit().putString("refresh_token", token).apply()
+    }
+
+    fun getRefreshToken(): String {
+        return prefs.getString("refresh_token", "") ?: ""
+    }
+
+    suspend fun tryAutoLogin(): Boolean {
+        val rtk = getRefreshToken()
+        Log.d("AUTO_LOGIN", "저장된 RTK: $rtk") // 이 로그로 실제 값 확인
+
+        if (rtk.isEmpty()) {
+            Log.d("AUTO_LOGIN", "저장된 RTK 없음 → 로그인 필요")
+            return false
+        }
+
+        return try {
+            val response = authService.reissueToken(rtk)
+            if (response.isSuccess) {
+                val atk = response.result.tokenList.find { it.types == "atk" }?.token ?: ""
+                val newRtk = response.result.tokenList.find { it.types == "rtk" }?.token ?: rtk
+
+                setAccessToken(atk)
+                setRefreshToken(newRtk)
+
+                Log.d("AUTO_LOGIN", "토큰 재발급 성공 → ATK 갱신 완료")
+                true
+            } else {
+                Log.w("AUTO_LOGIN", "토큰 재발급 실패 → 로그인 필요")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("AUTO_LOGIN", "자동 로그인 중 오류", e)
+            false
+        }
     }
 
     private val okHttpClient = OkHttpClient.Builder()
