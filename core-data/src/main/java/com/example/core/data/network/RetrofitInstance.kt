@@ -10,6 +10,7 @@ import com.example.core.data.api.UserService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
 
@@ -32,6 +33,9 @@ object RetrofitInstance {
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor())
+        .connectTimeout(60, TimeUnit.SECONDS) // 연결 타임아웃
+        .readTimeout(60, TimeUnit.SECONDS)    // 서버 응답 대기 시간
+        .writeTimeout(60, TimeUnit.SECONDS)   // 요청 전송 타임아웃
         .build()
 
     // MVC용 Retrofit
