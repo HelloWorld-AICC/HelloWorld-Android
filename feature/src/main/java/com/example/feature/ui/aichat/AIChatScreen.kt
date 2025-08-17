@@ -10,11 +10,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -115,9 +120,10 @@ fun Banner() {
         painter = painterResource(id = R.drawable.ic_banner),
         contentDescription = null,
         modifier = Modifier
-            .fillMaxWidth()
-            .height(145.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()                // 가로 전체 사용
+            .padding(horizontal = 24.dp)   // 좌우 여백 24dp
+            .clip(RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.FillWidth // 가로에 맞추고 세로 비율 유지
     )
 }
 
