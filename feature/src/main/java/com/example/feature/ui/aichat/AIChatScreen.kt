@@ -84,8 +84,6 @@ internal fun AiChatScreen(
         if (!chattingRooms.isNullOrEmpty()) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp)
             ) {
                 items(chattingRooms) { room ->
                     ConversationItem(
@@ -166,7 +164,7 @@ fun RecentChatSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 8.dp),
+                .padding(horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -188,7 +186,7 @@ fun ConversationItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 10.dp)
+            .padding(horizontal = 24.dp)
             .clickable(onClick = onPostClick)
     ) {
         Row(
