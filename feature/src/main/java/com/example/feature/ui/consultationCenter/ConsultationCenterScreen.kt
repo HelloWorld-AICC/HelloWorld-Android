@@ -2,6 +2,7 @@ package com.example.feature.ui.consultationCenter
 
 import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -106,7 +107,7 @@ fun ConsultationCenterScreen (
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
-                        val latLng = LatLng(location.latitude, location.longitude)
+                        val latLng = LatLng(location.latitude - 0.006, location.longitude)
                         userLocation = latLng
 
                         if (!cameraMoved) {
@@ -187,8 +188,7 @@ fun ConsultationCenterScreen (
                 centerList = centerList,
                 selectedCenter = selectedCenter,
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
+                    .align(Alignment.BottomCenter),
                 onClick = { viewModel.selectCenter(it) }
 
             )
@@ -203,18 +203,19 @@ fun ConsultationCenterListOverlay(
     modifier: Modifier = Modifier,
     onClick: (Center) -> Unit
 ) {
-    val targetHeight = if (selectedCenter != null) 373.dp else 200.dp
-
-    val animatedHeight by animateDpAsState(
-        targetValue = targetHeight,
-        label = "overlayHeight"
-    )
 
     Box(
         modifier = modifier
-            .width(320.dp)
-            .height(animatedHeight)
-            .clip(RoundedCornerShape(24.dp))
+            .fillMaxWidth()
+            .height(380.dp)
+            .clip(
+                RoundedCornerShape(
+                    topStart = 8.dp,
+                    topEnd = 8.dp,
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp
+                )
+            )
             .background(Color.White)
     ) {
         // ▶ 카드 내용 영역
@@ -301,7 +302,6 @@ fun ConsultationCenterCard(
                 contentDescription = null,
                 modifier = Modifier
                     .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp))
             )
         }
 
