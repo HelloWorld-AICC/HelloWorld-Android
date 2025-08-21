@@ -70,6 +70,7 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
 import com.example.feature.R
+import com.example.model.common.ContentType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,6 +90,8 @@ internal fun CommunityPostWrite(
 
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
+
+    val isCreate = viewModel.request.type == ContentType.CREATE
 
     // 이미지 결과 처리 함수
     fun handleImageResult(uri: List<Uri>) {
@@ -176,8 +179,9 @@ internal fun CommunityPostWrite(
                     .size(24.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
+            val title = if (isCreate) "게시글 작성" else "게시글 수정"
             Text(
-                text = "게시글 작성",
+                text = title,
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -334,80 +338,82 @@ internal fun CommunityPostWrite(
                     }
                 }
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "사진",
-                    style = AppTypography.label01,
-                    color = HelloWorldGrayScale800,
-                )
-                FlowRow(
-                    modifier = Modifier
-                        .background(Color.White, RoundedCornerShape(8.dp))
-                        .fillMaxWidth()
-                        .heightIn(min = 74.dp)
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+            if (isCreate) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    if (images.size < 12) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable {
-//                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_picture),
-                                contentDescription = null,
-                                tint = Color.Unspecified,
+                    Text(
+                        text = "사진",
+                        style = AppTypography.label01,
+                        color = HelloWorldGrayScale800,
+                    )
+                    FlowRow(
+                        modifier = Modifier
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .fillMaxWidth()
+                            .heightIn(min = 74.dp)
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        if (images.size < 12) {
+                            Box(
                                 modifier = Modifier
-                                    .size(16.dp)
+                                    .size(50.dp)
+                                    .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+//                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                                        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_picture),
+                                    contentDescription = null,
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                )
+                            }
+                        }
+                        images.forEach { imageUri ->
+                            MediaContentBox(
+                                context = context,
+                                imageUri = imageUri,
+                                onRemoveMedia = viewModel::removeImage
                             )
                         }
                     }
-                    images.forEach { imageUri ->
-                        MediaContentBox(
-                            context = context,
-                            imageUri = imageUri,
-                            onRemoveMedia = viewModel::removeImage
-                        )
-                    }
                 }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = "사진은 최대 10장까지 업로드 가능합니다",
-                    style = AppTypography.label03,
-                    color = HelloWorldGrayScale300,
-                )
-/*                Text(
-                    text = "영상은 최대 2개까지 업로드 가능합니다",
-                    style = AppTypography.label03,
-                    color = HelloWorldGrayScale300,
-                )*/
-                Text(
-                    text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
-                    style = AppTypography.label03,
-                    color = HelloWorldGrayScale300,
-                )
-                Text(
-                    text = "초상권•저작권 침해 등 위법 게시물은 관리자 판단으로 삭제될 수 있습니다",
-                    style = AppTypography.label03,
-                    color = HelloWorldGrayScale300,
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "사진은 최대 10장까지 업로드 가능합니다",
+                        style = AppTypography.label03,
+                        color = HelloWorldGrayScale300,
+                    )
+                    /*                Text(
+                                        text = "영상은 최대 2개까지 업로드 가능합니다",
+                                        style = AppTypography.label03,
+                                        color = HelloWorldGrayScale300,
+                                    )*/
+                    Text(
+                        text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
+                        style = AppTypography.label03,
+                        color = HelloWorldGrayScale300,
+                    )
+                    Text(
+                        text = "초상권•저작권 침해 등 위법 게시물은 관리자 판단으로 삭제될 수 있습니다",
+                        style = AppTypography.label03,
+                        color = HelloWorldGrayScale300,
+                    )
+                }
             }
         }
         TextButton(
@@ -415,10 +421,10 @@ internal fun CommunityPostWrite(
                 focusManager.clearFocus()
                 viewModel.updateDialogData(
                     DialogData(
-                        title = "게시글을 게시하시겠어요?",
+                        title = if (isCreate) "게시글을 게시하시겠어요?" else "게시글을 수정하시겠어요?",
                         subTitle = "게시 후에도 수정 하실 수 있습니다.",
                         dismiss = "취소하기",
-                        confirm = "게시하기",
+                        confirm = if (isCreate) "게시하기" else "수정하기",
                         onDismiss = { viewModel.updateDialogData() },
                         onConfirm = {
                             viewModel.updateDialogData()

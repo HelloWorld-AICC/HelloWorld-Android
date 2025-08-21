@@ -22,10 +22,10 @@ import javax.inject.Inject
 @HiltViewModel(assistedFactory = PostWriteViewModel.Factory::class)
 class PostWriteViewModel @AssistedInject constructor(
     private val communityRepository: CommunityRepository,
-    @Assisted val category: Int,
+    @Assisted val request: CommunityPostWrite,
 ) : ViewModel() {
 
-    private val _selectedTab = MutableStateFlow(category)
+    private val _selectedTab = MutableStateFlow(request.category)
     val selectedTab: StateFlow<Int> = _selectedTab
 
     private val _title = MutableStateFlow("")
@@ -109,7 +109,7 @@ class PostWriteViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            category: Int,
+            request: CommunityPostWrite
         ): PostWriteViewModel
     }
 

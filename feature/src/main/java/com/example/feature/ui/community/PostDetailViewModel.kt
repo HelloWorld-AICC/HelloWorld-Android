@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.community.CommunityRepository
 import com.example.core.ui.component.DialogData
+import com.example.core.ui.component.ToastData
 import com.example.core.util.extension.toFormattedDate
 import com.example.model.community.DetailComment
 import com.example.model.community.DetailRequest
@@ -39,22 +40,47 @@ class PostDetailViewModel @AssistedInject constructor(
     private val _commentList = MutableStateFlow<List<DetailComment>>(emptyList())
     val commentList: StateFlow<List<DetailComment>> = _commentList.asStateFlow()
 
+    private val _toastData = MutableStateFlow<ToastData?>(null)
+    val toastData = _toastData.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _hasMoreData = MutableStateFlow(true)
+    private val _page = MutableStateFlow(0)
+
     init {
-        getContent()
+        getContent(true)
     }
 
-    private fun getContent() {
+    fun getContent(init: Boolean? = null) {
+        if (init == true) {
+            _commentList.value = emptyList()
+            _page.value = 0
+        }
+
+        if (init != true && (_isLoading.value || !_hasMoreData.value)) return
+
+        if (_commentList.value.isNotEmpty()) _isLoading.value = true
+
         viewModelScope.launch {
             communityRepository.getCommunityPostDetail(
                 request = request.copy(
-                    page = 0, size = 10
+                    page = _page.value,
+                    size = 10,
                 )
             ).fold(
                 onSuccess = {
                     _post.value = it
-                    _commentList.value = it.commentList
+
+                    _commentList.value += it.commentList
+                    _hasMoreData.value = it.commentList.size == 10
+                    _page.value++
+
+                    _isLoading.value = false
                 },
                 onFailure = {
+                    _isLoading.value = false
                     // TODO
                 }
             )
@@ -83,13 +109,58 @@ class PostDetailViewModel @AssistedInject constructor(
             ).fold(
                 onSuccess = {
                     _commentText.value = ""
-                    getContent()
+                    getContent(true)
                 },
                 onFailure = {
                     // TODO
                 }
             )
         }
+    }
+
+    fun deletePost(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            communityRepository.deletePost(
+                categoryId = request.categoryId,
+                communityId = request.communityId
+            ).fold(
+                onSuccess = {
+                    onResult(true)
+                },
+                onFailure = {
+                    onResult(false)
+                }
+            )
+        }
+    }
+
+    fun deleteComment(commentId: Long = 0, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            communityRepository.deleteComment(
+                communityId = request.communityId,
+                commentId = commentId
+            ).fold(
+                onSuccess = {
+                    onResult(true)
+//                    _commentList.value = _commentList.value.filterNot { }
+                },
+                onFailure = {
+                    onResult(false)
+                }
+            )
+        }
+    }
+
+    fun reportPost() {
+
+    }
+
+    fun reportComment() {
+
+    }
+
+    fun updateToastData(data: ToastData? = null) {
+        _toastData.value = data
     }
 
     @AssistedFactory

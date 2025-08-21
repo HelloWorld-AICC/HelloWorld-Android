@@ -17,4 +17,7 @@ object ApiConstants {
     const val CREATE_COMMUNITY_COMMENT = "community/{community_id}/comment"                 // POST
 
     const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST
+
+    const val DELETE_COMMUNITY_POST = "community/{category_id}/{community_id}/delete"
+    const val DELETE_COMMUNITY_COMMENT = "community/{community_id}/{comment_id}/delete"
 }

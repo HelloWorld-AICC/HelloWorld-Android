@@ -24,11 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +46,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,7 +70,10 @@ import androidx.media3.ui.compose.PlayerSurface
 import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
+import com.example.core.ui.component.HWToast
+import com.example.core.ui.component.ToastData
 import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldError
 import com.example.core.ui.theme.HelloWorldGrayScale100
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale500
@@ -78,12 +84,16 @@ import com.example.core.util.extension.advancedImePadding
 import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
 import com.example.feature.R
+import com.example.model.common.ContentType
 import com.example.model.community.CommunityDetailFile
 import com.example.model.community.DetailComment
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun CommunityPostDetail(
+    onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel()
@@ -99,11 +109,32 @@ internal fun CommunityPostDetail(
 
     var expanded by remember { mutableStateOf(false) }
     val dialogData by viewModel.dialogData.collectAsState()
+    val toastData by viewModel.toastData.collectAsState()
+
+    val isLoading by viewModel.isLoading.collectAsState()
 
     BackHandler(enabled = showMediaViewer.visible) {
         viewModel.visibleMediaViewer(
             data = MediaViewData(visible = false)
         )
+    }
+
+    val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(lazyListState, commentList.size) {
+        snapshotFlow { lazyListState.layoutInfo }
+            .map { layoutInfo ->
+                val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                val totalItemsCount = layoutInfo.totalItemsCount
+
+                lastVisibleItemIndex >= totalItemsCount - 2
+            }
+            .distinctUntilChanged()
+            .collect { shouldLoadMore ->
+                if (shouldLoadMore && !isLoading && commentList.isNotEmpty()) {
+                    viewModel.getContent()
+                }
+            }
     }
 
     Column(
@@ -156,50 +187,86 @@ internal fun CommunityPostDetail(
                 )
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    containerColor = Color.White,
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "수정하기") },
-                        onClick = {}
-                    )
-                    HorizontalDivider()
-                    DropdownMenuItem(
-                        text = { Text(text = "삭제하기") },
-                        onClick = {
-                            viewModel.updateDialogData(
-                                DialogData(
-                                    title = "게시글을 삭제하시겠어요?",
-                                    subTitle = "삭제된 게시글은 복구할 수 없습니다.",
-                                    dismiss = "돌아가기",
-                                    confirm = "신고하기",
-                                    onDismiss = { viewModel.updateDialogData() },
-                                    onConfirm = {
-                                        // TODO api 추가
-                                        viewModel.updateDialogData()
-                                    },
+                    if (post.isOwner) {
+                        DropdownMenuItem(
+                            text = { Text(
+                                text = "수정하기",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            ) },
+                            onClick = {
+                                expanded = false
+                                onNavigateToCommunityPostWrite(
+                                    viewModel.request.categoryId.toInt(),
+                                    viewModel.request.communityId.toInt(),
+                                    ContentType.UPDATE
                                 )
-                            )
-                        }
-                    )
-                    // TODO 분기처리
-                    DropdownMenuItem(
-                        text = { Text(text = "신고하기") },
-                        onClick = {
-                            viewModel.updateDialogData(
-                                DialogData(
-                                    title = "게시글을 신고하시겠어요?",
-                                    subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
-                                    dismiss = "돌아가기",
-                                    confirm = "신고하기",
-                                    onDismiss = { viewModel.updateDialogData() },
-                                    onConfirm = {
-                                        // TODO api 추가
-                                        viewModel.updateDialogData()
-                                    },
+                            },
+                            modifier = Modifier
+                                .height(24.dp)
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                        DropdownMenuItem(
+                            text = { Text(
+                                text = "삭제하기",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            ) },
+                            onClick = {
+                                expanded = false
+                                viewModel.updateDialogData(
+                                    DialogData(
+                                        title = "게시글을 삭제하시겠어요?",
+                                        subTitle = "삭제된 게시글은 복구할 수 없습니다.",
+                                        dismiss = "돌아가기",
+                                        confirm = "삭제하기",
+                                        onDismiss = { viewModel.updateDialogData() },
+                                        onConfirm = {
+                                            viewModel.updateDialogData()
+                                            viewModel.deletePost { result ->
+                                                if (result) {
+
+                                                } else {
+
+                                                }
+                                            }
+                                        },
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            },
+                            modifier = Modifier
+                                .height(24.dp)
+                        )
+                    } else {
+                        DropdownMenuItem(
+                            text = { Text(
+                                text = "신고하기",
+                                style = AppTypography.label02,
+                                color = HelloWorldError,
+                            ) },
+                            onClick = {
+                                viewModel.updateDialogData(
+                                    DialogData(
+                                        title = "게시글을 신고하시겠어요?",
+                                        subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
+                                        dismiss = "돌아가기",
+                                        confirm = "신고하기",
+                                        onDismiss = { viewModel.updateDialogData() },
+                                        onConfirm = {
+                                            // TODO api 추가
+                                            viewModel.updateDialogData()
+                                        },
+                                    )
+                                )
+                            },
+                            modifier = Modifier
+                                .height(24.dp)
+                        )
+                    }
                 }
             }
         }
@@ -209,11 +276,13 @@ internal fun CommunityPostDetail(
             thickness = 1.dp,
             color = HelloWorldMain200
         )
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(Color.White)
+                .background(Color.White),
+            state = lazyListState
         ) {
             item {
                 Column(
@@ -323,8 +392,24 @@ internal fun CommunityPostDetail(
                                     confirm = "삭제하기",
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
-                                        // TODO api 추가
                                         viewModel.updateDialogData()
+                                        viewModel.deleteComment() { result ->
+                                            if (result) {
+                                                viewModel.updateToastData(
+                                                    ToastData(
+                                                        text = "댓글이 삭제 되었습니다.",
+                                                        onDismiss = { viewModel.updateToastData() }
+                                                    )
+                                                )
+                                            } else {
+                                                viewModel.updateToastData(
+                                                    ToastData(
+                                                        text = "댓글 삭제에 실패 했습니다.",
+                                                        onDismiss = { viewModel.updateToastData() }
+                                                    )
+                                                )
+                                            }
+                                        }
                                     },
                                 )
                             )
@@ -345,6 +430,18 @@ internal fun CommunityPostDetail(
                             )
                         }
                     )
+                }
+                if (isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
                 }
             }
         }
@@ -409,6 +506,11 @@ internal fun CommunityPostDetail(
     dialogData?.let {
         HWDialog(it)
     }
+
+    toastData?.let {
+        HWToast(it)
+    }
+
     if (showMediaViewer.visible && post.fileList.isNotEmpty()) {
         MediaViewer(
             onDismiss = { viewModel.visibleMediaViewer(MediaViewData(visible = false)) },
@@ -469,22 +571,39 @@ private fun CommentItem(
                 )
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    containerColor = Color.White,
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "수정하기") },
-                        onClick = {}
-                    )
-                    HorizontalDivider()
-                    DropdownMenuItem(
-                        text = { Text(text = "삭제하기") },
-                        onClick = { onDeleteClick() }
-                    )
-                    // TODO 분기처리
-                    DropdownMenuItem(
-                        text = { Text(text = "신고하기") },
-                        onClick = { onReportClick() }
-                    )
+                    if (comment.isOwner) {
+                        DropdownMenuItem(
+                            text = { Text(
+                                text = "삭제하기",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            ) },
+                            onClick = {
+                                onDeleteClick()
+                                expanded = false
+                            },
+                            modifier = Modifier
+                                .height(24.dp)
+                        )
+                    } else {
+                        DropdownMenuItem(
+                            text = { Text(
+                                text = "신고하기",
+                                style = AppTypography.label02,
+                                color = HelloWorldError,
+                            ) },
+                            onClick = {
+                                onReportClick()
+                                expanded = false
+                            },
+                            modifier = Modifier
+                                .height(24.dp)
+                        )
+                    }
                 }
             }
         }
@@ -632,6 +751,7 @@ private fun VideoPlayer(
 @Composable
 private fun CommunityPostDetailPreview() {
     CommunityPostDetail(
+        onNavigateToCommunityPostWrite = {_, _, _ ->},
         onNavigateBack = {}
     )
 }

@@ -142,7 +142,8 @@ fun MyNavigationHost(navController: NavHostController) {
             onClearCommunityUpdate = { navController.previousBackStackEntry?.savedStateHandle?.set("community_update", false) }
         )
         communityPostDetailScreen(
-            onNavigateBack = navController::navigateUp
+            onNavigateToCommunityPostWrite = navController::navigateToCommunityPostWrite,
+            onNavigateBack = navController::navigateUp,
         )
         communityPostWriteScreen(
             onNavigateBack = navController::navigateUp,

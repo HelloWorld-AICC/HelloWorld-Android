@@ -16,7 +16,9 @@ data class DetailResponse(
     @SerialName("fileList")
     val fileList: List<CommunityDetailFile> = emptyList(),
     @SerialName("commentDTOList")
-    val commentList: List<DetailComment> = emptyList()
+    val commentList: List<DetailComment> = emptyList(),
+    @SerialName("isOwner")
+    val isOwner: Boolean = false,
 )
 
 @Serializable
@@ -29,6 +31,8 @@ data class DetailComment(
     val createdAt: String,
     @SerialName("content")
     val content: String,
+    @SerialName("isOwner")
+    val isOwner: Boolean = false,
 )
 
 @Serializable

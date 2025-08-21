@@ -11,6 +11,7 @@ import com.example.feature.ui.community.CommunityPostDetail
 import com.example.feature.ui.community.CommunityPostWrite
 import com.example.feature.ui.community.PostDetailViewModel
 import com.example.feature.ui.community.PostWriteViewModel
+import com.example.model.common.ContentType
 import com.example.model.community.DetailRequest
 import kotlinx.serialization.Serializable
 
@@ -18,12 +19,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class CommunityPostDetail(val categoryId: Int, val communityId: Int)
 
-@Serializable data class CommunityPostWrite(val category: Int)
+@Serializable data class CommunityPostWrite(val category: Int, val communityId: Int = 0, val type: ContentType)
 
 fun NavController.navigateToCommunity(navOptions: NavOptions? = null) = navigate(route = "커뮤니티", navOptions)
 
 fun NavGraphBuilder.communityScreen(
-    onNavigateToCommunityPostWrite: (Int) -> Unit,
+    onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     onClearCommunityUpdate: () -> Unit,
@@ -41,6 +42,7 @@ fun NavGraphBuilder.communityScreen(
 fun NavController.navigateToCommunityPostDetail(categoryId: Int, communityId: Int, navOptions: NavOptions? = null) = navigate(CommunityPostDetail(categoryId, communityId), navOptions)
 
 fun NavGraphBuilder.communityPostDetailScreen(
+    onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     composable<CommunityPostDetail> { entry ->
@@ -49,6 +51,7 @@ fun NavGraphBuilder.communityPostDetailScreen(
         val request = DetailRequest(categoryId = route.categoryId.toLong(), communityId = route.communityId.toLong())
 
         CommunityPostDetail(
+            onNavigateToCommunityPostWrite = onNavigateToCommunityPostWrite,
             onNavigateBack = onNavigateBack,
             viewModel = hiltViewModel<PostDetailViewModel, PostDetailViewModel.Factory>(
                 key = "${request.communityId}"
@@ -59,22 +62,33 @@ fun NavGraphBuilder.communityPostDetailScreen(
     }
 }
 
-fun NavController.navigateToCommunityPostWrite(category: Int, navOptions: NavOptions? = null) = navigate(CommunityPostWrite(category), navOptions)
+fun NavController.navigateToCommunityPostWrite(
+    category: Int,
+    communityId: Int = 0,
+    contentType: ContentType,
+    navOptions: NavOptions? = null
+) = navigate(CommunityPostWrite(category, communityId, contentType), navOptions)
 
 fun NavGraphBuilder.communityPostWriteScreen(
     onNavigateBack: () -> Unit,
     onCommunityUpdated: () -> Unit,
 ) {
     composable<CommunityPostWrite> { entry ->
-        val category = entry.toRoute<CommunityPostWrite>().category
+        val route = entry.toRoute<CommunityPostWrite>()
+
+        val request = CommunityPostWrite(
+            route.category,
+            route.communityId,
+            route.type
+        )
 
         CommunityPostWrite(
             onNavigateBack = onNavigateBack,
             onCommunityUpdated = onCommunityUpdated,
             viewModel = hiltViewModel<PostWriteViewModel, PostWriteViewModel.Factory>(
-                key = "$category"
+                key = "${route.category} ${route.communityId}"
             ) { factory ->
-                factory.create(category)
+                factory.create(request)
             }
         )
     }
