@@ -62,6 +62,7 @@ fun MyPage(
     onNavigateToPostAndComments: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
     onNavigateToTermsOfService: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onNavigateToWithdraw: () -> Unit,
     onCheckProfileUpdate: () -> Boolean,
     onClearProfileUpdate: () -> Unit,
@@ -79,9 +80,11 @@ fun MyPage(
         onNavigateToPostAndComments = onNavigateToPostAndComments,
         onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
         onNavigateToTermsOfService= onNavigateToTermsOfService,
+        onNavigateToLogin= onNavigateToLogin,
         onNavigateToWithdraw = onNavigateToWithdraw,
         onCheckProfileUpdate = onCheckProfileUpdate,
         onClearProfileUpdate = onClearProfileUpdate,
+        onLogout = viewModel::logout,
         uiState = uiState,
         dialogData = dialogData,
         updateDialogData = viewModel::updateDialogData,
@@ -99,9 +102,11 @@ private fun MyPage(
     onNavigateToPostAndComments: () -> Unit = {},
     onNavigateToPrivacyPolicy: () -> Unit = {},
     onNavigateToTermsOfService: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {},
     onNavigateToWithdraw: () -> Unit = {},
     onCheckProfileUpdate: () -> Boolean,
     onClearProfileUpdate: () -> Unit,
+    onLogout: ((Boolean) -> Unit) -> Unit,
     uiState: MyPageUiState = MyPageUiState.Loading,
     dialogData: DialogData? = null,
     updateDialogData: (DialogData?) -> Unit,
@@ -307,8 +312,12 @@ private fun MyPage(
                                         confirm = "로그아웃",
                                         onDismiss = { updateDialogData(null) },
                                         onConfirm = {
-                                            // TODO 로그아웃 처리
                                             updateDialogData(null)
+                                            onLogout { result ->
+                                                if (result) {
+                                                    onNavigateToLogin()
+                                                }
+                                            }
                                         }
                                     )
                                 )
@@ -405,5 +414,6 @@ private fun MyPagePreview() {
         updateDialogData = {},
         onCheckProfileUpdate = { false },
         onClearProfileUpdate = {},
+        onLogout = {},
     )
 }

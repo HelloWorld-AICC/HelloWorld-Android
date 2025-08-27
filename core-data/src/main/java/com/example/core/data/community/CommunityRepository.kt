@@ -7,6 +7,8 @@ import com.example.model.community.DeleteCommentResponse
 import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailRequest
 import com.example.model.community.DetailResponse
+import com.example.model.community.UpdatePostRequest
+import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteFileRequest
 import com.example.model.community.WriteResponse
 
@@ -16,7 +18,7 @@ interface CommunityRepository {
     suspend fun getCommunityPostDetail(request: DetailRequest): Result<DetailResponse>
     suspend fun submitComment(communityId: Long, content: String): Result<CommunityResponse>   // return CommentId
 
-//    suspend fun updatePost()
+    suspend fun updatePost(categoryId: Long, communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse>
     suspend fun deletePost(categoryId: Long, communityId: Long): Result<DeletePostResponse>
     suspend fun deleteComment(communityId: Long, commentId: Long): Result<DeleteCommentResponse>
 //    suspend fun reportPost()

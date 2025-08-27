@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.data.community.CommunityRepository
 import com.example.core.ui.component.DialogData
 import com.example.feature.ui.community.navigation.CommunityPostWrite
+import com.example.model.common.ContentType
+import com.example.model.community.DetailRequest
+import com.example.model.community.UpdatePostRequest
 import com.example.model.community.WriteFileRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -74,6 +77,31 @@ class PostWriteViewModel @AssistedInject constructor(
         _images.value = _images.value.filter { it != uri }
     }
 
+    init {
+        if (request.type == ContentType.UPDATE) {
+            getContent()
+        }
+    }
+
+    fun getContent() {
+        viewModelScope.launch {
+            communityRepository.getCommunityPostDetail(
+                request = DetailRequest(
+                    categoryId = request.category.toLong(),
+                    communityId = request.communityId.toLong()
+                )
+            ).fold(
+                onSuccess = {
+                    _title.value = it.title
+                    _content.value = it.content
+                },
+                onFailure = {
+                    // TODO
+                }
+            )
+        }
+    }
+
     fun submitCommunityPost(context: Context, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
 
@@ -95,6 +123,26 @@ class PostWriteViewModel @AssistedInject constructor(
                 title = _title.value,
                 content = _content.value,
                 images = mediaBytesList
+            ).fold(
+                onSuccess = {
+                    onResult(true)
+                },
+                onFailure = {
+                    // TODO
+                }
+            )
+        }
+    }
+
+    fun updateCommunityPost(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            communityRepository.updatePost(
+                categoryId = request.category.toLong(),
+                communityId = request.communityId.toLong(),
+                request = UpdatePostRequest(
+                    title = _title.value,
+                    content = _content.value
+                )
             ).fold(
                 onSuccess = {
                     onResult(true)

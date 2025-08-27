@@ -44,6 +44,8 @@ fun NavController.navigateToCommunityPostDetail(categoryId: Int, communityId: In
 fun NavGraphBuilder.communityPostDetailScreen(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateBack: () -> Unit,
+    onCommunityUpdated: () -> Unit,
+    onCheckCommunityUpdate: () -> Boolean,
 ) {
     composable<CommunityPostDetail> { entry ->
         val route = entry.toRoute<CommunityPostDetail>()
@@ -53,6 +55,8 @@ fun NavGraphBuilder.communityPostDetailScreen(
         CommunityPostDetail(
             onNavigateToCommunityPostWrite = onNavigateToCommunityPostWrite,
             onNavigateBack = onNavigateBack,
+            onCommunityUpdated = onCommunityUpdated,
+            onCheckCommunityUpdate = onCheckCommunityUpdate,
             viewModel = hiltViewModel<PostDetailViewModel, PostDetailViewModel.Factory>(
                 key = "${request.communityId}"
             ) { factory ->

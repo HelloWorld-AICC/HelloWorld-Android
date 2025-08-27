@@ -428,7 +428,11 @@ internal fun CommunityPostWrite(
                         onDismiss = { viewModel.updateDialogData() },
                         onConfirm = {
                             viewModel.updateDialogData()
-                            viewModel.submitCommunityPost(context, onResult = { result -> if (result) { onCommunityUpdated() } })
+                            if (isCreate) {
+                                viewModel.submitCommunityPost(context, onResult = { result -> if (result) { onCommunityUpdated() } })
+                            } else {
+                                viewModel.updateCommunityPost { result -> if (result) { onCommunityUpdated() } }
+                            }
                         }
                     )
                 )

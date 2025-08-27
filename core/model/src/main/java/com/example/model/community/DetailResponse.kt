@@ -9,8 +9,6 @@ data class DetailResponse(
     val title: String = "",
     @SerialName("content")
     val content: String = "",
-    @SerialName("communityWriterEmail")
-    val communityWriterEmail: String = "",
     @SerialName("created_at")
     val createdAt: String = "",
     @SerialName("fileList")
@@ -23,10 +21,10 @@ data class DetailResponse(
 
 @Serializable
 data class DetailComment(
+    @SerialName("commentId")
+    val commentId: Long,
     @SerialName("anonymousName")
     val anonymousName: Long,        // 익명 + 반환값 표시
-    @SerialName("commentWriterEmail")
-    val commentWriterEmail: String,
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("content")

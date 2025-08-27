@@ -5,6 +5,8 @@ import com.example.model.community.CommunityResponse
 import com.example.model.community.DeleteCommentResponse
 import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailResponse
+import com.example.model.community.UpdatePostRequest
+import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteResponse
 import com.example.network.response.ApiResponse
 import com.example.network.retrofit.ApiConstants
@@ -15,6 +17,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -62,4 +65,11 @@ interface CommunityApi {
         @Path("community_id") communityId: Long,
         @Path("comment_id") commentId: Long,
     ): Response<ApiResponse<DeleteCommentResponse>>
+
+    @PATCH(ApiConstants.UPDATE_COMMUNITY_POST)
+    suspend fun updateCommunityPost(
+        @Path("category_id") categoryId: Long,
+        @Path("community_id") communityId: Long,
+        @Body request: UpdatePostRequest
+    ): Response<ApiResponse<UpdatePostResponse>>
 }

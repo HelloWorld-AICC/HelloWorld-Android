@@ -95,9 +95,19 @@ import kotlinx.coroutines.flow.map
 internal fun CommunityPostDetail(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateBack: () -> Unit,
+    onCommunityUpdated: () -> Unit,
+    onCheckCommunityUpdate: () -> Boolean,
     modifier: Modifier = Modifier,
     viewModel: PostDetailViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        val isUpdate = onCheckCommunityUpdate()
+
+        if (isUpdate) {
+            viewModel.getContent(true)
+            onCommunityUpdated()
+        }
+    }
     val post by viewModel.post.collectAsState()
     val commentList by viewModel.commentList.collectAsState()
     val commentText by viewModel.commentText.collectAsState()
@@ -229,9 +239,9 @@ internal fun CommunityPostDetail(
                                             viewModel.updateDialogData()
                                             viewModel.deletePost { result ->
                                                 if (result) {
-
+                                                    onCommunityUpdated()
                                                 } else {
-
+                                                    // TODO 실패처리
                                                 }
                                             }
                                         },
@@ -393,7 +403,7 @@ internal fun CommunityPostDetail(
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
                                         viewModel.updateDialogData()
-                                        viewModel.deleteComment() { result ->
+                                        viewModel.deleteComment(comment.commentId) { result ->
                                             if (result) {
                                                 viewModel.updateToastData(
                                                     ToastData(
@@ -752,6 +762,8 @@ private fun VideoPlayer(
 private fun CommunityPostDetailPreview() {
     CommunityPostDetail(
         onNavigateToCommunityPostWrite = {_, _, _ ->},
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onCommunityUpdated = {},
+        onCheckCommunityUpdate = { false }
     )
 }

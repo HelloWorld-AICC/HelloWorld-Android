@@ -140,9 +140,9 @@ class PostDetailViewModel @AssistedInject constructor(
                 communityId = request.communityId,
                 commentId = commentId
             ).fold(
-                onSuccess = {
+                onSuccess = { result ->
                     onResult(true)
-//                    _commentList.value = _commentList.value.filterNot { }
+                    _commentList.value = _commentList.value.filterNot { it.commentId == commentId}
                 },
                 onFailure = {
                     onResult(false)
