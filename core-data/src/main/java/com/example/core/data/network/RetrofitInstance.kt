@@ -20,46 +20,65 @@ object RetrofitInstance {
         Log.d("Prefs", "Stored Token: ${prefs.getString("access_token", "NULL")}")
     }
 
-    // 엑세스 토큰
+    // 엑세스 토큰 설정
     fun setAccessToken(token: String) {
         prefs.edit().putString("access_token", token).apply()
     }
 
+    // 엑세스 토큰 조회
     fun getAccessToken(): String {
         return prefs.getString("access_token", "") ?: ""
     }
 
-    // 리프레시 토큰
+    // 리프레시 토큰 설정
     fun setRefreshToken(token: String) {
         prefs.edit().putString("refresh_token", token).apply()
     }
 
+    // 리프레시 토큰 조회
     fun getRefreshToken(): String {
         return prefs.getString("refresh_token", "") ?: ""
     }
 
+    // 자동 로그인 
     suspend fun tryAutoLogin(): Boolean {
+        // 리프레시 토큰 발급받아서 rtk에 저장
         val rtk = getRefreshToken()
-        Log.d("AUTO_LOGIN", "저장된 RTK: $rtk") // 이 로그로 실제 값 확인
+        Log.d("AUTO_LOGIN", "저장된 RTK: $rtk") 
 
+        // 리프레시 토큰(rtk) 발급 안됐을 경우
         if (rtk.isEmpty()) {
-            Log.d("AUTO_LOGIN", "저장된 RTK 없음 → 로그인 필요")
+            Log.d("AUTO_LOGIN", "저장된 RTK 없음")
             return false
         }
-
+        
+        /*
+        * API 응답 받기 성공 -> true 반환
+        * API 응답 받기 실패 -> false 반환
+        */
         return try {
+            // 발급받은 리프레시 토큰을 재발급 api의 피라미터로 넘기고 응답 받기
             val response = authService.reissueToken(rtk)
+
+            // 응답을 성공적으로 받았을 경우
             if (response.isSuccess) {
+
+                // 타입이 atk일 경우 atk로 저장
                 val atk = response.result.tokenList.find { it.types == "atk" }?.token ?: ""
+
+                // 타입이 rtk일 경우 newRtk로 저장
                 val newRtk = response.result.tokenList.find { it.types == "rtk" }?.token ?: rtk
 
+                // 재발급 받은 atk로 엑세스 토큰 재설정
                 setAccessToken(atk)
+
+                // 재발급 받은 newRtk로 리프레시 토큰 재설정
                 setRefreshToken(newRtk)
 
-                Log.d("AUTO_LOGIN", "토큰 재발급 성공 → ATK 갱신 완료")
+                Log.d("AUTO_LOGIN", "재발급 API 응답 받기 성공")
                 true
             } else {
-                Log.w("AUTO_LOGIN", "토큰 재발급 실패 → 로그인 필요")
+                Log.w("AUTO_LOGIN", "재발급 API 응답 받기 실패")
                 false
             }
         } catch (e: Exception) {

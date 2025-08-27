@@ -15,9 +15,13 @@ class SplashViewModel : ViewModel() {
 
     fun checkAutoLogin() {
         viewModelScope.launch {
-            val rtk = RetrofitInstance.getRefreshToken()
+            val rtk = try {
+                RetrofitInstance.getRefreshToken()
+            } catch (e: Exception) {
+                Log.e("AUTO_LOGIN", "RTK 조회 실패", e)
+                null
+            }
 
-            // RTK 없으면 바로 온보딩 분기
             if (rtk.isNullOrEmpty()) {
                 Log.d("AUTO_LOGIN", "RTK 없음 → 자동 로그인 시도 안 함")
                 _isAutoLoginSuccess.value = false
@@ -28,7 +32,7 @@ class SplashViewModel : ViewModel() {
                 Log.d("AUTO_LOGIN", "RTK 있음 → 재발급 시도")
                 val response = RetrofitInstance.authService.reissueToken(rtk)
 
-                if (response.isSuccess) {
+                if (response.isSuccess && response.result?.tokenList != null) {
                     val atk = response.result.tokenList
                         .find { it.types.equals("ATK", ignoreCase = true) }
                         ?.token.orEmpty()

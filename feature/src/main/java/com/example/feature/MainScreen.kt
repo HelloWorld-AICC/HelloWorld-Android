@@ -117,9 +117,8 @@ fun MyNavigationHost(navController: NavHostController) {
         composable("온보딩") { LoginScreen(navController) }
         composable("언어 설정") { LanguageScreen(navController) }
         composable("이용 동의") { AgreementScreen(navController) }
-
         composable("축하") { CongratulationsScreen(navController) }
-        composable("홈") { HomeScreen(navController) } // TODO 마이페이지로 이동 경로 수정 해주세요
+        composable("홈") { HomeScreen(navController) }
         composable("상담 센터") {
             ConsultationCenterScreen (
                 onBackClick = navController::navigateUp

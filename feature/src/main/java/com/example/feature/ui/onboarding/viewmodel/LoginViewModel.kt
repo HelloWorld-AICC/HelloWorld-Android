@@ -29,28 +29,40 @@ class LoginViewModel : ViewModel() {
                 val response = RetrofitInstance.authService.getToken(idToken)
 
                 val tokenList = response.result?.tokenList
-                val atk = tokenList?.firstOrNull { it.types == "ATK" }?.token
-                val rtk = tokenList?.firstOrNull { it.types == "RTK" }?.token
+                val atk = tokenList?.firstOrNull { it.types.equals("ATK", true) }?.token
+                val rtk = tokenList?.firstOrNull { it.types.equals("RTK", true) }?.token
 
+                // ATK 없을 경우 RetrofitInstance에 설정
                 if (!atk.isNullOrBlank()) {
                     RetrofitInstance.setAccessToken(atk)
                     Log.d("LOGIN", "ATK 설정 성공: $atk")
-                    _loginSuccess.value = true
                 } else {
                     Log.e("LOGIN", "ATK가 비어 있거나 없음")
                 }
-
-                // 저장 완료 후 자동 로그인 시도
+                
+                // RTK 없을 경우 RetrofitInstance에 설정
                 if (!rtk.isNullOrBlank()) {
-                    val success = RetrofitInstance.tryAutoLogin()
-                    if (success) {
-                        Log.d("AUTO_LOGIN ", "자동 로그인 성공")
-                        _loginSuccess.value = true
-                    } else {
-                        Log.w("AUTO_LOGIN ", "자동 로그인 실패")
-                    }
+                    RetrofitInstance.setRefreshToken(rtk)
+                    Log.d("LOGIN", "RTK 설정 성공: $rtk")
                 } else {
-                    Log.w("AUTO_LOGIN ", "RTK가 없어 자동 로그인 생략")
+                    Log.w("LOGIN", "RTK가 비어 있음")
+                }
+
+                // ATK/RTK 저장 후 자동 로그인 시도
+                if (!rtk.isNullOrBlank()) {
+                    // 자동 로그인 성공 유무 확인
+                    val success = RetrofitInstance.tryAutoLogin()
+                    
+                    // 성공일 경우
+                    if (success) {
+                        Log.d("AUTO_LOGIN", "자동 로그인 성공")
+                        _loginSuccess.value = true
+                    }
+                    
+                    // 실패일 경우
+                    else {
+                        Log.w("AUTO_LOGIN", "자동 로그인 실패")
+                    }
                 }
 
             } catch (e: Exception) {
@@ -58,4 +70,4 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-} // Added LoginViewModel for handling Google login
+}
