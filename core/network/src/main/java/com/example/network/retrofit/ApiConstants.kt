@@ -11,10 +11,14 @@ object ApiConstants {
     const val ALL_MY_COMMUNITY = "myPage/AllMyCommunity"    // GET      본인 작성 글 조회
     const val ALL_MY_COMMENT = "myPage/AllMyComment"        // GET      본인 작성 댓글 조회
 
-    const val GET_COMMUNITY_POST_LIST = "community/{category_id}/list"                      // GET
-    const val CREATE_COMMUNITY_POST = "community/{category_id}/create"                      // POST
-    const val GET_COMMUNITY_POST_DETAIL = "community/{category_id}/detail/{community_id}"   // GET
-    const val CREATE_COMMUNITY_COMMENT = "community/{community_id}/comment"                 // POST
+    const val GET_COMMUNITY_POST_LIST = "community/{category_id}/list"                      // GET  글 조회
+    const val CREATE_COMMUNITY_POST = "community/{category_id}/create"                      // POST 글 등록
+    const val GET_COMMUNITY_POST_DETAIL = "community/{category_id}/detail/{community_id}"   // GET  글 상세 조회
+    const val CREATE_COMMUNITY_COMMENT = "community/{community_id}/comment"                 // POST 댓글 등록
 
-    const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST
+    const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST 언어 변경
+
+    const val UPDATE_COMMUNITY_POST = "community/{category_id}/{community_id}/modify"           // PATCH    글 수정
+    const val DELETE_COMMUNITY_POST = "community/{category_id}/{community_id}/delete"           // DELETE   글 삭제
+    const val DELETE_COMMUNITY_COMMENT = "community/{community_id}/{comment_id}/comment/delete" // DELETE   댓글 등록
 }
