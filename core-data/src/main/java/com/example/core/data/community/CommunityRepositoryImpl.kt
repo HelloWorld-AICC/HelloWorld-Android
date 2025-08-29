@@ -4,8 +4,12 @@ import android.net.Uri
 import android.util.Log
 import com.example.model.community.CommunityRequest
 import com.example.model.community.CommunityResponse
+import com.example.model.community.DeleteCommentResponse
+import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailRequest
 import com.example.model.community.DetailResponse
+import com.example.model.community.UpdatePostRequest
+import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteFileRequest
 import com.example.model.community.WriteResponse
 import com.example.network.community.CommunityDataSource
@@ -29,5 +33,17 @@ class CommunityRepositoryImpl @Inject constructor(
 
     override suspend fun submitComment(communityId: Long, content: String): Result<CommunityResponse> {
         return communityDataSource.submitComment(communityId, content)
+    }
+
+    override suspend fun updatePost(categoryId: Long, communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse> {
+        return communityDataSource.updatePost(categoryId, communityId, request)
+    }
+
+    override suspend fun deletePost(categoryId: Long, communityId: Long): Result<DeletePostResponse> {
+        return communityDataSource.deletePost(categoryId, communityId)
+    }
+
+    override suspend fun deleteComment(communityId: Long, commentId: Long): Result<DeleteCommentResponse> {
+        return communityDataSource.deleteComment(communityId, commentId)
     }
 }

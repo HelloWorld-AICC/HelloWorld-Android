@@ -52,6 +52,13 @@ class MyPageViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            // TODO logout (token 제거)
+            onResult(true)
+        }
+    }
 }
 
 sealed interface MyPageUiState {

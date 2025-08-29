@@ -176,9 +176,14 @@ fun Withdraw(
                                 confirm = "탈퇴하기",
                                 onDismiss = { viewModel.updateDialogData() },
                                 onConfirm = {
-                                    // TODO api 추가
                                     viewModel.updateDialogData()
-                                    onNavigateToWithdrawComplete()
+                                    viewModel.withdraw { result ->
+                                        if (result) {
+                                            onNavigateToWithdrawComplete()
+                                        } else {
+                                            // TODO 실패
+                                        }
+                                    }
                                 }
                             )
                         )
