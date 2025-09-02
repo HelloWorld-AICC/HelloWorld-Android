@@ -129,7 +129,7 @@ fun MyNavigationHost(navController: NavHostController) {
         }
         aiChatScreen(
             onPostClick = { chatId ->
-                navController.navigateToAIChatDetail(chatId)
+                navController.navigateToAIChatDetail(chatId!!)
             }
         )
         aiChatDetailScreen(
@@ -189,7 +189,7 @@ fun MyNavigationHost(navController: NavHostController) {
         )
         counselingDetailScreen(
             onNavigateBack = navController::navigateUp,
-            onNavigateToAIChatDetail = navController::navigateToAIChatDetail
+            onNavigateToAIChatDetail = { roomId -> navController.navigateToAIChatDetail(roomId.toString()) }
         )
         resumeScreen(
             onNavigateBack = navController::navigateUp

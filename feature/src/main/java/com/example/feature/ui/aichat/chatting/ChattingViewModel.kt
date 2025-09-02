@@ -1,66 +1,85 @@
 package com.example.feature.ui.aichat.chatting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.data.model.aichat.AIChatMessage
+import com.example.core.data.network.RetrofitInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 
-data class ChatMessage(
-    val text: String,
-    val isUser: Boolean,
-    val showSummaryIcon: Boolean = true  // 기본값은 true
-)
 
 @HiltViewModel
 class ChatViewModel @Inject constructor() : ViewModel() {
 
-    // 채팅방 목록 (예: 1, 2, 3)
-    private val _chatRoomIds = MutableStateFlow<List<Int>>(listOf())
-    val chatRoomIds: StateFlow<List<Int>> = _chatRoomIds
+    private val _chatRoomIds = MutableStateFlow<List<String>>(listOf())
+    val chatRoomIds: StateFlow<List<String>> = _chatRoomIds
 
-    // 선택된 채팅방 ID
-    private val _selectedChatId = MutableStateFlow<Int?>(null)
-    val selectedChatId: StateFlow<Int?> = _selectedChatId
+    private val _selectedChatId = MutableStateFlow<String?>(null)
+    val selectedChatId: StateFlow<String?> = _selectedChatId
 
-    // 각 채팅방 ID에 대응하는 메시지들
-    private val _chatMessages = MutableStateFlow<Map<Int, List<ChatMessage>>>(emptyMap())
-    val chatMessages: StateFlow<Map<Int, List<ChatMessage>>> = _chatMessages
+    private val _chatMessages = MutableStateFlow<Map<String, List<AIChatMessage>>>(emptyMap())
+    val chatMessages: StateFlow<Map<String, List<AIChatMessage>>> = _chatMessages
 
     private val _isTyping = MutableStateFlow(false)
     val isTyping: StateFlow<Boolean> = _isTyping
 
-    /** 채팅방 선택 **/
-    fun selectChat(chatId: Int) {
-        _selectedChatId.value = chatId
+    private val _summaryCompleted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val summaryCompleted = _summaryCompleted.asSharedFlow()
 
-        // 새 채팅방이면 초기 메시지 추가
-        if (!_chatMessages.value.containsKey(chatId)) {
-            val initialMessages = listOf(
-                ChatMessage(text = "안녕하세요!", isUser = false, showSummaryIcon = false),
-                ChatMessage(text = "어떤 고민이 있으신가요?", isUser = false, showSummaryIcon = false)
-            )
+    fun loadChatLog(roomId: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("ChatViewModel", "🔵 요청: getAIChatLog($roomId)")
+                val response = RetrofitInstance.aiChatService.getAIChatLog(roomId)
+                Log.d("ChatViewModel", "✅ 응답 수신: chatLogs=${response.chatLogs.size}, roomId=${response.roomId}")
 
-            _chatMessages.value = _chatMessages.value.toMutableMap().apply {
-                put(chatId, initialMessages)
+                val logs = response.chatLogs.map {
+                    val cleanedContent = if (it.sender.lowercase() == "user") {
+                        it.content.removeSurrounding("\"")
+                    } else {
+                        it.content
+                    }
+                    AIChatMessage(content = cleanedContent, sender = it.sender)
+                }
+                logs.forEachIndexed { i, log ->
+                    Log.d("ChatViewModel", "🗨️ $i : ${log.sender} → ${log.content}")
+                }
+
+                val introMessages = listOf(
+                    AIChatMessage(content = "안녕하세요!", sender = ""), // 언어에 따라 템플릿 다르게 변경 필요
+                    AIChatMessage(content = "어떤 고민이 있으신가요?", sender = "") // 언어에 따라 템플릿 다르게 변경 필요
+                )
+                val finalMessages = introMessages + logs
+
+                _chatMessages.value = _chatMessages.value.toMutableMap().apply {
+                    put(roomId, finalMessages)
+                }
+
+                if (!_chatRoomIds.value.contains(roomId)) {
+                    _chatRoomIds.value = _chatRoomIds.value + roomId
+                }
+
+                _selectedChatId.value = roomId
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "❌ getAIChatLog 실패", e)
             }
-
-            // 채팅방 ID 목록에 추가
-            _chatRoomIds.value = _chatRoomIds.value + chatId
         }
     }
 
-    /** 메시지 전송 **/
-    fun sendUserMessage(chatId: Int, userMessage: String) {
+    fun sendUserMessage(chatId: String, userMessage: String) {
         val currentMessages = _chatMessages.value[chatId].orEmpty()
 
-        // 유저 메시지 추가
-        val newUserMessage = ChatMessage(
-            text = userMessage,
-            isUser = true
+        val newUserMessage = AIChatMessage(
+            content = userMessage,
+            sender = "user"
         )
         val updatedMessages = currentMessages + newUserMessage
 
@@ -68,40 +87,140 @@ class ChatViewModel @Inject constructor() : ViewModel() {
             put(chatId, updatedMessages)
         }
 
-        // AI 응답 추가
         viewModelScope.launch {
-            _isTyping.value = true  // ⬅️ 입력 중 표시 ON
+            _isTyping.value = true
 
-            val response = callAI(userMessage)
+            var streamedText = ""
+            var finalRoomId: String?
 
-            _isTyping.value = false // ⬅️ 입력 중 표시 OFF
+            Log.d("ChatViewModel", "💬 유저 메시지 전송 시작 → \"$userMessage\"")
 
-            val refreshedMessages = _chatMessages.value[chatId].orEmpty()
-            val aiMessage = ChatMessage(
-                text = response,
-                isUser = false
+            askToAIWithStream(
+                roomId = chatId,
+                message = userMessage,
+                onPartialResponse = { partial ->
+                    streamedText += partial
+
+                    val current = _chatMessages.value[chatId].orEmpty()
+                    val updated = if (current.lastOrNull()?.sender == "bot") {
+                        current.dropLast(1) + AIChatMessage(content = streamedText, sender = "bot")
+                    } else {
+                        current + AIChatMessage(content = streamedText, sender = "bot")
+                    }
+
+                    _chatMessages.value = _chatMessages.value.toMutableMap().apply {
+                        put(chatId, updated)
+                    }
+
+                    Log.d("ChatViewModel", "🔄 스트리밍 응답 누적: $streamedText")
+                },
+                onComplete = { roomIdFromResponse ->
+                    _isTyping.value = false
+                    finalRoomId = roomIdFromResponse ?: chatId
+
+                    if (chatId == "new_chat" && roomIdFromResponse != null) {
+                        if (!_chatRoomIds.value.contains(roomIdFromResponse)) {
+                            _chatRoomIds.value += roomIdFromResponse
+                        }
+
+                        val currentMessages = _chatMessages.value["new_chat"].orEmpty()
+                        _chatMessages.value = _chatMessages.value.toMutableMap().apply {
+                            remove("new_chat")
+                            put(roomIdFromResponse, currentMessages)
+                        }
+
+                        _selectedChatId.value = roomIdFromResponse
+                        Log.d("ChatViewModel", "✅ Room 이동 완료: finalRoomId=$finalRoomId")
+                    } else {
+                        _selectedChatId.value = finalRoomId
+                    }
+
+                    Log.d("ChatViewModel", "✅ 스트리밍 완료: finalRoomId=$finalRoomId")
+                }
             )
-
-            val finalMessages = refreshedMessages + aiMessage
-
-            _chatMessages.value = _chatMessages.value.toMutableMap().apply {
-                put(chatId, finalMessages)
-            }
         }
     }
 
-    /** 메시지 가져오기 **/
-    fun getMessages(chatId: Int): List<ChatMessage> {
-        return _chatMessages.value[chatId].orEmpty()
+    private suspend fun askToAIWithStream(
+        roomId: String,
+        message: String,
+        onPartialResponse: (String) -> Unit,
+        onComplete: (String?) -> Unit
+    ) {
+        try {
+            Log.d("ChatViewModel", "🌐 요청: askToAI(roomId=$roomId, message=$message)")
+
+            val requestBody = message.toRequestBody("application/json".toMediaTypeOrNull())
+            val response = RetrofitInstance.aiChatService.askToAI(roomId, requestBody)
+
+            if (response.isSuccessful) {
+                val source = response.body()?.source()
+                var roomIdFromStream: String? = null
+                val messageBuilder = StringBuilder()
+                var emptyDataCount = 0
+
+                while (!source!!.exhausted()) {
+                    val line = source.readUtf8Line()
+                    Log.d("ChatViewModel", "📩 SSE 수신: $line")
+
+                    if (line != null && line.startsWith("data:")) {
+                        val content = line.removePrefix("data:")
+
+                        if (content.startsWith("Room ID:")) {
+                            roomIdFromStream = content.removePrefix("Room ID:").trim()
+                            Log.d("ChatViewModel", "🏷️ 추출된 Room ID: $roomIdFromStream")
+                        } else {
+                            if (content.isEmpty()) {
+                                // 빈 data 줄 감지 (줄바꿈 의미)
+                                emptyDataCount++
+                                if (emptyDataCount == 2) {
+                                    messageBuilder.append("\n")
+                                    emptyDataCount = 0
+                                }
+                            } else {
+                                emptyDataCount = 0
+                                messageBuilder.append(content)
+                            }
+                        }
+                    } else if (line.isNullOrBlank()) {
+                        // 하나의 메시지 블록 종료
+                        val completeMessage = messageBuilder.toString().trimEnd()
+                        if (completeMessage.isNotEmpty()) {
+                            onPartialResponse(completeMessage)
+                            messageBuilder.clear()
+                        }
+                    }
+                }
+
+                onComplete(roomIdFromStream)
+            } else {
+                Log.w("ChatViewModel", "❗askToAI 응답 실패: code=${response.code()}")
+                onComplete(null)
+            }
+        } catch (e: Exception) {
+            Log.e("ChatViewModel", "❌ askToAIWithStream 실패", e)
+            onComplete(null)
+        }
     }
 
-    private suspend fun callAI(prompt: String): String {
-        delay(10000)
-        return "AI 응답: $prompt"
-    }
+    fun summarizeMessage() {
+        val roomId = _selectedChatId.value ?: return
 
-    fun summarizeMessage(text : String) : Boolean {
-        return true
-    }
+        viewModelScope.launch {
+            try {
+                Log.d("ChatViewModel", "📌 요약 요청: roomId=$roomId")
+                val body = RetrofitInstance.aiChatService.summaryAIChat(roomId)
+                val result = body.use { it.string() }  // 꼭 close 되도록 use 사용
+                Log.d("ChatViewModel", "✅ 요약 요청 성공: $result")
 
+                if (result.trim().equals("complete", ignoreCase = true)) {
+                    _summaryCompleted.tryEmit(Unit) // UI에서 다이얼로그 표시
+                } else {
+                    Log.w("ChatViewModel", "⚠️ 예상 외 응답: $result")
+                }
+            } catch (e: Exception) {
+                Log.e("ChatViewModel", "❌ 요약 요청 실패", e)
+            }
+        }
+    }
 }

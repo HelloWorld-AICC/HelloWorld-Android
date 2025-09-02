@@ -10,7 +10,7 @@ import com.example.feature.ui.aichat.AiChatScreen
 import com.example.feature.ui.aichat.chatting.RecentChattingScreen
 
 fun NavGraphBuilder.aiChatScreen(
-    onPostClick: (Int) -> Unit,
+    onPostClick: (String?) -> Unit,
 ) {
     composable("채팅 상담") {
         AiChatScreen(
@@ -19,23 +19,30 @@ fun NavGraphBuilder.aiChatScreen(
     }
 }
 
-fun NavController.navigateToAIChatDetail(chatId: Int, navOptions: NavOptions? = null) {
-    navigate("chatting/$chatId", navOptions)
+fun NavController.navigateToAIChatDetail(roomId: String, navOptions: NavOptions? = null) {
+    navigate("room/$roomId", navOptions)
 }
 fun NavGraphBuilder.aiChatDetailScreen(
     onBackClick: () -> Unit
 ) {
     composable(
-        route = "chatting/{chatId}",
+        route = "room/{roomId}",
         arguments = listOf(
-            navArgument("chatId") { type = NavType.IntType }
+            navArgument("roomId") { type = NavType.StringType }
         )
     ) { backStackEntry ->
-        val chatId = backStackEntry.arguments?.getInt("chatId") ?: -1
+        val roomId = backStackEntry.arguments?.getString("roomId") ?: return@composable
 
-        RecentChattingScreen(
-            chatId = chatId,
-            onBackClick = onBackClick
-        )
+        // "new"인 경우 새 채팅 로직
+        if (roomId == "new_chat") {
+            // 예: ViewModel에서 새로운 roomId 생성 및 상태 준비
+        }
+
+        if (roomId != null) {
+            RecentChattingScreen(
+                roomId = roomId,
+                onBackClick = onBackClick
+            )
+        }
     }
 }
