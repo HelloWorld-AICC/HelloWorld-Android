@@ -59,12 +59,13 @@ import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
 import com.example.core.util.extension.truncateWithEllipsis
 import com.example.feature.R
+import com.example.model.common.ContentType
 import com.example.model.community.Post
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun Community(
-    onNavigateToCommunityPostWrite: (Int) -> Unit,
+    onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
     onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     onClearCommunityUpdate: () -> Unit,
@@ -199,7 +200,7 @@ internal fun Community(
                 .padding(24.dp)
                 .size(60.dp)
                 .clip(CircleShape)
-                .clickable { onNavigateToCommunityPostWrite(selectedTab) }
+                .clickable { onNavigateToCommunityPostWrite(selectedTab, 0, ContentType.CREATE) }
                 .border(1.dp, Color(0x40000000), shape = CircleShape)
         )
     }

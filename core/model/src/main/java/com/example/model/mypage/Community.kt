@@ -14,7 +14,7 @@ data class Community(
     @SerialName("uploadedAt")
     val uploadedAt: String,
     @SerialName("category")
-    val category: String,
+    val category: Long,
     @SerialName("commentCnt")
     val commentCnt: Int,
     @SerialName("imageUrl")

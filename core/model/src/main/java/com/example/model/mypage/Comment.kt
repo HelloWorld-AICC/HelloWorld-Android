@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Comment(
+    @SerialName("categoryId")
+    val categoryId: Long,
     @SerialName("communityId")
     val communityId: Long,
     @SerialName("commentId")

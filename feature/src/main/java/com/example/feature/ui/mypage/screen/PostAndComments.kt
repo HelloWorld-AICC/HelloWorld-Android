@@ -50,6 +50,7 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain500
+import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
 import com.example.core.util.extension.truncateWithEllipsis
 import com.example.feature.R
@@ -361,7 +362,7 @@ private fun CommunityItem(
         ) {
             // 카테고리, 날짜
             Text(
-                text = "${item.category} • ${item.uploadedAt.toFormattedDate()}",
+                text = "${item.category.toCategoryName()} • ${item.uploadedAt.toFormattedDate()}",
                 style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )
@@ -396,7 +397,7 @@ private fun CommentItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onItemClick(0, item.communityId.toInt()) } // TODO category Id 필요
+            .clickable { onItemClick(item.categoryId.toInt(), item.communityId.toInt()) }
             .padding(vertical = 20.dp)
     ) {
         Row(
@@ -435,7 +436,7 @@ private fun CommentItem(
         ) {
             // 카테고리, 날짜
             Text(
-                text = "직장 내 고충 • ${item.uploadedAt.toFormattedDate()}", // TODO Category Id 필요
+                text = "$${item.categoryId.toCategoryName()} • ${item.uploadedAt.toFormattedDate()}",
                 style = AppTypography.label03,
                 color = HelloWorldGrayScale500
             )

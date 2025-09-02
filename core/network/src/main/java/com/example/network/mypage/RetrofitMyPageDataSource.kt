@@ -191,18 +191,18 @@ class RetrofitMyPageDataSource @Inject constructor(
                 // retrofit error (200번대 이외)
                 !response.isSuccessful -> {
                     Log.e(TAG, "deleteProfile() HTTP error - code: ${response.code()}, message: ${response.message()}")
-                    Result.failure<DeleteProfileResponse>(HttpException(response))
+                    Result.failure(HttpException(response))
                 }
 
                 apiResponse?.isSuccess == true && apiResponse.result != null -> {
                     Log.d(TAG, "deleteProfile() success - result: ${apiResponse.result}")
-                    Result.success<DeleteProfileResponse>(apiResponse.result)
+                    Result.success(apiResponse.result)
                 }
 
                 // isSuccess = false, result == null
                 else -> {
                     Log.e(TAG, "deleteProfile() API error - code: ${apiResponse?.code}")
-                    Result.failure<DeleteProfileResponse>(Exception("${apiResponse?.code}"))
+                    Result.failure(Exception("${apiResponse?.code}"))
                 }
             }
         } catch (e: Exception) {

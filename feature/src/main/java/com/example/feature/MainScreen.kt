@@ -16,10 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.example.feature.onboarding.AgreementScreen
 import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
 import com.example.feature.ui.aichat.navigation.aiChatScreen
@@ -142,7 +144,11 @@ fun MyNavigationHost(navController: NavHostController) {
             onClearCommunityUpdate = { navController.previousBackStackEntry?.savedStateHandle?.set("community_update", false) }
         )
         communityPostDetailScreen(
-            onNavigateBack = navController::navigateUp
+            onNavigateToCommunityPostWrite = navController::navigateToCommunityPostWrite,
+            onNavigateBack = navController::navigateUp,
+            onCommunityUpdated = { navController.previousBackStackEntry?.savedStateHandle?.set("community_update", true) },
+            onCheckCommunityUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("community_update") ?: false },
+
         )
         communityPostWriteScreen(
             onNavigateBack = navController::navigateUp,
@@ -159,6 +165,13 @@ fun MyNavigationHost(navController: NavHostController) {
             onNavigateToPostAndComments = navController::navigateToPostAndComments,
             onNavigateToTermsOfService = navController::navigateToTermsOfService,
             onNavigateToPrivacyPolicy = navController::navigateToPrivacyPolicy,
+            onNavigateToLogin = {
+                val navOption = navOptions {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
+                navController.navigate("온보딩", navOption)
+            },
             onNavigateToWithdraw = navController::navigateToWithdraw,
             onCheckProfileUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("profile_updated") ?: false },
             onClearProfileUpdate = { navController.previousBackStackEntry?.savedStateHandle?.set("profile_updated", false) }
@@ -189,9 +202,22 @@ fun MyNavigationHost(navController: NavHostController) {
         termsOfServiceScreen( onNavigateBack = navController::navigateUp )
         withdrawScreen(
             onNavigateBack = navController::navigateUp,
-            onNavigateToWithdrawComplete = navController::navigateToWithdrawComplete,
+            onNavigateToWithdrawComplete = {
+                navController.navigateToWithdrawComplete(
+                    navOptions = navOptions {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                )
+            },
         )
-        withdrawCompleteScreen( onNavigateToLogin = {} ) // TODO Login 경로
+        withdrawCompleteScreen( onNavigateToLogin = {
+            val navOption = navOptions {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+            navController.navigate("온보딩", navOption)
+        } )
     }
 }
 
