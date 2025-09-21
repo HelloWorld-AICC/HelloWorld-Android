@@ -19,11 +19,11 @@ val localProperties = Properties().apply {
 val googleMapKey = localProperties.getProperty("google_map_key") ?: ""
 
 android {
-    namespace = "com.example.hello_world_mvp"
+    namespace = "com.hello.world"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.hello_world_mvp"
+        applicationId = "com.hello.world"
         minSdk = 32
         targetSdk = 36
         versionCode = 1
@@ -61,7 +61,6 @@ android {
     }
 
     dependencies {
-
         // Module Inject
         implementation(project(":core:model"))
         implementation(project(":core:network"))
@@ -102,6 +101,5 @@ android {
 
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
     }
 }

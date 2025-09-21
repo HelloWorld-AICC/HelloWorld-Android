@@ -1,4 +1,4 @@
-package com.example.hello_world_mvp
+package com.hello.world
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
