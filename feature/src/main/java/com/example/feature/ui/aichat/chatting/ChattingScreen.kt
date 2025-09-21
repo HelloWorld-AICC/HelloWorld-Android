@@ -67,6 +67,7 @@ import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.HelloWorldMain700
+import com.example.core.util.extension.advancedImePadding
 import com.example.feature.R
 import kotlin.math.max
 
@@ -206,7 +207,6 @@ internal fun RecentChattingScreen(
     }
 }
 
-
 @Composable
 fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel, showSummaryIcon: Boolean
 ) {
@@ -228,11 +228,21 @@ fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel, showSummaryIcon: Bo
                     .widthIn(max = 290.dp)
                     .padding(horizontal = 16.dp, vertical = 11.dp)
             ) {
-                Text(
-                    msg.content,
-                    style = AppTypography.body01,
-                    color = if (isUser) HelloWorldMain0 else HelloWorldMain700
-                )
+                if (isUser) {
+                    // 유저 메시지는 평문
+                    Text(
+                        text = msg.content,
+                        style = AppTypography.body01,
+                        color = HelloWorldMain0
+                    )
+                } else {
+                    // 봇 메시지는 마크다운 렌더
+                    MarkdownText(
+                        markdown = msg.content,
+                        textColor = HelloWorldMain700,   // 버블 색에 맞춰 글자색
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
             // 마지막 봇 메시지에만 아이콘 노출
@@ -310,16 +320,5 @@ fun SummaryCompletedDialog(onDismiss: () -> Unit) {
             }
         }
     }
-}
-
-fun Modifier.advancedImePadding() = composed {
-    var consumePadding by remember { mutableIntStateOf(0) }
-    onGloballyPositioned { coordinates ->
-        val rootHeight = coordinates.findRootCoordinates().size.height
-        val componentBottom = (coordinates.positionInWindow().y + coordinates.size.height).toInt()
-        consumePadding = max(0, rootHeight - componentBottom)
-    }.consumeWindowInsets(
-        PaddingValues(bottom = with(LocalDensity.current) { consumePadding.toDp() })
-    ).imePadding()
 }
 
