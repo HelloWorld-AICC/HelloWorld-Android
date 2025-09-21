@@ -75,22 +75,21 @@ val AppTypography = CustomTypography(
     ),
     heading04 = TextStyle(
         fontFamily = Pretendard,
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-        letterSpacing = (-0.02).em
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
+        letterSpacing = (-0.01).em
     ),
     body01 = TextStyle(
         fontFamily = Pretendard,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         letterSpacing = (-0.02).em
     ),
     body02 = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.sp
+        fontSize = 14.sp,
+        letterSpacing = (-0.02).em
     ),
     label01 = TextStyle(
         fontFamily = Pretendard,
