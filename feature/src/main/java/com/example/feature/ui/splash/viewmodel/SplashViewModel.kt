@@ -31,6 +31,7 @@ class SplashViewModel : ViewModel() {
             try {
                 Log.d("AUTO_LOGIN", "RTK 있음 → 재발급 시도")
                 val response = RetrofitInstance.authService.reissueToken(rtk)
+                Log.d("AUTO_LOGIN", "재발급 성공 응답: $response")
 
                 if (response.isSuccess && response.result?.tokenList != null) {
                     val atk = response.result.tokenList
