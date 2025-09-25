@@ -3,16 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
 
-    id("kotlin-kapt")                     // kapt 플러그인 추가
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.example.core.data"
-    compileSdk = 34   // 36 대신 34 권장 (안정화된 최신 LTS)
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 24   // 보통 23~24 기준으로
+        minSdk = 32
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -27,36 +28,42 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17   // 최신 JDK와 맞춤
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "11"
     }
 }
 
 dependencies {
+
     // Module Inject
     implementation(project(":core:network"))
     implementation(project(":core:model"))
     implementation(project(":core:datastore"))
 
-    // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)     // ksp → kapt 변경
+    ksp(libs.hilt.android.compiler)
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    // AndroidX & Test
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // Converter (JakeWharton)
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+    // Kotlinx Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-core:1.1.1")
 }

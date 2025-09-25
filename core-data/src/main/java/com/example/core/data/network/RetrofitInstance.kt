@@ -7,9 +7,11 @@ import com.example.core.data.api.AIChatService
 import com.example.core.data.api.AuthService
 import com.example.core.data.api.ConsultationCenterService
 import com.example.core.data.api.UserService
+import kotlinx.serialization.json.Json
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
@@ -43,39 +45,24 @@ object RetrofitInstance {
         return prefs.getString("refresh_token", "") ?: ""
     }
 
-    // 자동 로그인 
+    // 자동 로그인
     suspend fun tryAutoLogin(): Boolean {
-        // 리프레시 토큰 발급받아서 rtk에 저장
         val rtk = getRefreshToken()
-        Log.d("AUTO_LOGIN", "저장된 RTK: $rtk") 
+        Log.d("AUTO_LOGIN", "저장된 RTK: $rtk")
 
-        // 리프레시 토큰(rtk) 발급 안됐을 경우
         if (rtk.isEmpty()) {
             Log.d("AUTO_LOGIN", "저장된 RTK 없음")
             return false
         }
-        
-        /*
-        * API 응답 받기 성공 -> true 반환
-        * API 응답 받기 실패 -> false 반환
-        */
+
         return try {
-            // 발급받은 리프레시 토큰을 재발급 api의 피라미터로 넘기고 응답 받기
             val response = authService.reissueToken(rtk)
 
-            // 응답을 성공적으로 받았을 경우
             if (response.isSuccess) {
+                val atk = response.result.tokenList.find { it.types.equals("atk", true) }?.token ?: ""
+                val newRtk = response.result.tokenList.find { it.types.equals("rtk", true) }?.token ?: rtk
 
-                // 타입이 atk일 경우 atk로 저장
-                val atk = response.result.tokenList.find { it.types == "atk" }?.token ?: ""
-
-                // 타입이 rtk일 경우 newRtk로 저장
-                val newRtk = response.result.tokenList.find { it.types == "rtk" }?.token ?: rtk
-
-                // 재발급 받은 atk로 엑세스 토큰 재설정
                 setAccessToken(atk)
-
-                // 재발급 받은 newRtk로 리프레시 토큰 재설정
                 setRefreshToken(newRtk)
 
                 Log.d("AUTO_LOGIN", "재발급 API 응답 받기 성공")
@@ -92,30 +79,38 @@ object RetrofitInstance {
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor())
-        .connectTimeout(60, TimeUnit.SECONDS) // 연결 타임아웃
-        .readTimeout(60, TimeUnit.SECONDS)    // 서버 응답 대기 시간
-        .writeTimeout(60, TimeUnit.SECONDS)   // 요청 전송 타임아웃
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
         .build()
+
+    private val contentType = "application/json".toMediaType()
+
+    private val json = Json {
+        ignoreUnknownKeys = true   // 서버에서 필요 없는 필드 내려와도 무시
+        isLenient = true           // json 포맷 조금 느슨하게 허용
+        encodeDefaults = true
+    }
 
     // MVC용 Retrofit
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(json.asConverterFactory(contentType)) // ✅ 변경
         .build()
 
     // WebFlux용 Retrofit
     private val retrofitWebflux = Retrofit.Builder()
         .baseUrl(BASE_URL_WEBFLUX)
         .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(json.asConverterFactory(contentType)) // ✅ 변경
         .build()
 
-    //MVC용 서비스
+    // MVC용 서비스
     val authService: AuthService = retrofit.create(AuthService::class.java)
     val userService: UserService = retrofit.create(UserService::class.java)
-    val centerService : ConsultationCenterService = retrofit.create(ConsultationCenterService::class.java)
+    val centerService: ConsultationCenterService = retrofit.create(ConsultationCenterService::class.java)
 
-    //WebFlux용 서비스
-    val aiChatService : AIChatService = retrofitWebflux.create(AIChatService::class.java)
+    // WebFlux용 서비스
+    val aiChatService: AIChatService = retrofitWebflux.create(AIChatService::class.java)
 }
