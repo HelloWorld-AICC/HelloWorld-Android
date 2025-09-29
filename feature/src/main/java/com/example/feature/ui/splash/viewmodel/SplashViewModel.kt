@@ -4,11 +4,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.network.RetrofitInstance
+import com.example.network.interceptor.TokenRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SplashViewModel : ViewModel() {
+@HiltViewModel
+class SplashViewModel @Inject constructor(
+    private val tokenRepository: TokenRepository
+) : ViewModel() {
+
 
     private val _isAutoLoginSuccess = MutableStateFlow<Boolean?>(null)
     val isAutoLoginSuccess = _isAutoLoginSuccess.asStateFlow()
@@ -39,7 +46,14 @@ class SplashViewModel : ViewModel() {
                         ?.token.orEmpty()
 
                     if (atk.isNotEmpty()) {
+                        // SharedPreferences 저장
                         RetrofitInstance.setAccessToken(atk)
+                        Log.d("AUTO_LOGIN", "RetrofitInstance에 ATK 저장 완료: $atk")
+
+                        // DataStore 저장
+                        tokenRepository.setAccessToken(atk)
+                        Log.d("AUTO_LOGIN", "TokenRepository(DataStore)에 ATK 저장 완료: $atk")
+
                         Log.d("AUTO_LOGIN", "토큰 재발급 성공 → ATK 갱신 완료")
                         _isAutoLoginSuccess.value = true
                     } else {

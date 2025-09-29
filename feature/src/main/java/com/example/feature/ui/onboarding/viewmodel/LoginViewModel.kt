@@ -5,22 +5,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.model.LoginEmailRequest
 import com.example.core.data.model.LoginTokenItem
-import com.example.core.data.model.TokenResponse
 import com.example.core.data.network.RetrofitInstance
+import com.example.network.interceptor.TokenRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val tokenRepository: TokenRepository
+) : ViewModel() {
 
     private val _loginSuccess = MutableStateFlow(false)
     val loginSuccess: StateFlow<Boolean> = _loginSuccess
 
-    /**
-     * Google 로그인 처리
-     * @param email 구글 계정 이메일
-     * @param accessToken 구글 accessToken (authCode 교환 후 얻음)
-     */
     fun handleGoogleLogin(email: String?, accessToken: String?) {
         if (email.isNullOrBlank()) {
             Log.e("LOGIN", "이메일이 null이거나 비어 있음")
@@ -29,7 +29,6 @@ class LoginViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // 1) 이메일 로그인 먼저 시도
                 val emailResponse = RetrofitInstance.authService.loginWithEmail(LoginEmailRequest(email))
 
                 if (emailResponse.isSuccess) {
@@ -39,7 +38,6 @@ class LoginViewModel : ViewModel() {
                 } else {
                     Log.w("LOGIN", "이메일 로그인 실패 → 구글 로그인 시도")
 
-                    // 2) 이메일 로그인 실패 시 신규 가입 (accessToken 필요)
                     if (!accessToken.isNullOrBlank()) {
                         val googleResponse = RetrofitInstance.authService.getToken(accessToken)
                         if (googleResponse.isSuccess) {
@@ -63,18 +61,28 @@ class LoginViewModel : ViewModel() {
         val atk = tokenList?.firstOrNull { it.types.equals("ATK", true) }?.token
         val rtk = tokenList?.firstOrNull { it.types.equals("RTK", true) }?.token
 
-        if (!atk.isNullOrBlank()) {
-            RetrofitInstance.setAccessToken(atk)
-            Log.d("LOGIN", "ATK 설정 성공: $atk")
-        } else {
-            Log.e("LOGIN", "ATK가 비어 있거나 없음")
-        }
+        viewModelScope.launch {
+            if (!atk.isNullOrBlank()) {
+                // SharedPreferences 저장
+                RetrofitInstance.setAccessToken(atk)
+                Log.d("LOGIN", "ATK 설정 성공 (Prefs): $atk")
 
-        if (!rtk.isNullOrBlank()) {
-            RetrofitInstance.setRefreshToken(rtk)
-            Log.d("LOGIN", "RTK 설정 성공: $rtk")
-        } else {
-            Log.w("LOGIN", "RTK가 비어 있음")
+                // DataStore 저장
+                tokenRepository.setAccessToken(atk)
+                Log.d("LOGIN", "ATK 설정 성공 (DataStore): $atk")
+            } else {
+                Log.e("LOGIN", "ATK가 비어 있거나 없음")
+            }
+
+            if (!rtk.isNullOrBlank()) {
+                RetrofitInstance.setRefreshToken(rtk)
+                Log.d("LOGIN", "RTK 설정 성공 (Prefs): $rtk")
+
+                tokenRepository.setRefreshToken(rtk)
+                Log.d("LOGIN", "RTK 설정 성공 (DataStore): $rtk")
+            } else {
+                Log.w("LOGIN", "RTK가 비어 있음")
+            }
         }
     }
 }

@@ -24,12 +24,12 @@ class TokenRepositoryImpl @Inject constructor(
         private val KEY_REFRESH_TOKEN = stringPreferencesKey("rtk")
     }
 
-    override suspend fun getAccessToken(): String {
-        return context.dataStore.data.map { prefs -> prefs[KEY_ACCESS_TOKEN] ?: "" }.first()
+    override suspend fun getAccessToken(): String? {
+        return context.dataStore.data.map { prefs -> prefs[KEY_ACCESS_TOKEN] }.first()
     }
 
-    override suspend fun getRefreshToken(): String {
-        return context.dataStore.data.map { prefs -> prefs[KEY_REFRESH_TOKEN] ?: "" }.first()
+    override suspend fun getRefreshToken(): String? {
+        return context.dataStore.data.map { prefs -> prefs[KEY_REFRESH_TOKEN] }.first()
     }
 
     override suspend fun setAccessToken(token: String) {

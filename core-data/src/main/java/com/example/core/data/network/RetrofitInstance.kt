@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
+// SharedPreferences 기반
 object RetrofitInstance {
 
     private const val BASE_URL = "https://helloworldhelp.shop/mvc/"
