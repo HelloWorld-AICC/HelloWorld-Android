@@ -71,7 +71,9 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            GoogleSignInButton(onTokenReceived = {idToken -> viewModel.handleGoogleLogin(idToken)})
+            GoogleSignInButton { email, accessToken ->
+                viewModel.handleGoogleLogin(email, accessToken)
+            }
 
             SplashImg()
         }
@@ -79,7 +81,7 @@ fun LoginScreen(navController: NavController) {
 }
 
 @Composable
-fun GoogleSignInButton(onTokenReceived: (String?) -> Unit) {
+fun GoogleSignInButton(onTokenReceived: (String?, String?) -> Unit) {
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
@@ -89,9 +91,10 @@ fun GoogleSignInButton(onTokenReceived: (String?) -> Unit) {
 
         try {
             val account = task.getResult(ApiException::class.java)
-            val idToken = account.idToken
-            Log.d("LOGIN", "idToken: $idToken")
-            onTokenReceived(idToken)
+            val email = account?.email
+            val authCode = account?.serverAuthCode
+            Log.d("LOGIN", "email: $email, authCode: $authCode")
+            onTokenReceived(email, authCode)
         } catch (e: ApiException) {
             Log.e("LOGIN", "Google 로그인 실패", e)
         }
