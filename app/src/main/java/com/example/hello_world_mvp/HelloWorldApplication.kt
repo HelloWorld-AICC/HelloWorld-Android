@@ -1,4 +1,4 @@
-package com.hello.world
+package com.example.hello_world_mvp
 
 import android.app.Application
 import com.example.core.data.network.RetrofitInstance

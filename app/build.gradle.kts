@@ -19,11 +19,11 @@ val localProperties = Properties().apply {
 val googleMapKey = localProperties.getProperty("google_map_key") ?: ""
 
 android {
-    namespace = "com.hello.world"
+    namespace = "com.example.hello_world_mvp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.hello.world"
+        applicationId = "com.example.hello_world_mvp"
         minSdk = 32
         targetSdk = 36
         versionCode = 1

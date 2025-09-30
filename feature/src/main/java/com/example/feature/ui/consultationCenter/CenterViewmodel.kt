@@ -1,19 +1,16 @@
+// com/example/feature/ui/consultationCenter/CenterViewModel.kt
 package com.example.feature.ui.consultationCenter
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.model.Center
-import com.example.core.data.model.ConsultationCenterResponse
 import com.example.core.data.network.RetrofitInstance
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CenterViewModel @Inject constructor() : ViewModel() {
+class CenterViewModel : ViewModel() {
 
     // 선택된 센터 상태
     private val _selectedCenter = MutableStateFlow<Center?>(null)
@@ -27,20 +24,6 @@ class CenterViewModel @Inject constructor() : ViewModel() {
         _selectedCenter.value = center
     }
 
-    fun fetchCenterListIfTokenExists(
-        page: Int = 0,
-        size: Int = 20,
-        latitude: Double,
-        longitude: Double
-    ) {
-        val token = RetrofitInstance.getAccessToken()
-        if (token.isNotBlank()) {
-            fetchCenterList(page, size, latitude, longitude)
-        } else {
-            Log.w("CenterViewModel", "토큰 없음 - 센터 정보 요청 보류")
-        }
-    }
-
     fun fetchCenterList(
         page: Int = 0,
         size: Int = 20,
@@ -49,24 +32,36 @@ class CenterViewModel @Inject constructor() : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val response: ConsultationCenterResponse =
-                    RetrofitInstance.centerService.getCenterInfo(
-                        page = page,
-                        size = size,
-                        latitude = latitude,
-                        longitude = longitude
-                    )
+                val response = RetrofitInstance.centerService.getCenterInfo(
+                    page = page,
+                    size = size,
+                    latitude = latitude,
+                    longitude = longitude
+                )
 
-                if (response.isSuccess) {
-                    _centerList.value = response.result.centerMapList
-                    Log.d("CenterViewModel", "센터 정보 성공적으로 로드됨: ${response.result.centerMapList.size}개")
-                    Log.d("CenterViewModel", "센터 정보 성공적으로 로드됨: ${response.result.centerMapList}")
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body?.isSuccess == true) {
+                        val centers = body.result?.centerMapList
+                        if (centers != null) {
+                            _centerList.value = centers
+                        }
+                        Log.d("CenterViewModel", "센터 정보 로드: ${centers?.size}개")
+                        Log.d("CenterViewModel", "센터 목록: $centers")
+                    } else {
+                        Log.w(
+                            "CenterViewModel",
+                            "API isSuccess=false: code=${body?.code}, msg=${body?.message}"
+                        )
+                    }
                 } else {
-                    Log.w("CenterViewModel", "센터 정보 응답 실패: ${response.message}")
+                    Log.w(
+                        "CenterViewModel",
+                        "HTTP 실패: ${response.code()} ${response.message()}"
+                    )
                 }
-
             } catch (e: Exception) {
-                Log.e("CenterViewModel", "센터 정보 API 실패: ${e.message}")
+                Log.e("CenterViewModel", "센터 정보 API 실패: ${e.message}", e)
             }
         }
     }

@@ -1,6 +1,10 @@
 package com.example.feature.ui.consultationCenter
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
+import android.os.Looper
+import androidx.annotation.RequiresPermission
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -28,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.model.Center
 import com.example.core.ui.component.BackHeader
@@ -35,7 +40,7 @@ import com.example.core.ui.theme.AppTypography
 import com.example.feature.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
@@ -50,10 +55,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun ConsultationCenterScreen (
+fun ConsultationCenterScreen(
     onBackClick: () -> Unit,
     viewModel: CenterViewModel = hiltViewModel()
 ) {
@@ -65,9 +69,49 @@ fun ConsultationCenterScreen (
     val selectedCenter by viewModel.selectedCenter.collectAsState()
     val centerList by viewModel.centerList.collectAsState()
 
+    // ✅ 권한을 FINE/COARSE 둘 다 요청
+    val locationPermissions = rememberMultiplePermissionsState(
+        listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
+
+    // ✅ 둘 중 하나만 승인돼도 위치 기능 활성화
+    val hasLocationPermission = remember(locationPermissions.permissions) {
+        locationPermissions.permissions.any { it.status.isGranted } ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasLocationPermission) {
+            locationPermissions.launchMultiplePermissionRequest()
+        }
+    }
+
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    // ✅ FINE 없으면 BALANCED로 완화
+    val locationRequest = remember(hasLocationPermission) {
+        val priority =
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                Priority.PRIORITY_HIGH_ACCURACY
+            else
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY
+
+        LocationRequest.Builder(priority, 10_000L).apply {
+            setMinUpdateIntervalMillis(5_000L)
+            setMaxUpdateDelayMillis(15_000L)
+        }.build()
+    }
+
+    // 사용자의 현재 위치가 정해지면 센터 목록을 fetch
     LaunchedEffect(userLocation) {
         userLocation?.let { location ->
-            viewModel.fetchCenterListIfTokenExists(
+            viewModel.fetchCenterList(
                 page = 0,
                 size = 20,
                 latitude = location.latitude,
@@ -76,37 +120,13 @@ fun ConsultationCenterScreen (
         }
     }
 
-    val locationPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
-
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-
-    val locationRequest = remember {
-        LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            10000L
-        ).apply {
-            setMinUpdateIntervalMillis(5000L)
-            setMaxUpdateDelayMillis(15000L)
-        }.build()
-    }
-
-    // 권한 요청
-    LaunchedEffect(Unit) {
-        if (!locationPermissionState.status.isGranted) {
-            locationPermissionState.launchPermissionRequest()
-        }
-    }
-
     // 위치 콜백 등록 및 해제
-    DisposableEffect(locationPermissionState.status) {
-        if (locationPermissionState.status.isGranted) {
+    DisposableEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
+                        // 위도 보정(기존 코드 유지)
                         val latLng = LatLng(location.latitude - 0.006, location.longitude)
                         userLocation = latLng
 
@@ -119,20 +139,21 @@ fun ConsultationCenterScreen (
                 }
             }
 
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                context.mainLooper
+            // ✅ 권한이 있을 때만, 어노테이션이 붙은 헬퍼로 호출
+            startLocationUpdatesSafely(
+                client = fusedLocationClient,
+                request = locationRequest,
+                callback = locationCallback,
+                looper = context.mainLooper
             )
 
-            onDispose {
-                fusedLocationClient.removeLocationUpdates(locationCallback)
-            }
+            onDispose { fusedLocationClient.removeLocationUpdates(locationCallback) }
         } else {
-            onDispose {}
+            onDispose { /* no-op */ }
         }
     }
 
+    // 특정 센터를 선택하면 카메라 이동
     LaunchedEffect(selectedCenter) {
         selectedCenter?.let { center ->
             val latLng = LatLng(center.latitude, center.longitude)
@@ -150,18 +171,19 @@ fun ConsultationCenterScreen (
             onBackClick = { onBackClick() }
         )
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f) // 나머지 공간을 지도+오버레이가 채움
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f) // 나머지 공간을 지도+오버레이가 채움
         ) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
-                    isMyLocationEnabled = locationPermissionState.status.isGranted
+                    isMyLocationEnabled = hasLocationPermission // ✅ 권한 있을 때만
                 ),
                 uiSettings = MapUiSettings(
-                    myLocationButtonEnabled = true
+                    myLocationButtonEnabled = hasLocationPermission // ✅ 버튼도 권한 연동
                 ),
                 onMapClick = {
                     viewModel.selectCenter(null)
@@ -190,9 +212,24 @@ fun ConsultationCenterScreen (
                 modifier = Modifier
                     .align(Alignment.BottomCenter),
                 onClick = { viewModel.selectCenter(it) }
-
             )
         }
+    }
+}
+
+@RequiresPermission(
+    anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION]
+)
+private fun startLocationUpdatesSafely(
+    client: com.google.android.gms.location.FusedLocationProviderClient,
+    request: LocationRequest,
+    callback: com.google.android.gms.location.LocationCallback,
+    looper: Looper
+) {
+    try {
+        client.requestLocationUpdates(request, callback, looper)
+    } catch (se: SecurityException) {
+        Log.e("LOC", "SecurityException while starting location updates", se)
     }
 }
 
@@ -203,7 +240,6 @@ fun ConsultationCenterListOverlay(
     modifier: Modifier = Modifier,
     onClick: (Center) -> Unit
 ) {
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -260,7 +296,6 @@ fun ConsultationCenterListOverlay(
     }
 }
 
-
 @Composable
 fun ConsultationCenterCard(
     center: Center,
@@ -271,7 +306,7 @@ fun ConsultationCenterCard(
             .fillMaxWidth()
             .padding(top = 12.dp)
             .height(75.dp)
-            .clickable { onClick() } // <- 클릭 이벤트 추가
+            .clickable { onClick() } // ← 클릭 이벤트
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -289,19 +324,15 @@ fun ConsultationCenterCard(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(text = "•", style = AppTypography.label03)
-//                    Spacer(modifier = Modifier.width(2.dp))
-//                    Text(text = center.phone, style = AppTypography.label03)
                 }
-                Spacer(modifier = Modifier.height(4.dp)) // ← 간격 추가
-
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(text = center.address, style = AppTypography.label03)
             }
 
             Image(
                 painter = painterResource(id = R.drawable.ic_google),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
+                modifier = Modifier.size(64.dp)
             )
         }
 
