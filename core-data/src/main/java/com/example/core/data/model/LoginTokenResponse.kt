@@ -2,16 +2,21 @@
 
 package com.example.core.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LoginTokenItem (
     val types: String,
     val token: String,
     val tokenExpriresTime: String,
 )
 
+@Serializable
 data class LoginTokenResult(
     val tokenList: List<LoginTokenItem>
 )
 
+@Serializable
 data class LoginTokenResponse (
     val isSuccess: Boolean,
     val code: String,

@@ -122,6 +122,8 @@ dependencies {
     // Gson
     implementation("com.google.code.gson:gson:2.11.0")
 
+    implementation(project(":core:network"))
+
     // oss-licenses
     implementation(libs.androidx.appcompat)
     implementation(libs.play.services.oss.licenses)

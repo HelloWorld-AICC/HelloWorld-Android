@@ -11,7 +11,6 @@ import okhttp3.Response
 class AuthInterceptor : Interceptor {
 
     // OkHttp가 API 호출 시 intercept() 호출
-    // chain: 요청을 계속 이어주는 파이프라인 같은 것..
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = RetrofitInstance.getAccessToken()
         Log.d("AuthInterceptor", "access token: $accessToken")

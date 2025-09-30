@@ -9,6 +9,7 @@ data class LanguageRequest(
     val language: Long,
 )
 
+@Serializable
 enum class Language(val code: Long, val displayName: String, val flag: String) {
     ENGLISH(1, "English", Flag.ENGLISH),
     KOREAN(2, "Korean", Flag.KOREAN),

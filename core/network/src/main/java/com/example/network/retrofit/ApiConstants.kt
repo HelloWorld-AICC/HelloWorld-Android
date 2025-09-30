@@ -1,7 +1,7 @@
 package com.example.network.retrofit
 
 object ApiConstants {
-    const val BASE_URL = "https://www.gotoend.store/mvc/"
+    const val BASE_URL = "https://helloworldhelp.shop/mvc/"
 
     const val MY_PAGE = "myPage/"                           // GET      마이페이지
     const val SET_PROFILE = "myPage/setProfile"             // PATCH    프로필 변경
