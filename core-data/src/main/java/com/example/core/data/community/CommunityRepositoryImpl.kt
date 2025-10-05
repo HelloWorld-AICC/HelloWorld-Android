@@ -8,6 +8,7 @@ import com.example.model.community.DeleteCommentResponse
 import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailRequest
 import com.example.model.community.DetailResponse
+import com.example.model.community.ReportPostResponse
 import com.example.model.community.UpdatePostRequest
 import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteFileRequest
@@ -45,5 +46,9 @@ class CommunityRepositoryImpl @Inject constructor(
 
     override suspend fun deleteComment(communityId: Long, commentId: Long): Result<DeleteCommentResponse> {
         return communityDataSource.deleteComment(communityId, commentId)
+    }
+
+    override suspend fun reportPost(communityId: Long): Result<ReportPostResponse> {
+        return communityDataSource.reportPost(communityId)
     }
 }

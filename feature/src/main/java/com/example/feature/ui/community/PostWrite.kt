@@ -1,6 +1,5 @@
 package com.example.feature.ui.community
 
-import android.R.attr.mimeType
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,10 +36,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +55,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.video.videoFrameMillis
-import com.airbnb.lottie.animation.content.Content
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
@@ -365,7 +362,6 @@ internal fun CommunityPostWrite(
                                     .clickable {
 //                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
                                         galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
                                     },
                                 contentAlignment = Alignment.Center
                             ) {

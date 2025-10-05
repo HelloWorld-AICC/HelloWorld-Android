@@ -259,6 +259,7 @@ internal fun CommunityPostDetail(
                                 color = HelloWorldError,
                             ) },
                             onClick = {
+                                expanded = false
                                 viewModel.updateDialogData(
                                     DialogData(
                                         title = "게시글을 신고하시겠어요?",
@@ -269,6 +270,23 @@ internal fun CommunityPostDetail(
                                         onConfirm = {
                                             // TODO api 추가
                                             viewModel.updateDialogData()
+                                            viewModel.reportPost { result ->
+                                                if (result) {
+                                                    viewModel.updateToastData(
+                                                        ToastData(
+                                                            text = "게시글이 신고되었습니다.",
+                                                            onDismiss = { viewModel.updateToastData() }
+                                                        )
+                                                    )
+                                                } else {
+                                                    viewModel.updateToastData(
+                                                        ToastData(
+                                                            text = "서버와의 통신에 실패했습니다.",
+                                                            onDismiss = { viewModel.updateToastData() }
+                                                        )
+                                                    )
+                                                }
+                                            }
                                         },
                                     )
                                 )

@@ -9,4 +9,6 @@ data class UpdatePostRequest(
     val title: String,
     @SerialName("content")
     val content: String,
+    @SerialName("communityCategoryId")
+    val communityCategoryId: Int,
 )

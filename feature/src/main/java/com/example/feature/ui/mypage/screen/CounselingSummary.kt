@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -103,19 +104,39 @@ private fun CounselingSummary(
                 }
             }
             is CounselingSummaryUiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                ) {
-                    // TODO 빈 리스트일때 띄울 컴포넌트 작성 필요
-                    items(uiState.result) {
-                        ChatItem(
-                            onClick = { onNavigateToCounselingDetail() }
+                if (uiState.result.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_mascot_error),
+                            contentDescription = null
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "아직 상담내역이 없어요.\n링고와 함께 AI상담을 시작해보세요.",
+                            style = AppTypography.label02,
+                            color = HelloWorldGrayScale300,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                    ) {
+                        items(uiState.result) {
+                            ChatItem(
+                                onClick = { onNavigateToCounselingDetail() }
+                            )
+                        }
                     }
                 }
             }
-            is CounselingSummaryUiState.Error -> TODO()
+            is CounselingSummaryUiState.Error -> {}
         }
     }
 }
