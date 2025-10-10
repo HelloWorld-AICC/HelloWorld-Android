@@ -370,9 +370,9 @@ fun ConsultationCenterCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = center.status,
+                        text = if (center.status == "OPEN") "영업 중" else "영업 종료",
                         style = AppTypography.label03,
-                        color = if (center.status == "영업 중") Color(0xFF5A90D2) else Color(0xFFA6A6A6)
+                        color = if (center.status == "OPEN") Color(0xFF5A90D2) else Color(0xFFA6A6A6)
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(text = "•", style = AppTypography.label03)
