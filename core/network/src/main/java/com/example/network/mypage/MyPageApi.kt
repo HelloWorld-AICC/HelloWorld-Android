@@ -21,13 +21,12 @@ import retrofit2.http.Query
 
 interface MyPageApi {
     @GET(ApiConstants.MY_PAGE)
-    // suspend fun getMyPage(): ApiResponse<UserInfo>
     suspend fun getMyPage(): Response<ApiResponse<UserInfo>>
 
     @Multipart
     @PATCH(ApiConstants.SET_PROFILE)
     suspend fun setProfile(
-        @Part("niFenum class LanguageckName") nickName: RequestBody,
+        @Part("nickName") nickName: RequestBody,
         @Part file: MultipartBody.Part?
     ): Response<ApiResponse<UpdateProfileResponse>>
 
