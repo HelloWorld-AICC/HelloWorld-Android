@@ -26,7 +26,7 @@ class AIChatViewModel @Inject constructor() : ViewModel() {
                 val response = RetrofitInstance.aiChatService.getAIChattingRooms()
 
                 if (response.isSuccessful) {
-                    val rooms = response.body()?.result
+                    val rooms = response.body()
                     if (rooms != null) {
                         _chattingRooms.value = rooms
                         Log.d(TAG, "채팅방 목록 로드 성공: ${rooms.size}개")

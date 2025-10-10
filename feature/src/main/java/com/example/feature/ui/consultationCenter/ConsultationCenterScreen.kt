@@ -1,12 +1,13 @@
 package com.example.feature.ui.consultationCenter
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
+import android.location.Geocoder
+import android.os.Build
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,12 +32,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.data.model.Center
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
+import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -49,11 +52,21 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import java.util.Locale
+import kotlin.coroutines.resume
+private const val CAMERA_LAT_SHIFT = -0.006  // 초기 보정과 동일
+
+private fun correctedForOverlay(latLng: LatLng, shift: Double = CAMERA_LAT_SHIFT): LatLng =
+    LatLng(latLng.latitude + shift, latLng.longitude)
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -68,6 +81,17 @@ fun ConsultationCenterScreen(
 
     val selectedCenter by viewModel.selectedCenter.collectAsState()
     val centerList by viewModel.centerList.collectAsState()
+
+    var locationTitle by remember { mutableStateOf("") }
+
+    // userLocation이 설정될 때 주소로 갱신
+    LaunchedEffect(userLocation) {
+        userLocation?.let { ll ->
+            reverseGeocodeToSidoGu(context, ll)?.let { sidoGu ->
+                locationTitle = sidoGu   // 예: "서울시 구로구"
+            }
+        }
+    }
 
     // ✅ 권한을 FINE/COARSE 둘 다 요청
     val locationPermissions = rememberMultiplePermissionsState(
@@ -126,13 +150,12 @@ fun ConsultationCenterScreen(
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
-                        // 위도 보정(기존 코드 유지)
-                        val latLng = LatLng(location.latitude - 0.006, location.longitude)
-                        userLocation = latLng
+                        val raw = LatLng(location.latitude, location.longitude)
+                        val corrected = correctedForOverlay(raw)   // 🔁 공통 헬퍼 사용
+                        userLocation = corrected
 
                         if (!cameraMoved) {
-                            cameraPositionState.position =
-                                CameraPosition.fromLatLngZoom(latLng, 15f)
+                            cameraPositionState.position = CameraPosition.fromLatLngZoom(corrected, 15f)
                             cameraMoved = true
                         }
                     }
@@ -156,9 +179,10 @@ fun ConsultationCenterScreen(
     // 특정 센터를 선택하면 카메라 이동
     LaunchedEffect(selectedCenter) {
         selectedCenter?.let { center ->
-            val latLng = LatLng(center.latitude, center.longitude)
+            val raw = LatLng(center.latitude, center.longitude)
+            val corrected = correctedForOverlay(raw)   // 🔁 동일 보정
             val update = CameraUpdateFactory.newCameraPosition(
-                CameraPosition.fromLatLngZoom(latLng, 15f)
+                CameraPosition.fromLatLngZoom(corrected, 15f)
             )
             cameraPositionState.animate(update)
         }
@@ -189,6 +213,21 @@ fun ConsultationCenterScreen(
                     viewModel.selectCenter(null)
                 }
             ) {
+                MapEffect(userLocation) { map ->
+                    map.setOnMyLocationButtonClickListener {
+                        val target = userLocation
+                        if (target != null) {
+                            val update = CameraUpdateFactory.newCameraPosition(
+                                CameraPosition.fromLatLngZoom(target, 15f) // 줌은 기존과 동일
+                            )
+                            map.animateCamera(update)   // 기본 동작 대신 우리가 보정 반영한 좌표로 이동
+                            true                       // 이벤트 소비(기본 recenter 막기)
+                        } else {
+                            false                      // 위치 모르면 기본 동작 실행
+                        }
+                    }
+                }
+
                 centerList.forEach { center ->
                     val markerState = remember(center) {
                         MarkerState(position = LatLng(center.latitude, center.longitude))
@@ -205,10 +244,13 @@ fun ConsultationCenterScreen(
                 }
             }
 
+
+
             // 지도 위에 오버레이
             ConsultationCenterListOverlay(
                 centerList = centerList,
                 selectedCenter = selectedCenter,
+                headerTitle = locationTitle,          // ✅ 추가
                 modifier = Modifier
                     .align(Alignment.BottomCenter),
                 onClick = { viewModel.selectCenter(it) }
@@ -237,6 +279,7 @@ private fun startLocationUpdatesSafely(
 fun ConsultationCenterListOverlay(
     centerList: List<Center>,
     selectedCenter: Center?,
+    headerTitle: String,
     modifier: Modifier = Modifier,
     onClick: (Center) -> Unit
 ) {
@@ -244,41 +287,52 @@ fun ConsultationCenterListOverlay(
         modifier = modifier
             .fillMaxWidth()
             .height(380.dp)
-            .clip(
-                RoundedCornerShape(
-                    topStart = 8.dp,
-                    topEnd = 8.dp,
-                    bottomStart = 0.dp,
-                    bottomEnd = 0.dp
-                )
-            )
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .background(Color.White)
     ) {
-        // ▶ 카드 내용 영역
+        // ⬇️ 패딩 포함 컨텐트 래퍼
         Column(
             modifier = Modifier
-                .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 0.dp)
+                .fillMaxSize()
+                .padding(start = 20.dp, end = 20.dp, top = 24.dp)
         ) {
-            Text(
-                text = "내 주변 상담센터",
-                style = AppTypography.body01,
-                modifier = Modifier.padding(bottom = 3.dp)
-            )
+            // ⬇️ 아이콘 + 현재 위치(구 단위)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 6.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_my_location),
+                    contentDescription = "현재 위치",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = headerTitle.ifBlank {""},
+                    style = AppTypography.body01,
+                    maxLines = 1,
+                    color = HelloWorldMain700,              // ✅ 원하는 색
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
+            // ⬇️ 리스트 (패딩 영역과 동일 폭)
             LazyColumn(
                 modifier = Modifier
-                    .width(281.dp)
-                    .weight(1f) // 높이 자동 확장
+                    .fillMaxWidth()
+                    .weight(1f),
+                // 하단 그라디언트(60dp)에 가리지 않도록 여유 패딩
+                contentPadding = PaddingValues(bottom = 72.dp)
             ) {
                 items(centerList) { center ->
-                    ConsultationCenterCard(
-                        center = center,
-                        onClick = { onClick(center) } // 전달
-                    )
+                    ConsultationCenterCard(center = center) { onClick(center) }
                 }
             }
         }
 
+        // ⬇️ 하단 그라디언트
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -286,15 +340,13 @@ fun ConsultationCenterListOverlay(
                 .align(Alignment.BottomCenter)
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.White
-                        )
+                        colors = listOf(Color.Transparent, Color.White)
                     )
                 )
         )
     }
 }
+
 
 @Composable
 fun ConsultationCenterCard(
@@ -304,10 +356,10 @@ fun ConsultationCenterCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp)
-            .height(75.dp)
+            .height(87.dp)
             .clickable { onClick() } // ← 클릭 이벤트
     ) {
+        Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -338,5 +390,49 @@ fun ConsultationCenterCard(
 
         Spacer(modifier = Modifier.height(12.dp))
         HorizontalDivider(color = Color(0xFFCFE3FD))
+    }
+}
+
+private fun normalizeSido(admin: String?): String {
+    if (admin.isNullOrBlank()) return ""
+    // “서울특별시” → “서울시”, “부산광역시” → “부산시” 등
+    return admin
+        .replace("특별시", "시")
+        .replace("광역시", "시")
+        .replace("특별자치시", "시")
+        .replace("특별자치도", "도")
+}
+
+suspend fun reverseGeocodeToSidoGu(
+    context: Context,
+    latLng: LatLng
+): String? {
+    val geocoder = Geocoder(context, Locale.KOREA)
+    val lat = latLng.latitude
+    val lng = latLng.longitude
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        suspendCancellableCoroutine { cont ->
+            geocoder.getFromLocation(lat, lng, 1) { list ->
+                val a = list.firstOrNull()
+                val sido = normalizeSido(a?.adminArea)              // 서울시/부산시…
+                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea // 구로구/영등포구…
+                cont.resume(
+                    if (!sido.isNullOrBlank() && !gu.isNullOrBlank())
+                        "$sido $gu" else null
+                )
+            }
+        }
+    } else {
+        withContext(Dispatchers.IO) {
+            try {
+                val a = geocoder.getFromLocation(lat, lng, 1)?.firstOrNull()
+                val sido = normalizeSido(a?.adminArea)
+                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
+                if (!sido.isNullOrBlank() && !gu.isNullOrBlank()) "$sido $gu" else null
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 }

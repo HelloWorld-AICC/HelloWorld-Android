@@ -94,8 +94,10 @@ internal fun RecentChattingScreen(
 
     var showSummaryDialog by remember { mutableStateOf(false) }
 
-    val lastBotMessage = messages.lastOrNull { it.sender.equals("bot", ignoreCase = true) }
-
+    val introSet = remember { setOf("안녕하세요!", "어떤 고민이 있으신가요?") }
+    val lastSummarizableBot = messages.lastOrNull {
+        it.sender.equals("bot", ignoreCase = true) && it.content !in introSet
+    }
     LaunchedEffect(Unit) {
         viewModel.summaryCompleted.collect {
             showSummaryDialog = true
@@ -130,7 +132,7 @@ internal fun RecentChattingScreen(
                 ChatBubble(
                     msg = msg,
                     viewModel = viewModel,
-                    showSummaryIcon = (msg === lastBotMessage) // 같은 객체라서 참조 비교 OK
+                    showSummaryIcon = (msg === lastSummarizableBot) // ✅ 인트로는 자연히 제외
                 )
             }
         }
@@ -240,7 +242,6 @@ fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel, showSummaryIcon: Bo
                     MarkdownText(
                         markdown = msg.content,
                         textColor = HelloWorldMain700,   // 버블 색에 맞춰 글자색
-                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

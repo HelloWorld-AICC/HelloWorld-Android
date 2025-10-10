@@ -16,7 +16,7 @@ data class Center(
     @SerialName("status")    val status: String,
     @SerialName("closed")    val closed: String,
     @SerialName("address")   val address: String,
-    @SerialName("image")     val image: String,
+    @SerialName("image")     val image: String? = null,   // ← 여기!
     @SerialName("latitude")  val latitude: Double,
     @SerialName("longitude") val longitude: Double
 )

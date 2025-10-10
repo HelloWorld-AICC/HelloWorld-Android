@@ -49,7 +49,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                     return@launch
                 }
 
-                val body: AIChatLogResponse = resp.body()?.result
+                val body: AIChatLogResponse = resp.body()
                     ?: run {
                         Log.w(TAG, "❗getAIChatLog 응답 body=null")
                         return@launch

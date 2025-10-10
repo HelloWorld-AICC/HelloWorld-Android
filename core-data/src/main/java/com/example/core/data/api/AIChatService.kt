@@ -30,10 +30,10 @@ interface AIChatService {
     ) : Response<ResponseBody>
 
     @GET("user/room-list")
-    suspend fun getAIChattingRooms() : Response<ApiResponse<List<ChattingRoom>>>
+    suspend fun getAIChattingRooms() : Response<List<ChattingRoom>>
 
     @GET("chat/room-log")
     suspend fun getAIChatLog(
         @Query("roomId") roomId : String
-    ) :  Response<ApiResponse<AIChatLogResponse>>
+    ) :  Response<AIChatLogResponse>
 }
