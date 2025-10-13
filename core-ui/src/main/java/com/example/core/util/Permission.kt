@@ -17,7 +17,7 @@ fun rememberPhotoPickerWithPermission(
     onImageSelected: (Uri) -> Unit
 ): () -> Unit {
     val context = LocalContext.current
-    
+
     // Photo Picker 런처
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -26,7 +26,7 @@ fun rememberPhotoPickerWithPermission(
             onImageSelected(contentUri)
         }
     }
-    
+
     // 권한 요청 런처 (권한 승인 시 자동으로 photo picker 실행)
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -40,7 +40,55 @@ fun rememberPhotoPickerWithPermission(
             )
         }
     }
-    
+
+    // 권한 체크 및 Photo Picker 실행 함수 반환
+    return {
+        checkAndRequestPhotoPermission(
+            context = context,
+            onPermissionGranted = {
+                photoPicker.launch(
+                    PickVisualMediaRequest(
+                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+            },
+            onRequestPermission = { permission ->
+                permissionLauncher.launch(permission)
+            }
+        )
+    }
+}
+
+@Composable
+fun rememberMultiplePhotoPickerWithPermission(
+    maxItems: Int = 10,
+    onImagesSelected: (List<Uri>) -> Unit
+): () -> Unit {
+    val context = LocalContext.current
+
+    // Multiple Photo Picker 런처
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = maxItems)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            onImagesSelected(uris)
+        }
+    }
+
+    // 권한 요청 런처 (권한 승인 시 자동으로 photo picker 실행)
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // 권한이 승인되면 즉시 photo picker 실행
+            photoPicker.launch(
+                PickVisualMediaRequest(
+                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        }
+    }
+
     // 권한 체크 및 Photo Picker 실행 함수 반환
     return {
         checkAndRequestPhotoPermission(
