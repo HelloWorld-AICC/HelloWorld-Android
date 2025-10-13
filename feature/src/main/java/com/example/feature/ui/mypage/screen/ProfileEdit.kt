@@ -1,8 +1,6 @@
 package com.example.feature.ui.mypage.screen
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -62,6 +60,7 @@ import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain100
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
+import com.example.core.util.rememberPhotoPickerWithPermission
 import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
 import com.example.model.common.Language
@@ -88,17 +87,9 @@ fun ProfileEdit(
     val languages: List<Language> = Language.entries
     var expanded by remember { mutableStateOf(false) }
 
-    // 이미지 결과 처리 함수
-    fun handleImageResult(uri: Uri) {
+    // 권한 체크 후 갤러리 런처
+    val launchPhotoPicker = rememberPhotoPickerWithPermission { uri ->
         viewModel.updateUserImg(uri)
-    }
-    // 갤러리 런처
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            handleImageResult(uri)
-        }
     }
 
     Column(
@@ -163,7 +154,7 @@ fun ProfileEdit(
             Box(
                 modifier = Modifier
                     .clickable {
-                        galleryLauncher.launch("image/jpeg")
+                        launchPhotoPicker()
                     }
             ) {
                 if (editingUserImg != null) {

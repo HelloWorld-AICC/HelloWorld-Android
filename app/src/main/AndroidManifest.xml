@@ -5,9 +5,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- API 30(Android 11) 이상에서 외부 저장소 접근을 위한 권한 -->
+    <!-- READ_EXTERNAL_STORAGE: 외부 저장소에서 파일을 읽기 위한 권한 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+
+    <!-- API 33(Android 13) 이상에서 미디어 파일 접근을 위한 세분화된 권한 -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
