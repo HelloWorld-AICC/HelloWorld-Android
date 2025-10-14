@@ -9,6 +9,7 @@ import com.example.model.community.DeleteCommentResponse
 import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailRequest
 import com.example.model.community.DetailResponse
+import com.example.model.community.ReportPostResponse
 import com.example.model.community.UpdatePostRequest
 import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteFileRequest
@@ -304,6 +305,40 @@ class RetrofitCommunityDataSource @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "updatePost() exception", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun reportPost(communityId: Long): Result<ReportPostResponse> {
+        Log.d(TAG, "reportPost() called")
+
+        return try {
+            val response = communityApi.reportPost(communityId = communityId,)
+            Log.d(TAG, "reportPost() response received - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
+
+            val apiResponse = response.body()
+            Log.d(TAG, "reportPost() apiResponse - result: ${apiResponse?.result}")
+
+            when {
+                // retrofit error (200번대 이외)
+                !response.isSuccessful -> {
+                    Log.e(TAG, "reportPost() HTTP error - code: ${response.code()}, message: ${response.message()}")
+                    Result.failure(HttpException(response))
+                }
+
+                apiResponse?.isSuccess == true && apiResponse.result != null -> {
+                    Log.d(TAG, "reportPost() success - result: ${apiResponse.result}")
+                    Result.success(apiResponse.result)
+                }
+
+                // isSuccess = false, result == null
+                else -> {
+                    Log.e(TAG, "reportPost() API error - code: ${apiResponse?.code}")
+                    Result.failure(Exception("${apiResponse?.code}"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "reportPost() exception", e)
             Result.failure(e)
         }
     }

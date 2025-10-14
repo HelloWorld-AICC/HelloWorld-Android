@@ -151,8 +151,20 @@ class PostDetailViewModel @AssistedInject constructor(
         }
     }
 
-    fun reportPost() {
-
+    /** 게시글 신고하기 */
+    fun reportPost(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            communityRepository.reportPost(
+                request.communityId
+            ).fold(
+                onSuccess = {
+                    onResult(true)
+                },
+                onFailure = {
+                    onResult(false)
+                }
+            )
+        }
     }
 
     fun reportComment() {

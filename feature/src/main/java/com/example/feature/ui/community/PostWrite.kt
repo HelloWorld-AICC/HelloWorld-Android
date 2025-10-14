@@ -1,9 +1,7 @@
 package com.example.feature.ui.community
 
-import android.R.attr.mimeType
 import android.content.Context
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -37,10 +35,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +54,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.video.videoFrameMillis
-import com.airbnb.lottie.animation.content.Content
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
@@ -69,6 +65,7 @@ import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
+import com.example.core.util.rememberMultiplePhotoPickerWithPermission
 import com.example.feature.R
 import com.example.model.common.ContentType
 
@@ -93,41 +90,11 @@ internal fun CommunityPostWrite(
 
     val isCreate = viewModel.request.type == ContentType.CREATE
 
-    // 이미지 결과 처리 함수
-    fun handleImageResult(uri: List<Uri>) {
-        viewModel.addImages(uri)
-    }
-    fun filterMediaByCount(uris: List<Uri>, maxImages: Int, maxVideos: Int): List<Uri> {
-        val imageUris = mutableListOf<Uri>()
-        val videoUris = mutableListOf<Uri>()
-
-        uris.forEach { uri ->
-            val mimeType = context.contentResolver.getType(uri)
-            when {
-                mimeType?.startsWith("image/") == true && imageUris.size < maxImages -> {
-                    imageUris.add(uri)
-                }
-                mimeType?.startsWith("video/") == true && videoUris.size < maxVideos -> {
-                    videoUris.add(uri)
-                }
-            }
-        }
-
-        return imageUris + videoUris
-    }
-    // 갤러리 런처
-    /*val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 12)
+    // 권한 체크 후 갤러리 런처
+    val launchPhotoPicker = rememberMultiplePhotoPickerWithPermission(
+        maxItems = 10
     ) { uris ->
-        if (uris.isNotEmpty()) {
-            val filteredUris = filterMediaByCount(uris, maxImages = 10, maxVideos = 2)
-            handleImageResult(filteredUris)
-        }
-    }*/
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 10)
-    ) { uri ->
-        handleImageResult(uri)
+        viewModel.addImages(uris)
     }
 
     Column(
@@ -356,16 +323,14 @@ internal fun CommunityPostWrite(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        if (images.size < 12) {
+                        if (images.size < 10) {
                             Box(
                                 modifier = Modifier
                                     .size(50.dp)
                                     .background(HelloWorldGrayScale100, RoundedCornerShape(8.dp))
                                     .clip(RoundedCornerShape(8.dp))
                                     .clickable {
-//                                    galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-                                        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
+                                        launchPhotoPicker()
                                     },
                                 contentAlignment = Alignment.Center
                             ) {

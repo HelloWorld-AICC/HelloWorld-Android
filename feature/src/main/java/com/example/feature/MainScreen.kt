@@ -147,14 +147,13 @@ fun MyNavigationHost(navController: NavHostController) {
             onNavigateBack = navController::navigateUp,
             onCommunityUpdated = { navController.previousBackStackEntry?.savedStateHandle?.set("community_update", true) },
             onCheckCommunityUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("community_update") ?: false },
-
         )
         communityPostWriteScreen(
             onNavigateBack = navController::navigateUp,
             onCommunityUpdated = {
                 navController.previousBackStackEntry?.savedStateHandle?.set("community_update", true)
                 navController.popBackStack()
-            }
+            },
         )
         myPageScreen(
             onNavigateBack = navController::navigateUp,

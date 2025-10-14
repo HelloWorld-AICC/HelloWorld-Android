@@ -141,7 +141,8 @@ class PostWriteViewModel @AssistedInject constructor(
                 communityId = request.communityId.toLong(),
                 request = UpdatePostRequest(
                     title = _title.value,
-                    content = _content.value
+                    content = _content.value,
+                    communityCategoryId = _selectedTab.value
                 )
             ).fold(
                 onSuccess = {

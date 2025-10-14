@@ -5,6 +5,7 @@ import com.example.model.community.CommunityResponse
 import com.example.model.community.DeleteCommentResponse
 import com.example.model.community.DeletePostResponse
 import com.example.model.community.DetailResponse
+import com.example.model.community.ReportPostResponse
 import com.example.model.community.UpdatePostRequest
 import com.example.model.community.UpdatePostResponse
 import com.example.model.community.WriteResponse
@@ -72,4 +73,9 @@ interface CommunityApi {
         @Path("community_id") communityId: Long,
         @Body request: UpdatePostRequest
     ): Response<ApiResponse<UpdatePostResponse>>
+
+    @POST(ApiConstants.REPORT_COMMUNITY_POST)
+    suspend fun reportPost(
+        @Path("community_id") communityId: Long,
+    ): Response<ApiResponse<ReportPostResponse>>
 }

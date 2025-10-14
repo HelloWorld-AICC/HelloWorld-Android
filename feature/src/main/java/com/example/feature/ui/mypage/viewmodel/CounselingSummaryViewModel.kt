@@ -28,7 +28,6 @@ class CounselingSummaryViewModel @Inject constructor(
     fun getAllSummary(page: Int = 1, size: Int = 10) {
         viewModelScope.launch {
             _uiState.value = CounselingSummaryUiState.Loading
-            delay(3000) // TODO 제거
             myPageRepository.getAllSummary(
                 PageSizeRequest(
                     page = page,
