@@ -61,7 +61,6 @@ android {
     }
 
     dependencies {
-
         // Module Inject
         implementation(project(":core:model"))
         implementation(project(":core:network"))
@@ -102,6 +101,5 @@ android {
 
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
     }
 }

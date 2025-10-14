@@ -1,24 +1,22 @@
 package com.example.core.data.model
 
-data class ConsultationCenterResponse (
-    val isSuccess: Boolean,
-    val code: String,
-    val message: String,
-    val result: ConsultationCenterResult
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ConsultationCenterResponse(
+    @SerialName("centerMapList") val centerMapList: List<Center>,
+    @SerialName("userId")        val userId: String
 )
 
-data class ConsultationCenterResult(
-    val centerMapList: List<Center>,
-    val userId : String
-)
-
-data class Center (
-    val centerId : Int,
-    val name : String,
-    val status : String,
-    val closed : String,
-    val address : String,
-    val image : String,
-    val latitude : Double,
-    val longitude : Double
+@Serializable
+data class Center(
+    @SerialName("centerId")  val centerId: Int,
+    @SerialName("name")      val name: String,
+    @SerialName("status")    val status: String,
+    @SerialName("closed")    val closed: String,
+    @SerialName("address")   val address: String,
+    @SerialName("image")     val image: String? = null,   // ← 여기!
+    @SerialName("latitude")  val latitude: Double,
+    @SerialName("longitude") val longitude: Double
 )
