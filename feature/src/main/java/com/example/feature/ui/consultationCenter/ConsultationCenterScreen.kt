@@ -1,9 +1,11 @@
+// com/example/feature/ui/consultationCenter/ConsultationCenterScreen.kt
 package com.example.feature.ui.consultationCenter
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.util.Log
@@ -13,18 +15,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,11 +58,16 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.coroutines.resume
-private const val CAMERA_LAT_SHIFT = -0.006  // 초기 보정과 동일
+
+private const val CAMERA_LAT_SHIFT = -0.006          // 오버레이 보정
+private const val QUERY_RADIUS_METERS = 100_000f     // 🔵 반경 100km
+private const val REQUERY_THRESHOLD_METERS = 500f  // 지도 중심 이동 임계(500m)
 
 private fun correctedForOverlay(latLng: LatLng, shift: Double = CAMERA_LAT_SHIFT): LatLng =
     LatLng(latLng.latitude + shift, latLng.longitude)
@@ -81,32 +85,35 @@ fun ConsultationCenterScreen(
 
     val selectedCenter by viewModel.selectedCenter.collectAsState()
     val centerList by viewModel.centerList.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    val listState = rememberLazyListState()
 
     var locationTitle by remember { mutableStateOf("") }
 
-    // userLocation이 설정될 때 주소로 갱신
+    // 지도 기반 재조회 기준점(마지막 쿼리 중심)
+    var lastQueryLocation by remember { mutableStateOf<LatLng?>(null) }
+
+    // 위치 → 행정구역명 갱신
     LaunchedEffect(userLocation) {
         userLocation?.let { ll ->
             reverseGeocodeToSidoGu(context, ll)?.let { sidoGu ->
-                locationTitle = sidoGu   // 예: "서울시 구로구"
+                locationTitle = sidoGu
             }
         }
     }
 
-    // ✅ 권한을 FINE/COARSE 둘 다 요청
+    // 위치 권한
     val locationPermissions = rememberMultiplePermissionsState(
         listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
-
-    // ✅ 둘 중 하나만 승인돼도 위치 기능 활성화
-    val hasLocationPermission = remember(locationPermissions.permissions) {
+    val hasLocationPermission =
         locationPermissions.permissions.any { it.status.isGranted } ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
 
     LaunchedEffect(Unit) {
         if (!hasLocationPermission) {
@@ -114,11 +121,8 @@ fun ConsultationCenterScreen(
         }
     }
 
-    val fusedLocationClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-    // ✅ FINE 없으면 BALANCED로 완화
     val locationRequest = remember(hasLocationPermission) {
         val priority =
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -132,26 +136,40 @@ fun ConsultationCenterScreen(
         }.build()
     }
 
-    // 사용자의 현재 위치가 정해지면 센터 목록을 fetch
+    // 최초/의미있는 사용자 위치 변경 시 100km 반경으로 초기 로드
     LaunchedEffect(userLocation) {
-        userLocation?.let { location ->
-            viewModel.fetchCenterList(
-                page = 0,
-                size = 20,
-                latitude = location.latitude,
-                longitude = location.longitude
-            )
+        userLocation?.let { current ->
+            val prev = lastQueryLocation
+            if (prev == null) {
+                lastQueryLocation = current
+                viewModel.resetAndLoad(
+                    latitude = current.latitude,
+                    longitude = current.longitude,
+                    radiusMeters = QUERY_RADIUS_METERS
+                )
+            } else {
+                val dist = FloatArray(1)
+                Location.distanceBetween(prev.latitude, prev.longitude, current.latitude, current.longitude, dist)
+                if (dist[0] >= REQUERY_THRESHOLD_METERS) {
+                    lastQueryLocation = current
+                    viewModel.resetAndLoad(
+                        latitude = current.latitude,
+                        longitude = current.longitude,
+                        radiusMeters = QUERY_RADIUS_METERS
+                    )
+                }
+            }
         }
     }
 
-    // 위치 콜백 등록 및 해제
+    // 위치 업데이트
     DisposableEffect(hasLocationPermission) {
         if (hasLocationPermission) {
             val locationCallback = object : com.google.android.gms.location.LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
                         val raw = LatLng(location.latitude, location.longitude)
-                        val corrected = correctedForOverlay(raw)   // 🔁 공통 헬퍼 사용
+                        val corrected = correctedForOverlay(raw)
                         userLocation = corrected
 
                         if (!cameraMoved) {
@@ -162,77 +180,99 @@ fun ConsultationCenterScreen(
                 }
             }
 
-            // ✅ 권한이 있을 때만, 어노테이션이 붙은 헬퍼로 호출
             startLocationUpdatesSafely(
                 client = fusedLocationClient,
                 request = locationRequest,
                 callback = locationCallback,
                 looper = context.mainLooper
             )
-
             onDispose { fusedLocationClient.removeLocationUpdates(locationCallback) }
-        } else {
-            onDispose { /* no-op */ }
-        }
+        } else onDispose { }
     }
 
-    // 특정 센터를 선택하면 카메라 이동
+    // 센터 선택 시 카메라 이동
     LaunchedEffect(selectedCenter) {
         selectedCenter?.let { center ->
             val raw = LatLng(center.latitude, center.longitude)
-            val corrected = correctedForOverlay(raw)   // 🔁 동일 보정
-            val update = CameraUpdateFactory.newCameraPosition(
+            val corrected = correctedForOverlay(raw)
+            cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(
                 CameraPosition.fromLatLngZoom(corrected, 15f)
-            )
-            cameraPositionState.animate(update)
+            ))
         }
     }
 
-    // UI 영역
+    // 바닥 스크롤 감지 → 다음 페이지 로드
+    LaunchedEffect(listState, centerList) {
+        snapshotFlow {
+            val total = listState.layoutInfo.totalItemsCount
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            total > 0 && lastVisible >= total - 1
+        }.distinctUntilChanged()
+            .collectLatest { reachedEnd ->
+                if (reachedEnd) viewModel.loadNextPage()
+            }
+    }
+
+    // UI
     Column(modifier = Modifier.fillMaxSize()) {
-        BackHeader(
-            title = "오프라인 상담센터",
-            onBackClick = { onBackClick() }
-        )
+        BackHeader(title = "오프라인 상담센터", onBackClick = onBackClick)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) // 나머지 공간을 지도+오버레이가 채움
+                .weight(1f)
         ) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
-                properties = MapProperties(
-                    isMyLocationEnabled = hasLocationPermission // ✅ 권한 있을 때만
-                ),
-                uiSettings = MapUiSettings(
-                    myLocationButtonEnabled = hasLocationPermission // ✅ 버튼도 권한 연동
-                ),
-                onMapClick = {
-                    viewModel.selectCenter(null)
-                }
+                properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
+                uiSettings = MapUiSettings(myLocationButtonEnabled = hasLocationPermission),
+                onMapClick = { viewModel.selectCenter(null) }
             ) {
-                MapEffect(userLocation) { map ->
-                    map.setOnMyLocationButtonClickListener {
-                        val target = userLocation
-                        if (target != null) {
-                            val update = CameraUpdateFactory.newCameraPosition(
-                                CameraPosition.fromLatLngZoom(target, 15f) // 줌은 기존과 동일
+                // ✅ 지도 이동 후(카메라 멈춤) 중심 기준 반경 100km 재조회
+                MapEffect(lastQueryLocation) { map ->
+                    map.setOnCameraIdleListener {
+                        val target = map.cameraPosition.target
+                        val prev = lastQueryLocation
+                        if (prev == null) {
+                            lastQueryLocation = target
+                            viewModel.resetAndLoad(
+                                target.latitude, target.longitude, QUERY_RADIUS_METERS
                             )
-                            map.animateCamera(update)   // 기본 동작 대신 우리가 보정 반영한 좌표로 이동
-                            true                       // 이벤트 소비(기본 recenter 막기)
                         } else {
-                            false                      // 위치 모르면 기본 동작 실행
+                            val d = FloatArray(1)
+                            Location.distanceBetween(prev.latitude, prev.longitude,
+                                target.latitude, target.longitude, d)
+                            if (d[0] >= REQUERY_THRESHOLD_METERS) {
+                                lastQueryLocation = target
+                                viewModel.resetAndLoad(
+                                    target.latitude, target.longitude, QUERY_RADIUS_METERS
+                                )
+                            }
                         }
                     }
                 }
 
+                // ✅ 내 위치 버튼 보정(이것도 반드시 GoogleMap 내부)
+                MapEffect(userLocation) { m ->
+                    m.setOnMyLocationButtonClickListener {
+                        val target = userLocation
+                        if (target != null) {
+                            m.animateCamera(
+                                CameraUpdateFactory.newCameraPosition(
+                                    CameraPosition.fromLatLngZoom(target, 15f)
+                                )
+                            )
+                            true
+                        } else false
+                    }
+                }
+
+                // 마커 렌더링
                 centerList.forEach { center ->
                     val markerState = remember(center) {
                         MarkerState(position = LatLng(center.latitude, center.longitude))
                     }
-
                     Marker(
                         state = markerState,
                         title = center.name,
@@ -245,14 +285,13 @@ fun ConsultationCenterScreen(
             }
 
 
-
-            // 지도 위에 오버레이
             ConsultationCenterListOverlay(
                 centerList = centerList,
                 selectedCenter = selectedCenter,
-                headerTitle = locationTitle,          // ✅ 추가
-                modifier = Modifier
-                    .align(Alignment.BottomCenter),
+                headerTitle = locationTitle,
+                listState = listState,
+                isLoading = isLoading,
+                modifier = Modifier.align(Alignment.BottomCenter),
                 onClick = { viewModel.selectCenter(it) }
             )
         }
@@ -280,6 +319,8 @@ fun ConsultationCenterListOverlay(
     centerList: List<Center>,
     selectedCenter: Center?,
     headerTitle: String,
+    listState: LazyListState,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
     onClick: (Center) -> Unit
 ) {
@@ -290,13 +331,11 @@ fun ConsultationCenterListOverlay(
             .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             .background(Color.White)
     ) {
-        // ⬇️ 패딩 포함 컨텐트 래퍼
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 20.dp, end = 20.dp, top = 24.dp)
         ) {
-            // ⬇️ 아이콘 + 현재 위치(구 단위)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -310,29 +349,40 @@ fun ConsultationCenterListOverlay(
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = headerTitle.ifBlank {""},
+                    text = headerTitle.ifBlank { "" },
                     style = AppTypography.body01,
                     maxLines = 1,
-                    color = HelloWorldMain700,              // ✅ 원하는 색
+                    color = HelloWorldMain700,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            // ⬇️ 리스트 (패딩 영역과 동일 폭)
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                // 하단 그라디언트(60dp)에 가리지 않도록 여유 패딩
                 contentPadding = PaddingValues(bottom = 72.dp)
             ) {
                 items(centerList) { center ->
                     ConsultationCenterCard(center = center) { onClick(center) }
                 }
+
+                item {
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
             }
         }
 
-        // ⬇️ 하단 그라디언트
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -347,7 +397,6 @@ fun ConsultationCenterListOverlay(
     }
 }
 
-
 @Composable
 fun ConsultationCenterCard(
     center: Center,
@@ -357,7 +406,7 @@ fun ConsultationCenterCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(87.dp)
-            .clickable { onClick() } // ← 클릭 이벤트
+            .clickable { onClick() }
     ) {
         Spacer(modifier = Modifier.height(12.dp))
         Row(
@@ -395,7 +444,6 @@ fun ConsultationCenterCard(
 
 private fun normalizeSido(admin: String?): String {
     if (admin.isNullOrBlank()) return ""
-    // “서울특별시” → “서울시”, “부산광역시” → “부산시” 등
     return admin
         .replace("특별시", "시")
         .replace("광역시", "시")
@@ -415,8 +463,8 @@ suspend fun reverseGeocodeToSidoGu(
         suspendCancellableCoroutine { cont ->
             geocoder.getFromLocation(lat, lng, 1) { list ->
                 val a = list.firstOrNull()
-                val sido = normalizeSido(a?.adminArea)              // 서울시/부산시…
-                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea // 구로구/영등포구…
+                val sido = normalizeSido(a?.adminArea)
+                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
                 cont.resume(
                     if (!sido.isNullOrBlank() && !gu.isNullOrBlank())
                         "$sido $gu" else null
