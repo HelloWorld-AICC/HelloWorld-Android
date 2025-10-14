@@ -66,8 +66,7 @@ import java.util.Locale
 import kotlin.coroutines.resume
 
 private const val CAMERA_LAT_SHIFT = -0.006          // 오버레이 보정
-private const val QUERY_RADIUS_METERS = 100_000f     // 🔵 반경 100km
-private const val REQUERY_THRESHOLD_METERS = 500f  // 지도 중심 이동 임계(500m)
+private const val REQUERY_THRESHOLD_METERS = 5_000f  // 지도 중심 이동 임계(5km)
 
 private fun correctedForOverlay(latLng: LatLng, shift: Double = CAMERA_LAT_SHIFT): LatLng =
     LatLng(latLng.latitude + shift, latLng.longitude)
@@ -136,27 +135,19 @@ fun ConsultationCenterScreen(
         }.build()
     }
 
-    // 최초/의미있는 사용자 위치 변경 시 100km 반경으로 초기 로드
+    // 최초/의미있는 사용자 위치 변경 시 초기 로드
     LaunchedEffect(userLocation) {
         userLocation?.let { current ->
             val prev = lastQueryLocation
             if (prev == null) {
                 lastQueryLocation = current
-                viewModel.resetAndLoad(
-                    latitude = current.latitude,
-                    longitude = current.longitude,
-                    radiusMeters = QUERY_RADIUS_METERS
-                )
+                viewModel.resetAndLoad(current.latitude, current.longitude)
             } else {
                 val dist = FloatArray(1)
                 Location.distanceBetween(prev.latitude, prev.longitude, current.latitude, current.longitude, dist)
                 if (dist[0] >= REQUERY_THRESHOLD_METERS) {
                     lastQueryLocation = current
-                    viewModel.resetAndLoad(
-                        latitude = current.latitude,
-                        longitude = current.longitude,
-                        radiusMeters = QUERY_RADIUS_METERS
-                    )
+                    viewModel.resetAndLoad(current.latitude, current.longitude)
                 }
             }
         }
@@ -195,22 +186,12 @@ fun ConsultationCenterScreen(
         selectedCenter?.let { center ->
             val raw = LatLng(center.latitude, center.longitude)
             val corrected = correctedForOverlay(raw)
-            cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(
-                CameraPosition.fromLatLngZoom(corrected, 15f)
-            ))
+            cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(corrected, 15f)
+                )
+            )
         }
-    }
-
-    // 바닥 스크롤 감지 → 다음 페이지 로드
-    LaunchedEffect(listState, centerList) {
-        snapshotFlow {
-            val total = listState.layoutInfo.totalItemsCount
-            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-            total > 0 && lastVisible >= total - 1
-        }.distinctUntilChanged()
-            .collectLatest { reachedEnd ->
-                if (reachedEnd) viewModel.loadNextPage()
-            }
     }
 
     // UI
@@ -229,31 +210,29 @@ fun ConsultationCenterScreen(
                 uiSettings = MapUiSettings(myLocationButtonEnabled = hasLocationPermission),
                 onMapClick = { viewModel.selectCenter(null) }
             ) {
-                // ✅ 지도 이동 후(카메라 멈춤) 중심 기준 반경 100km 재조회
+                // ✅ 지도 이동 후(카메라 멈춤) 중심이 5km 이상 바뀌면 재조회 (반경 제한 없음)
                 MapEffect(lastQueryLocation) { map ->
                     map.setOnCameraIdleListener {
                         val target = map.cameraPosition.target
                         val prev = lastQueryLocation
                         if (prev == null) {
                             lastQueryLocation = target
-                            viewModel.resetAndLoad(
-                                target.latitude, target.longitude, QUERY_RADIUS_METERS
-                            )
+                            viewModel.resetAndLoad(target.latitude, target.longitude)
                         } else {
                             val d = FloatArray(1)
-                            Location.distanceBetween(prev.latitude, prev.longitude,
-                                target.latitude, target.longitude, d)
+                            Location.distanceBetween(
+                                prev.latitude, prev.longitude,
+                                target.latitude, target.longitude, d
+                            )
                             if (d[0] >= REQUERY_THRESHOLD_METERS) {
                                 lastQueryLocation = target
-                                viewModel.resetAndLoad(
-                                    target.latitude, target.longitude, QUERY_RADIUS_METERS
-                                )
+                                viewModel.resetAndLoad(target.latitude, target.longitude)
                             }
                         }
                     }
                 }
 
-                // ✅ 내 위치 버튼 보정(이것도 반드시 GoogleMap 내부)
+                // ✅ 내 위치 버튼 보정
                 MapEffect(userLocation) { m ->
                     m.setOnMyLocationButtonClickListener {
                         val target = userLocation
@@ -268,7 +247,7 @@ fun ConsultationCenterScreen(
                     }
                 }
 
-                // 마커 렌더링
+                // 마커
                 centerList.forEach { center ->
                     val markerState = remember(center) {
                         MarkerState(position = LatLng(center.latitude, center.longitude))
@@ -284,7 +263,6 @@ fun ConsultationCenterScreen(
                 }
             }
 
-
             ConsultationCenterListOverlay(
                 centerList = centerList,
                 selectedCenter = selectedCenter,
@@ -295,6 +273,18 @@ fun ConsultationCenterScreen(
                 onClick = { viewModel.selectCenter(it) }
             )
         }
+    }
+
+    // 바닥 스크롤 감지 → 다음 페이지 로드
+    LaunchedEffect(listState, centerList) {
+        snapshotFlow {
+            val total = listState.layoutInfo.totalItemsCount
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            total > 0 && lastVisible >= total - 1
+        }.distinctUntilChanged()
+            .collectLatest { reachedEnd ->
+                if (reachedEnd) viewModel.loadNextPage()
+            }
     }
 }
 
