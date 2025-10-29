@@ -115,6 +115,8 @@ dependencies {
 
     //Markdown
     implementation("io.noties.markwon:core:4.6.2")
+    implementation("io.noties.markwon:linkify:4.6.2")
+
 
     //animation
     implementation("androidx.compose.animation:animation-core:1.6.1") // Compose 버전에 따라 조정
