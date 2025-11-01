@@ -63,11 +63,17 @@ import com.example.model.mypage.Community
 internal fun PostAndComments(
     onNavigateBack: () -> Unit,
     onNavigateCommunity: (Int, Int) -> Unit,
+    onCheckCommunityUpdate: () -> Boolean,
     viewModel: PostAndCommentsViewModel = hiltViewModel()
 ) {
     val selectedMenu by viewModel.selectedMenu.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    LaunchedEffect(onCheckCommunityUpdate()) {
+        val isUpdate = onCheckCommunityUpdate()
+        if (isUpdate) { viewModel.changeMenu(selectedMenu) }
+    }
 
     PostAndComments(
         onNavigateBack = onNavigateBack,
@@ -76,7 +82,7 @@ internal fun PostAndComments(
         uiState = uiState,
         changeMenu = viewModel::changeMenu,
         isLoading = isLoading,
-        onLoadMore = viewModel::loadData
+        onLoadMore = viewModel::loadData,
     )
 
 }
@@ -449,6 +455,7 @@ private fun CommentItem(
 private fun PostAndCommentsPreview() {
     PostAndComments(
         onNavigateBack = {},
-        onNavigateCommunity = {_, _ -> }
+        onNavigateCommunity = {_, _ -> },
+        onCheckCommunityUpdate = { false }
     )
 }

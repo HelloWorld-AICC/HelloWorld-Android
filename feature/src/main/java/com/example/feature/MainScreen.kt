@@ -188,6 +188,7 @@ fun MyNavigationHost(navController: NavHostController) {
         postAndCommentsScreen(
             onNavigateBack = navController::navigateUp,
             onNavigateCommunity = navController::navigateToCommunityPostDetail,
+            onCheckCommunityUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("community_update") ?: false },
         )
         withdrawScreen(
             onNavigateBack = navController::navigateUp,

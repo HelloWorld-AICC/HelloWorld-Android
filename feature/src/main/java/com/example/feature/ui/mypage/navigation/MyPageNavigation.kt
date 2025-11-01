@@ -130,11 +130,13 @@ fun NavController.navigateToPostAndComments(navOptions: NavOptions? = null) = na
 fun NavGraphBuilder.postAndCommentsScreen(
     onNavigateBack: () -> Unit,
     onNavigateCommunity: (Int, Int) -> Unit,
+    onCheckCommunityUpdate: () -> Boolean,
 ) {
     composable<PostAndComments> {
         PostAndComments(
             onNavigateBack = onNavigateBack,
             onNavigateCommunity = onNavigateCommunity,
+            onCheckCommunityUpdate = onCheckCommunityUpdate,
         )
     }
 }
