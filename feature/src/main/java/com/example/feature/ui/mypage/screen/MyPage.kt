@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
@@ -60,8 +61,6 @@ fun MyPage(
     onNavigateToCounselingSummary: () -> Unit,
     onNavigateToResume: () -> Unit,
     onNavigateToPostAndComments: () -> Unit,
-    onNavigateToPrivacyPolicy: () -> Unit,
-    onNavigateToTermsOfService: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToWithdraw: () -> Unit,
     onCheckProfileUpdate: () -> Boolean,
@@ -78,8 +77,6 @@ fun MyPage(
         onNavigateToCounselingSummary = onNavigateToCounselingSummary,
         onNavigateToResume = onNavigateToResume,
         onNavigateToPostAndComments = onNavigateToPostAndComments,
-        onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
-        onNavigateToTermsOfService= onNavigateToTermsOfService,
         onNavigateToLogin= onNavigateToLogin,
         onNavigateToWithdraw = onNavigateToWithdraw,
         onCheckProfileUpdate = onCheckProfileUpdate,
@@ -100,8 +97,6 @@ private fun MyPage(
     onNavigateToCounselingSummary: () -> Unit = {},
     onNavigateToResume: () -> Unit = {},
     onNavigateToPostAndComments: () -> Unit = {},
-    onNavigateToPrivacyPolicy: () -> Unit = {},
-    onNavigateToTermsOfService: () -> Unit = {},
     onNavigateToLogin: () -> Unit = {},
     onNavigateToWithdraw: () -> Unit = {},
     onCheckProfileUpdate: () -> Boolean,
@@ -251,11 +246,17 @@ private fun MyPage(
                         )
                         MenuListItem(
                             title = "서비스 이용약관",
-                            onClick = { onNavigateToTermsOfService() }
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW, "https://burnt-cellar-02c.notion.site/HelloWorld-262d4f1c212180c0bdd6cddbffacbc31?source=copy_link".toUri())
+                                context.startActivity(intent)
+                            }
                         )
                         MenuListItem(
                             title = "개인정보 처리방침",
-                            onClick = { onNavigateToPrivacyPolicy() }
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW, "https://burnt-cellar-02c.notion.site/HelloWorld-262d4f1c212180049db4c7972cf4c6f2?source=copy_link".toUri())
+                                context.startActivity(intent)
+                            }
                         )
                         MenuListItem(
                             title = "오픈소스 라이선스",
@@ -401,8 +402,6 @@ private fun MyPagePreview() {
         onNavigateToCounselingSummary = {},
         onNavigateToResume = {},
         onNavigateToPostAndComments = {},
-        onNavigateToPrivacyPolicy = {},
-        onNavigateToTermsOfService = {},
         onNavigateToWithdraw = {},
         uiState = MyPageUiState.Success(
             UserInfo(

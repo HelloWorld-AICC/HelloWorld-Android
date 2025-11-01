@@ -10,10 +10,8 @@ import com.example.feature.ui.mypage.screen.CounselingDetail
 import com.example.feature.ui.mypage.screen.CounselingSummary
 import com.example.feature.ui.mypage.screen.MyPage
 import com.example.feature.ui.mypage.screen.PostAndComments
-import com.example.feature.ui.mypage.screen.PrivacyPolicy
 import com.example.feature.ui.mypage.screen.ProfileEdit
 import com.example.feature.ui.mypage.screen.Resume
-import com.example.feature.ui.mypage.screen.TermsOfService
 import com.example.feature.ui.mypage.screen.Withdraw
 import com.example.feature.ui.mypage.screen.WithdrawComplete
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
@@ -33,10 +31,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object PostAndComments
 
-@Serializable data object PrivacyPolicy
-
-@Serializable data object TermsOfService
-
 @Serializable data object Withdraw
 
 @Serializable data object WithdrawComplete
@@ -49,8 +43,6 @@ fun NavGraphBuilder.myPageScreen(
     onNavigateToCounselingSummary: () -> Unit,
     onNavigateToResume: () -> Unit,
     onNavigateToPostAndComments: () -> Unit,
-    onNavigateToPrivacyPolicy: () -> Unit,
-    onNavigateToTermsOfService: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToWithdraw: () -> Unit,
     onCheckProfileUpdate: () -> Boolean,
@@ -63,8 +55,6 @@ fun NavGraphBuilder.myPageScreen(
             onNavigateToCounselingSummary = onNavigateToCounselingSummary,
             onNavigateToResume = onNavigateToResume,
             onNavigateToPostAndComments = onNavigateToPostAndComments,
-            onNavigateToPrivacyPolicy = onNavigateToPrivacyPolicy,
-            onNavigateToTermsOfService = onNavigateToTermsOfService,
             onNavigateToLogin = onNavigateToLogin,
             onNavigateToWithdraw = onNavigateToWithdraw,
             onCheckProfileUpdate = onCheckProfileUpdate,
@@ -145,30 +135,6 @@ fun NavGraphBuilder.postAndCommentsScreen(
         PostAndComments(
             onNavigateBack = onNavigateBack,
             onNavigateCommunity = onNavigateCommunity,
-        )
-    }
-}
-
-fun NavController.navigateToPrivacyPolicy(navOptions: NavOptions? = null) = navigate(PrivacyPolicy, navOptions)
-
-fun NavGraphBuilder.privacyPolicyScreen(
-    onNavigateBack: () -> Unit
-) {
-    composable<PrivacyPolicy> {
-        PrivacyPolicy(
-            onNavigateBack = onNavigateBack
-        )
-    }
-}
-
-fun NavController.navigateToTermsOfService(navOptions: NavOptions? = null) = navigate(TermsOfService, navOptions)
-
-fun NavGraphBuilder.termsOfServiceScreen(
-    onNavigateBack: () -> Unit
-) {
-    composable<TermsOfService> {
-        TermsOfService(
-            onNavigateBack = onNavigateBack
         )
     }
 }
