@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -39,17 +38,13 @@ import com.example.feature.ui.mypage.navigation.myPageScreen
 import com.example.feature.ui.mypage.navigation.navigateToCounselingDetail
 import com.example.feature.ui.mypage.navigation.navigateToCounselingSummary
 import com.example.feature.ui.mypage.navigation.navigateToPostAndComments
-import com.example.feature.ui.mypage.navigation.navigateToPrivacyPolicy
 import com.example.feature.ui.mypage.navigation.navigateToProfileEdit
 import com.example.feature.ui.mypage.navigation.navigateToResume
-import com.example.feature.ui.mypage.navigation.navigateToTermsOfService
 import com.example.feature.ui.mypage.navigation.navigateToWithdraw
 import com.example.feature.ui.mypage.navigation.navigateToWithdrawComplete
 import com.example.feature.ui.mypage.navigation.postAndCommentsScreen
-import com.example.feature.ui.mypage.navigation.privacyPolicyScreen
 import com.example.feature.ui.mypage.navigation.profileEditScreen
 import com.example.feature.ui.mypage.navigation.resumeScreen
-import com.example.feature.ui.mypage.navigation.termsOfServiceScreen
 import com.example.feature.ui.mypage.navigation.withdrawCompleteScreen
 import com.example.feature.ui.mypage.navigation.withdrawScreen
 import com.example.feature.ui.onboarding.screen.CongratulationsScreen
@@ -161,8 +156,6 @@ fun MyNavigationHost(navController: NavHostController) {
             onNavigateToCounselingSummary = navController::navigateToCounselingSummary,
             onNavigateToResume = navController::navigateToResume,
             onNavigateToPostAndComments = navController::navigateToPostAndComments,
-            onNavigateToTermsOfService = navController::navigateToTermsOfService,
-            onNavigateToPrivacyPolicy = navController::navigateToPrivacyPolicy,
             onNavigateToLogin = {
                 val navOption = navOptions {
                     popUpTo(0) { inclusive = true }
@@ -195,9 +188,8 @@ fun MyNavigationHost(navController: NavHostController) {
         postAndCommentsScreen(
             onNavigateBack = navController::navigateUp,
             onNavigateCommunity = navController::navigateToCommunityPostDetail,
+            onCheckCommunityUpdate = { navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("community_update") ?: false },
         )
-        privacyPolicyScreen( onNavigateBack = navController::navigateUp )
-        termsOfServiceScreen( onNavigateBack = navController::navigateUp )
         withdrawScreen(
             onNavigateBack = navController::navigateUp,
             onNavigateToWithdrawComplete = {

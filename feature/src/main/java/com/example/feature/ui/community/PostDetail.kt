@@ -240,6 +240,7 @@ internal fun CommunityPostDetail(
                                             viewModel.deletePost { result ->
                                                 if (result) {
                                                     onCommunityUpdated()
+                                                    onNavigateBack()
                                                 } else {
                                                     // TODO 실패처리
                                                 }
@@ -426,7 +427,10 @@ internal fun CommunityPostDetail(
                                                 viewModel.updateToastData(
                                                     ToastData(
                                                         text = "댓글이 삭제 되었습니다.",
-                                                        onDismiss = { viewModel.updateToastData() }
+                                                        onDismiss = {
+                                                            viewModel.updateToastData()
+                                                            onCommunityUpdated()
+                                                        }
                                                     )
                                                 )
                                             } else {
@@ -524,6 +528,7 @@ internal fun CommunityPostDetail(
                             ) {
                                 viewModel.submitComment()
                                 focusManager.clearFocus()
+                                onCommunityUpdated()
                             }
                             .padding(4.dp)
                     )

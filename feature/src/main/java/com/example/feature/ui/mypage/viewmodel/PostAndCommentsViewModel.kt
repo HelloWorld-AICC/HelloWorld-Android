@@ -58,7 +58,7 @@ class PostAndCommentsViewModel @Inject constructor(
         _isLoading.value = true
 
         viewModelScope.launch {
-            MyPostAndCommentUiState.Loading
+            _uiState.value = MyPostAndCommentUiState.Loading
             when (type) {
                 "게시글" -> {
                     myPageRepository.getAllMyCommunity(
