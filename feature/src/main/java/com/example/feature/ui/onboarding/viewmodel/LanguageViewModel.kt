@@ -1,6 +1,8 @@
 package com.example.feature.ui.onboarding.viewmodel
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.common.LanguageRepository
@@ -26,6 +28,7 @@ class LanguageViewModel @Inject constructor(
                 result.onSuccess {
                     Log.d(TAG, "서버 저장 성공: $it")
                     saveToDatastore(language)   // Datastore 저장
+                    applyLanguage(language)     // 앱 언어 적용
                 }.onFailure {
                     Log.e(TAG, "서버 저장 실패: ${it.message}")
                 }
@@ -41,6 +44,16 @@ class LanguageViewModel @Inject constructor(
             Log.d(TAG, "로컬 저장 성공 (Datastore): ${language.displayName}")
         } catch (e: Exception) {
             Log.e(TAG, "로컬 저장 실패: ${e.message}", e)
+        }
+    }
+
+    private fun applyLanguage(language: Language) {
+        try {
+            val localeList = LocaleListCompat.forLanguageTags(language.localeCode)
+            AppCompatDelegate.setApplicationLocales(localeList)
+            Log.d(TAG, "앱 언어 적용 성공: ${language.displayName} (${language.localeCode})")
+        } catch (e: Exception) {
+            Log.e(TAG, "앱 언어 적용 실패: ${e.message}", e)
         }
     }
 

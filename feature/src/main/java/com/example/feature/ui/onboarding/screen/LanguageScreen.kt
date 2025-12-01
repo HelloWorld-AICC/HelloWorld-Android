@@ -10,19 +10,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain100
 import com.example.core.ui.theme.White
-import com.example.feature.R
 import com.example.feature.ui.onboarding.viewmodel.LanguageViewModel
 import com.example.model.common.Language
+import com.example.core.ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +41,7 @@ fun LanguageScreen(
     Scaffold(
         bottomBar = {
             BottomButton(
-                text = "확인",
+                text = stringResource(R.string.confirm),
                 onClick = {
                     viewModel.setLanguage(selectedLanguage) // 언어 설정
                     navController.navigate("이용 동의")     // 다음 화면
@@ -64,7 +68,7 @@ fun LanguageScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Which language do you prefer?",
+                text = stringResource(R.string.auth_language_title),
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale800
             )
@@ -72,7 +76,7 @@ fun LanguageScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Please select your language",
+                text = stringResource(R.string.auth_language_subtitle),
                 style = AppTypography.body02,
                 color = HelloWorldGrayScale300
             )
@@ -93,7 +97,9 @@ fun LanguageScreen(
                 ) {
                     OutlinedTextField(
                         value = "${selectedLanguage.flag} ${selectedLanguage.displayName}",
-                        onValueChange = {},
+                        onValueChange = {
+                            viewModel.setLanguage(selectedLanguage)
+                        },
                         readOnly = true,
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded)
