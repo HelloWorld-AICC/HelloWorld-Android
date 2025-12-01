@@ -51,6 +51,7 @@ import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.component.HWDropdownMenuBox
+import com.example.core.ui.component.HWToast
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale0
 import com.example.core.ui.theme.HelloWorldGrayScale100
@@ -80,6 +81,7 @@ fun ProfileEdit(
     val editingUserImg by viewModel.editingUserImg.collectAsState()
     val editingLanguage by viewModel.editingLanguage.collectAsState()
     val dialogData by viewModel.dialogData.collectAsState()
+    val toastData by viewModel.toastData.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -343,6 +345,9 @@ fun ProfileEdit(
     }
     dialogData?.let {
         HWDialog(it)
+    }
+    toastData?.let {
+        HWToast(it)
     }
 }
 
