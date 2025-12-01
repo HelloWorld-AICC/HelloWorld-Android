@@ -1,5 +1,7 @@
 package com.example.domain
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.example.core.data.common.LanguageRepository
 import com.example.core.data.mypage.MyPageRepository
 import com.example.model.common.Language
@@ -21,6 +23,9 @@ class SetProfileUseCase @Inject constructor(
             if (language != null) {
                 languageRepository.submitLanguage(language).onSuccess {
                     languageRepository.setLanguage(language)
+                    // 앱 언어 적용
+                    val localeList = LocaleListCompat.forLanguageTags(language.localeCode)
+                    AppCompatDelegate.setApplicationLocales(localeList)
                 }
             }
         }
