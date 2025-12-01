@@ -13,7 +13,7 @@ object ApiConstants {
 
     const val GET_COMMUNITY_POST_LIST = "community/{category_id}/list"                      // GET  글 조회
     const val CREATE_COMMUNITY_POST = "community/{category_id}/create"                      // POST 글 등록
-    const val GET_COMMUNITY_POST_DETAIL = "community/{category_id}/detail/{community_id}"   // GET  글 상세 조회
+    const val GET_COMMUNITY_POST_DETAIL = "community/detail/{community_id}"   // GET  글 상세 조회
     const val CREATE_COMMUNITY_COMMENT = "community/{community_id}/comment"                 // POST 댓글 등록
 
     const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST 언어 변경

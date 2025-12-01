@@ -43,7 +43,6 @@ interface CommunityApi {
 
     @GET(ApiConstants.GET_COMMUNITY_POST_DETAIL)
     suspend fun getCommunityPostDetail(
-        @Path("category_id") categoryId: Long,
         @Path("community_id") communityId: Long,
         @Query("page") page: Int,
         @Query("size") size: Int,

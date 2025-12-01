@@ -126,7 +126,6 @@ class RetrofitCommunityDataSource @Inject constructor(
 
         return try {
             val response = communityApi.getCommunityPostDetail(
-                categoryId = request.categoryId,
                 communityId = request.communityId,
                 page = request.page,
                 size = request.size
