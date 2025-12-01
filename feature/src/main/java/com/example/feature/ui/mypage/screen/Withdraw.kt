@@ -148,7 +148,7 @@ fun Withdraw(
                     Text(
                         text = item,
                         style = AppTypography.heading04,
-                        color = HelloWorldGrayScale800
+                        color = HelloWorldGrayScale500
                     )
                 }
             )
