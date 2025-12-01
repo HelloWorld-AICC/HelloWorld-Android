@@ -72,7 +72,7 @@ fun WithdrawComplete(
                     color = HelloWorldMain700,
                 )
                 Text(
-                    text = "지금까지 함께해주셔서 감사합니다.\n언제든 다시 찾아오셔도 좋아요.\nHelloWorld는 늘 곁에 있을게요.",
+                    text = "언제든 다시 찾아오셔도 좋아요.\nHelloWorld는 늘 곁에 있을게요.",
                     style = AppTypography.body02,
                     color = HelloWorldMain600,
                     textAlign = TextAlign.Center,
