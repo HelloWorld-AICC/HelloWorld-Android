@@ -21,6 +21,9 @@ class LoginViewModel @Inject constructor(
     private val _loginSuccess = MutableStateFlow(false)
     val loginSuccess: StateFlow<Boolean> = _loginSuccess
 
+    private val _isExistUser = MutableStateFlow(false)
+    val isExistUser: StateFlow<Boolean> = _isExistUser
+
     fun handleGoogleLogin(email: String?, accessToken: String?) {
         if (email.isNullOrBlank()) {
             Log.e("LOGIN", "이메일이 null이거나 비어 있음")
@@ -31,10 +34,11 @@ class LoginViewModel @Inject constructor(
             try {
                 val emailResponse = RetrofitInstance.authService.loginWithEmail(LoginEmailRequest(email))
 
-                if (emailResponse.isSuccess) {
+                if (emailResponse.isSuccess) { // 기존 회원
                     Log.d("LOGIN", "이메일 로그인 성공")
                     saveTokens(emailResponse.result?.tokenList)
                     _loginSuccess.value = true
+                    _isExistUser.value = true
                 } else {
                     Log.w("LOGIN", "이메일 로그인 실패 → 구글 로그인 시도")
 
@@ -44,6 +48,7 @@ class LoginViewModel @Inject constructor(
                             Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
                             saveTokens(googleResponse.result?.tokenList)
                             _loginSuccess.value = true
+                            _isExistUser.value = false
                         } else {
                             Log.e("LOGIN", "구글 로그인 API 실패")
                         }

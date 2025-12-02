@@ -39,13 +39,22 @@ fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: LoginViewModel = hiltViewModel()
     val loginSuccess by viewModel.loginSuccess.collectAsState()
+    val isExistUser by viewModel.isExistUser.collectAsState()
 
     RetrofitInstance.init(context) // 앱 시작 시 초기화
 
     // 로그인 성공 시 화면 전환
     if (loginSuccess) {
-        navController.navigate("언어 설정") {
-            popUpTo("Login") {inclusive}
+        if (isExistUser) {
+            navController.navigate("홈") {
+                popUpTo("온보딩") { inclusive = true }
+                launchSingleTop = true
+            }
+        } else {
+            navController.navigate("언어 설정") {
+                popUpTo("스플래시") { inclusive = false }
+                launchSingleTop = true
+            }
         }
     }
 
