@@ -79,10 +79,11 @@ object RetrofitInstance {
     }
 
     private val okHttpClient = OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
         .addInterceptor(AuthInterceptor())
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(0, TimeUnit.SECONDS)      // SSE: 서버가 푸시하므로 0 추천
+        .readTimeout(0, TimeUnit.SECONDS)       // 무제한(혹은 충분히 크게)
         .build()
 
     private val contentType = "application/json".toMediaType()
