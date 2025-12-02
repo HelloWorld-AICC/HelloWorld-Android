@@ -166,14 +166,11 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Image(
                 painter = painterResource(id = R.drawable.banner_helloworld),
                 contentDescription = "HelloWorld 배너",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
             )
         }
     }

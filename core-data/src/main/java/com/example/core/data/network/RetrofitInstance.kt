@@ -46,7 +46,6 @@ object RetrofitInstance {
         return prefs.getString("refresh_token", "") ?: ""
     }
 
-    // 🔥 로그아웃 시 호출할 함수
     fun clearTokens() {
         prefs.edit()
             .remove("access_token")

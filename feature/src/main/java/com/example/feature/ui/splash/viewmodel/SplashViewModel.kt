@@ -44,20 +44,31 @@ class SplashViewModel @Inject constructor(
                     val atk = response.result.tokenList
                         .find { it.types.equals("ATK", ignoreCase = true) }
                         ?.token.orEmpty()
+                    val rtk = response.result.tokenList
+                        .find { it.types.equals("RTK", ignoreCase = true) }
+                        ?.token.orEmpty()
 
-                    if (atk.isNotEmpty()) {
+                    if (atk.isNotEmpty() &&  rtk.isNotEmpty()) {
                         // SharedPreferences 저장
                         RetrofitInstance.setAccessToken(atk)
                         Log.d("AUTO_LOGIN", "RetrofitInstance에 ATK 저장 완료: $atk")
 
+                        RetrofitInstance.setRefreshToken(rtk)
+                        Log.d("AUTO_LOGIN", "RetrofitInstance에 RTK 저장 완료: $rtk")
+
+
                         // DataStore 저장
                         tokenRepository.setAccessToken(atk)
                         Log.d("AUTO_LOGIN", "TokenRepository(DataStore)에 ATK 저장 완료: $atk")
-
                         Log.d("AUTO_LOGIN", "토큰 재발급 성공 → ATK 갱신 완료")
+
+                        tokenRepository.setRefreshToken(rtk)
+                        Log.d("AUTO_LOGIN", "TokenRepository(DataStore)에 RTK 저장 완료: $atk")
+                        Log.d("AUTO_LOGIN", "토큰 재발급 성공 → RTK 갱신 완료")
+
                         _isAutoLoginSuccess.value = true
                     } else {
-                        Log.w("AUTO_LOGIN", "재발급 응답에 ATK 없음")
+                        Log.w("AUTO_LOGIN", "재발급 응답에 ATK or RTK 없음")
                         _isAutoLoginSuccess.value = false
                     }
                 } else {
