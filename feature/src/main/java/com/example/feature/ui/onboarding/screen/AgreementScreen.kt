@@ -124,28 +124,6 @@ fun AgreementScreen(navController: NavHostController) {
                     color = HelloWorldGrayScale300
                 )
             }
-
-            if (!agreePrivacy || !agreeTerms) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = HelloWorldMain400,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(vertical = 9.dp, horizontal = 24.dp)
-                ) {
-                    Text(
-                        text = "이용약관 동의가 필요합니다",
-                        style = AppTypography.label01,
-                        color = HelloWorldGrayScale0
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 
