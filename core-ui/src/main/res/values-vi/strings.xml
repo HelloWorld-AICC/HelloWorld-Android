@@ -37,6 +37,7 @@
     <string name="action_edit">Sửa</string>
     <string name="action_delete">Xóa</string>
     <string name="action_report">Báo cáo</string>
+    <string name="community_input_placeholder">Để lại một bình luận.</string>
     <string name="community_report_post_confirm">Bạn có muốn báo cáo bài viết này không?</string>
     <string name="community_report_comment_confirm">Bạn có muốn báo cáo bình luận này không?</string>
     <string name="community_report_post_complete">Bài viết đã được báo cáo.</string>
@@ -107,4 +108,7 @@
     <string name="mypage_logout_dialog_title">Bạn có muốn đăng xuất không?</string>
     <string name="mypage_logout_dialog_subtitle">Hẹn gặp lại lần sau!</string>
     <string name="mypage_nickname_edit">Thay đổi biệt danh</string>
+    <string name="community_empty_message">Chưa có bài viết nào.\nHãy viết bài đăng đầu tiên của bạn!</string>
+    <string name="ai_chat_toast">Vui lòng nhập tin nhắn chat dưới 500 ký tự.</string>
+    <string name="mypage_chat_sumary">Tóm tắt chat</string>
 </resources>

@@ -37,6 +37,7 @@
     <string name="action_edit">修改</string>
     <string name="action_delete">删除</string>
     <string name="action_report">举报</string>
+    <string name="community_input_placeholder">留下您的评论。</string>
     <string name="community_report_post_confirm">您确定要举报该帖子吗？</string>
     <string name="community_report_comment_confirm">您确定要举报该评论吗？</string>
     <string name="community_report_post_complete">帖子已被举报</string>
@@ -107,4 +108,7 @@
     <string name="mypage_logout_dialog_title">您确定要退出登录吗？</string>
     <string name="mypage_logout_dialog_subtitle">期待下次再见！</string>
     <string name="mypage_nickname_edit">更改昵称</string>
+    <string name="community_empty_message">还没有帖子。\n撰写您的第一篇帖子吧！</string>
+    <string name="ai_chat_toast">聊天请输入在 500 字以内。</string>
+    <string name="mypage_chat_sumary">聊天摘要</string>
 </resources>

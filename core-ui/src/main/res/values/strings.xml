@@ -61,9 +61,9 @@
     <string name="community_category_insurance">Industrial Accidents and Medical</string>
     <string name="community_category_etc">Other</string>
 
-    <string name="community_empty_message">3</string>
+    <string name="community_empty_message">There are no posts yet.\nWrite your first post!</string>
 
-    <string name="community_input_placeholder">3</string>
+    <string name="community_input_placeholder">Leave a comment.</string>
 
     <string name="community_report_post_confirm">Would you like to report the post?</string>
     <string name="community_report_comment_confirm">Would you like to report the comment?</string>
@@ -153,4 +153,6 @@
 
     <string name="mypage_withdraw_complete_title">Withdrawal is complete.</string>
     <string name="mypage_withdraw_complete_message">Thank you for being with us so far. HelloWorld will always be by your side.</string>
+    <string name="ai_chat_toast">채팅은 500자 이하로 입력해주세요.</string>
+    <string name="mypage_chat_sumary">Chat Summary</string>
 </resources>
