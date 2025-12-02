@@ -23,18 +23,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AgreementScreen(navController: NavHostController) {
-    var allAgree by remember { mutableStateOf(false) }
     var agreeTerms by remember { mutableStateOf(false) }
     var agreePrivacy by remember { mutableStateOf(false) }
     var showModal by remember { mutableStateOf(false) }
     var shouldNavigateToHome by remember { mutableStateOf(false) }
 
-    LaunchedEffect(allAgree) {
-        if (allAgree) {
-            agreeTerms = true
-            agreePrivacy = true
-        }
-    }
+    val allAgree = agreeTerms && agreePrivacy   // <- 파생 값으로 계산
+
 
     LaunchedEffect(shouldNavigateToHome) {
         if (shouldNavigateToHome) {
@@ -95,29 +90,31 @@ fun AgreementScreen(navController: NavHostController) {
                 AgreementCheckbox(
                     text = "모두 동의",
                     checked = allAgree,
-                    onCheckedChange = {
-                        allAgree = it
-                    })
+                    onCheckedChange = { isChecked ->
+                        agreeTerms = isChecked
+                        agreePrivacy = isChecked
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 AgreementCheckbox(
                     text = "개인정보 처리방침",
                     checked = agreePrivacy,
-                    onCheckedChange = {
-                        agreePrivacy = it
-                        allAgree = agreePrivacy && agreeTerms
-                    })
+                    onCheckedChange = { isChecked ->
+                        agreePrivacy = isChecked
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 AgreementCheckbox(
                     text = "서비스 이용약관",
                     checked = agreeTerms,
-                    onCheckedChange = {
-                        agreeTerms = it
-                        allAgree = agreePrivacy && agreeTerms
-                    })
+                    onCheckedChange = { isChecked ->
+                        agreeTerms = isChecked
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
