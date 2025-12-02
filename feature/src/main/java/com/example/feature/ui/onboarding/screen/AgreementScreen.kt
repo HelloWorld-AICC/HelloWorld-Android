@@ -1,5 +1,7 @@
 package com.example.feature.onboarding
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,23 +15,35 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.core.ui.component.DialogData
+import com.example.core.ui.component.HWDialog
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.*
 import com.example.feature.R
 import kotlinx.coroutines.launch
+import kotlin.String
 
 @Composable
 fun AgreementScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
     var agreeTerms by remember { mutableStateOf(false) }
     var agreePrivacy by remember { mutableStateOf(false) }
     var showModal by remember { mutableStateOf(false) }
     var shouldNavigateToHome by remember { mutableStateOf(false) }
 
-    val allAgree = agreeTerms && agreePrivacy   // <- 파생 값으로 계산
+    val allAgree = agreeTerms && agreePrivacy
 
+    var showExitDialog by remember { mutableStateOf(false) }     // 🔥 뒤로가기 확인 모달
+
+    BackHandler(enabled = !showModal) {
+        showExitDialog = true
+    }
 
     LaunchedEffect(shouldNavigateToHome) {
         if (shouldNavigateToHome) {
@@ -129,10 +143,30 @@ fun AgreementScreen(navController: NavHostController) {
 
     if (showModal) {
         TermsModal(
-            onDismiss = {
+            onDismiss = { isAgreed ->
                 showModal = false
-                shouldNavigateToHome = true
+                if (isAgreed) {
+                    shouldNavigateToHome = true   // ✅ 동의했을 때만 네비게이션 트리거
+                }
             }
+        )
+    }
+
+    if (showExitDialog) {
+        HWDialog(
+            data = DialogData(
+                title = "앗, 잠시만요",
+                subTitle = "지금 나가시면 입력한 정보는 모두 지워집니다.",
+                dismiss = "나가기",
+                confirm = "계속 작성하기",
+                onDismiss = {
+                    showExitDialog = false
+                    activity?.finish()
+                },
+                onConfirm = {
+                    showExitDialog = false
+                },
+            )
         )
     }
 }
@@ -177,7 +211,7 @@ fun AgreementCheckbox(text: String, checked: Boolean, onCheckedChange: (Boolean)
 }
 
 @Composable
-fun TermsModal(onDismiss: () -> Unit) {
+fun TermsModal(onDismiss: (Boolean) -> Unit) {
     val scrollState = rememberScrollState()
     val agreed = remember { mutableStateOf(false) }
     val hasScrolledToBottom = remember {
@@ -189,7 +223,7 @@ fun TermsModal(onDismiss: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(false) },
         confirmButton = {
             if (hasScrolledToBottom.value) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -199,7 +233,7 @@ fun TermsModal(onDismiss: () -> Unit) {
                             agreed.value = true
                             coroutineScope.launch {
                                 kotlinx.coroutines.delay(100)
-                                onDismiss()
+                                onDismiss(true)
                             }
                         },
                         colors = RadioButtonDefaults.colors(
