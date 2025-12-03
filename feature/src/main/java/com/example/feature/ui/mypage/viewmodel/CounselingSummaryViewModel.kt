@@ -21,28 +21,63 @@ class CounselingSummaryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<CounselingSummaryUiState>(CounselingSummaryUiState.Loading)
     val uiState: StateFlow<CounselingSummaryUiState> = _uiState.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _hasMoreData = MutableStateFlow(true)
+    val hasMoreData = _hasMoreData.asStateFlow()
+
+    private var currentPage = 0
+    private val currentSummaryList = mutableListOf<Summary>()
+
     init {
-        getAllSummary()
+        loadInitialData()
     }
 
-    fun getAllSummary(page: Int = 1, size: Int = 10) {
+    private fun loadInitialData() {
+        currentPage = 0
+        currentSummaryList.clear()
+        loadSummaryPage()
+    }
+
+    fun loadNextPage() {
+        if (_isLoading.value || !_hasMoreData.value) return
+        loadSummaryPage()
+    }
+
+    private fun loadSummaryPage() {
         viewModelScope.launch {
-            _uiState.value = CounselingSummaryUiState.Loading
+            _isLoading.value = true
+
             myPageRepository.getAllSummary(
                 PageSizeRequest(
-                    page = page,
-                    size = size,
+                    page = currentPage,
+                    size = PAGE_SIZE,
                 )
             ).fold(
-                onSuccess = {
-                    _uiState.value = CounselingSummaryUiState.Success(it.allSummaryList)
+                onSuccess = { response ->
+                    val newItems = response.allSummaryList
+                    currentSummaryList.addAll(newItems)
+
+                    _hasMoreData.value = newItems.size == PAGE_SIZE
+
+                    if (_hasMoreData.value) {
+                        currentPage++
+                    }
+
+                    _uiState.value = CounselingSummaryUiState.Success(currentSummaryList.toList())
                 },
                 onFailure = {
                     _uiState.value = CounselingSummaryUiState.Error("${it.message}")
-
                 }
             )
+
+            _isLoading.value = false
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 10
     }
 }
 

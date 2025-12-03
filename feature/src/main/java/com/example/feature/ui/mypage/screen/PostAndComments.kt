@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.example.core.ui.R
 import com.example.core.ui.component.HWDropdownMenuBox
 import com.example.core.ui.component.IconPosition
 import com.example.core.ui.theme.AppTypography
@@ -53,7 +55,6 @@ import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
 import com.example.core.util.extension.truncateWithEllipsis
-import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.MyPostAndCommentUiState
 import com.example.feature.ui.mypage.viewmodel.PostAndCommentsViewModel
 import com.example.model.mypage.Comment
@@ -91,13 +92,13 @@ internal fun PostAndComments(
 private fun PostAndComments(
     onNavigateBack: () -> Unit,
     onNavigateCommunity: (Int, Int) -> Unit,
-    selectedMenu: String = "게시글",
+    selectedMenu: Int = R.string.posts,
     uiState: MyPostAndCommentUiState = MyPostAndCommentUiState.Loading,
-    changeMenu: (String) -> Unit,
+    changeMenu: (Int) -> Unit,
     isLoading: Boolean = false,
-    onLoadMore: (String) -> Unit,
+    onLoadMore: (Int) -> Unit,
 ) {
-    val options: List<String> = listOf("게시글", "댓글")
+    val options: List<Int> = listOf(R.string.posts, R.string.comments)
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -123,7 +124,7 @@ private fun PostAndComments(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "게시글 / 댓글",
+                text = stringResource(R.string.mypage_posts_comments),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -162,7 +163,7 @@ private fun PostAndComments(
                     },
                     itemContent = { item, isSelected ->
                         Text(
-                            text = item,
+                            text = stringResource(item),
                             style = AppTypography.label01,
                             color = HelloWorldGrayScale300,
                             textAlign = TextAlign.End,
@@ -204,8 +205,8 @@ private fun PostAndComments(
 private fun <T> ListItems (
     items: List<T> = emptyList(),
     isLoading: Boolean,
-    selectedMenu: String,
-    onLoadMore: (String) -> Unit,
+    selectedMenu: Int,
+    onLoadMore: (Int) -> Unit,
     onItemClick: (Int, Int) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -299,7 +300,7 @@ private fun <T> ListItems (
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
+                    text = stringResource(R.string.community_empty_message),
                     style = AppTypography.label02,
                     color = HelloWorldGrayScale300,
                     textAlign = TextAlign.Center

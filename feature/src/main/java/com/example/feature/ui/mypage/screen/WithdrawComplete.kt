@@ -18,15 +18,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.core.ui.R
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldMain0
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
-import com.example.feature.R
 
 @Composable
 fun WithdrawComplete(
@@ -52,7 +53,7 @@ fun WithdrawComplete(
             verticalArrangement = Arrangement.spacedBy(40.dp)
         ) {
             Image(
-                painter = painterResource(com.example.core.ui.R.drawable.logo_helloworld),
+                painter = painterResource(R.drawable.logo_helloworld),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(HelloWorldMain600),
                 modifier = Modifier
@@ -67,12 +68,12 @@ fun WithdrawComplete(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "탈퇴가 완료되었습니다.",
+                    text = stringResource(R.string.mypage_withdraw_complete_title),
                     style = AppTypography.heading01,
                     color = HelloWorldMain700,
                 )
                 Text(
-                    text = "언제든 다시 찾아오셔도 좋아요.\nHelloWorld는 늘 곁에 있을게요.",
+                    text = stringResource(R.string.mypage_withdraw_complete_message),
                     style = AppTypography.body02,
                     color = HelloWorldMain600,
                     textAlign = TextAlign.Center,
@@ -84,7 +85,7 @@ fun WithdrawComplete(
             )
         }
         Text(
-            text = "확인",
+            text = stringResource(R.string.confirm),
             style = AppTypography.heading01,
             color = HelloWorldMain0,
             textAlign = TextAlign.Center,

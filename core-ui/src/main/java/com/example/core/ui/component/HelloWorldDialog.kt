@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.core.ui.theme.AppTypography
@@ -45,12 +46,12 @@ fun HWDialog(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = data.title,
+                    text = stringResource(id = data.title),
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale500,
                 )
                 Text(
-                    text = data.subTitle,
+                    text = stringResource(id = data.subTitle),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale300,
                 )
@@ -70,7 +71,7 @@ fun HWDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = data.dismiss,
+                        text = stringResource(id = data.dismiss),
                         style = AppTypography.label01,
                         color = HelloWorldMain0,
                     )
@@ -84,7 +85,7 @@ fun HWDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = data.confirm,
+                        text = stringResource(id = data.confirm),
                         style = AppTypography.label01,
                         color = HelloWorldMain0,
                     )
@@ -95,10 +96,10 @@ fun HWDialog(
 }
 
 data class DialogData(
-    val title: String = "",
-    val subTitle: String = "",
-    val dismiss: String = "취소",
-    val confirm: String = "확인",
+    val title: Int,
+    val subTitle: Int,
+    val dismiss: Int,
+    val confirm: Int,
     val onDismiss: () -> Unit,
     val onConfirm: () -> Unit = {},
 )
