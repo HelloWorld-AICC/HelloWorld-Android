@@ -5,37 +5,53 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.core.data.mypage.MyPageRepository
 import com.example.core.ui.theme.HelloWorldGrayScale800
+import com.example.model.mypage.DetailSummaryRequest
+import com.example.model.mypage.DetailSummaryResponse
+import com.example.model.mypage.Summary
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class CounselingDetailViewModel @Inject constructor(
-
+@HiltViewModel(assistedFactory = CounselingDetailViewModel.Factory::class)
+class CounselingDetailViewModel @AssistedInject constructor(
+    private val myPageRepository: MyPageRepository,
+    @Assisted val summaryId: Int,
 ) : ViewModel() {
 
-    private val _summaryText = MutableStateFlow<AnnotatedString>(androidx.compose.ui.text.AnnotatedString(""))
-    val summaryText: StateFlow<AnnotatedString> = _summaryText
+    private val _summary = MutableStateFlow<DetailSummaryResponse?>(null)
+    val summary = _summary.asStateFlow()
 
     init {
-        _summaryText.value = styledText()
+        getSummary()
     }
 
-    private fun styledText(): AnnotatedString {
-        return buildAnnotatedString {
-            append("John Smith는 한국에서 근무 중인 호주 출신 근로자로, 지난 3개월 동안 ")
-
-            withStyle(style = SpanStyle(color = HelloWorldGrayScale800)) {
-                append("임금체불과 직장 내 괴롭힘")
-            }
-
-            append(
-                "을 겪고 있다고 보고했습니다. 그는 고용주에게 여러 차례 임금 지급을 요청했지만, " +
-                        "고용주는 이를 무시하고 있으며, 직장 내 동료들의 괴롭힘으로 인해 정신적 스트레스가 심한 상태입니다. " +
-                        "John은 이러한 문제를 해결하기 위해 필요한 조치와 지원 방법에 대해 궁금해 했습니다."
+    fun getSummary() {
+        viewModelScope.launch {
+            myPageRepository.getDetailSummary(DetailSummaryRequest(summaryId.toLong())
+            ).fold(
+                onSuccess = {
+                    _summary.value = it
+                },
+                onFailure = {
+                    // TODO
+                }
             )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            summaryId: Int
+        ): CounselingDetailViewModel
     }
 }

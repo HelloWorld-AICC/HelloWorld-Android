@@ -33,6 +33,9 @@ android {
 
         // 🔐 구글 맵 키만 리소스로 노출
         resValue("string", "google_map_key", googleMapKey)
+
+        // 지원 언어 명시
+        resourceConfigurations.addAll(listOf("en", "ko", "ja", "zh-rCN", "vi"))
     }
 
     buildTypes {

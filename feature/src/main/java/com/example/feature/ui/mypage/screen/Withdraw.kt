@@ -26,10 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.R
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.component.HWDropdownMenuBox
@@ -40,7 +42,6 @@ import com.example.core.ui.theme.HelloWorldGrayScale500
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain0
 import com.example.core.ui.theme.HelloWorldMain500
-import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.WithdrawViewModel
 
 @Composable
@@ -52,7 +53,12 @@ fun Withdraw(
     val dialogData by viewModel.dialogData.collectAsState()
 
     // TODO viewmodel
-    val options: List<String> = listOf("필요한 기능이 없어요", "도움이 되지 않아요", "이용이 어려워요", "더 이상 한국에서 근로생활은 하지 않아요")
+    val options: List<String> = listOf(
+        stringResource(R.string.mypage_withdraw_reason_no_feature),
+        stringResource(R.string.mypage_withdraw_reason_not_helpful),
+        stringResource(R.string.mypage_withdraw_reason_difficult),
+        stringResource(R.string.mypage_withdraw_reason_no_work),
+    )
     var selected by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
@@ -79,7 +85,7 @@ fun Withdraw(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "탈퇴하기",
+                text = stringResource(R.string.withdraw),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -102,12 +108,12 @@ fun Withdraw(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "정말 탈퇴하실 건가요?",
+                    text = stringResource(R.string.mypage_withdraw_title),
                     style = AppTypography.title03,
                     color = HelloWorldGrayScale800,
                 )
                 Text(
-                    text = "탈퇴하신 후에도 작성하신 글과 댓글은 서비스에 남을 수 있으며,\n이후에는 수정·삭제 등 관리가 불가능합니다.",
+                    text = stringResource(R.string.mypage_withdraw_warning),
                     style = AppTypography.label02,
                     color = HelloWorldGrayScale500,
                     textAlign = TextAlign.Center
@@ -122,7 +128,7 @@ fun Withdraw(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "탈퇴를 결심하게 된 이유를 알려주세요",
+                text = stringResource(R.string.mypage_withdraw_reason_title),
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale800,
             )
@@ -139,7 +145,7 @@ fun Withdraw(
                 },
                 selectedContent = { item ->
                     Text(
-                        text = item ?: "이유를 선택해주세요",
+                        text = item ?: stringResource(R.string.mypage_withdraw_reason_placeholder),
                         style = AppTypography.heading04,
                         color = if (item == null) HelloWorldGrayScale300 else HelloWorldGrayScale800
                     )
@@ -148,7 +154,7 @@ fun Withdraw(
                     Text(
                         text = item,
                         style = AppTypography.heading04,
-                        color = HelloWorldGrayScale800
+                        color = HelloWorldGrayScale500
                     )
                 }
             )
@@ -158,7 +164,7 @@ fun Withdraw(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "탈퇴하기",
+                text = stringResource(R.string.withdraw),
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale500,
                 textAlign = TextAlign.Center,
@@ -170,10 +176,10 @@ fun Withdraw(
                     ) {
                         viewModel.updateDialogData(
                             DialogData(
-                                title = "탈퇴 하시겠어요?",
-                                subTitle = "게시글과 댓글에 대한 권한이 없어집니다",
-                                dismiss = "취소",
-                                confirm = "탈퇴하기",
+                                title = R.string.mypage_withdraw_confirm,
+                                subTitle = R.string.mypage_withdraw_rights_warning,
+                                dismiss = R.string.community_post_cancel,
+                                confirm = R.string.withdraw,
                                 onDismiss = { viewModel.updateDialogData() },
                                 onConfirm = {
                                     viewModel.updateDialogData()
@@ -191,7 +197,7 @@ fun Withdraw(
                     .padding(vertical = 22.dp)
             )
             Text(
-                text = "취소",
+                text = stringResource(R.string.community_post_cancel),
                 style = AppTypography.heading01,
                 color = HelloWorldMain0,
                 textAlign = TextAlign.Center,

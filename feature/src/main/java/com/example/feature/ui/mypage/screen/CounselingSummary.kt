@@ -15,19 +15,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,33 +42,54 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
-import com.example.feature.R
+import com.example.core.ui.R
 import com.example.feature.ui.mypage.viewmodel.CounselingSummaryUiState
 import com.example.feature.ui.mypage.viewmodel.CounselingSummaryViewModel
 
 @Composable
 fun CounselingSummary(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: () -> Unit,
+    onNavigateToCounselingDetail: (Int) -> Unit,
     viewModel: CounselingSummaryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val hasMoreData by viewModel.hasMoreData.collectAsState()
 
     CounselingSummary(
         onNavigateBack = onNavigateBack,
         onNavigateToCounselingDetail = onNavigateToCounselingDetail,
         uiState = uiState,
-        getAllSummary = viewModel::getAllSummary
+        isLoading = isLoading,
+        hasMoreData = hasMoreData,
+        loadNextPage = viewModel::loadNextPage
     )
 }
 
 @Composable
 private fun CounselingSummary(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: () -> Unit,
+    onNavigateToCounselingDetail: (Int) -> Unit,
     uiState: CounselingSummaryUiState,
-    getAllSummary: (page: Int, size: Int) -> Unit,
+    isLoading: Boolean,
+    hasMoreData: Boolean,
+    loadNextPage: () -> Unit,
 ) {
+    val listState = rememberLazyListState()
+
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleItem != null && lastVisibleItem.index >= totalItems - 1 && hasMoreData && !isLoading
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            loadNextPage()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -88,7 +114,7 @@ private fun CounselingSummary(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "내 상담 요약",
+                text = stringResource(R.string.mypage_consultation_summary),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -104,7 +130,7 @@ private fun CounselingSummary(
                 }
             }
             is CounselingSummaryUiState.Success -> {
-                if (uiState.result.isEmpty()) {
+                if (uiState.result.isEmpty() && !isLoading) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -117,7 +143,7 @@ private fun CounselingSummary(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "아직 상담내역이 없어요.\n링고와 함께 AI상담을 시작해보세요.",
+                            text = stringResource(R.string.ai_empty_message),
                             style = AppTypography.label02,
                             color = HelloWorldGrayScale300,
                             textAlign = TextAlign.Center
@@ -125,13 +151,31 @@ private fun CounselingSummary(
                     }
                 } else {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
                     ) {
-                        items(uiState.result) {
+                        items(uiState.result) { summary ->
                             ChatItem(
-                                onClick = { onNavigateToCounselingDetail() }
+                                title = summary.title,
+                                onClick = { onNavigateToCounselingDetail(summary.summaryId.toInt()) }
                             )
+                        }
+
+                        if (isLoading) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = HelloWorldMain500
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -144,6 +188,7 @@ private fun CounselingSummary(
 @Composable
 fun ChatItem(
     modifier: Modifier = Modifier,
+    title: String,
     onClick: () -> Unit,
 ) {
     Column(
@@ -169,13 +214,13 @@ fun ChatItem(
                         contentDescription = null
                     )
                     Text(
-                        text = "chat 요약",
+                        text = stringResource(R.string.mypage_chat_sumary),
                         style = AppTypography.label01,
                         color = HelloWorldGrayScale300
                     )
                 }
                 Text(
-                    text = "임금 체불과 직장 내 괴롭힘",
+                    text = title,
                     style = AppTypography.heading04,
                     color = HelloWorldGrayScale800,
                 )
@@ -200,6 +245,6 @@ fun ChatItem(
 private fun CounselingSummaryPreview() {
     CounselingSummary(
         onNavigateBack = {},
-        onNavigateToCounselingDetail = {}
+        onNavigateToCounselingDetail = {_ ->}
     )
 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,12 +49,12 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.BuildConfig
-import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.MyPageUiState
 import com.example.feature.ui.mypage.viewmodel.MyPageViewModel
 import com.example.model.common.Language
 import com.example.model.mypage.UserInfo
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.example.core.ui.R
 
 @Composable
 fun MyPage(
@@ -198,7 +200,7 @@ private fun MyPage(
                             color = HelloWorldGrayScale800,
                         )
                         Text(
-                            text = "오늘도 낯선 땅에서 열심히 살아가는 당신을, 헬로월드가 항상 응원하고 있어요",
+                            text = stringResource(R.string.mypage_welcome_message),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.W500,
                             color = HelloWorldGrayScale300,
@@ -213,20 +215,20 @@ private fun MyPage(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     MenuCard(
-                        title = "프로필 변경",
+                        title = stringResource(R.string.mypage_profile_edit),
                         onClick = { onNavigateToProfileEdit(uiState.userInfo.name, uiState.userInfo.userImg, uiState.userInfo.language) }, // TODO language
                     )
                     MenuCard(
-                        title = "내 상담 요약",
+                        title = stringResource(R.string.mypage_consultation_summary),
                         onClick = { onNavigateToCounselingSummary() },
                     )
                     MenuCard(
-                        title = "이력서\n/ 자기소개서",
+                        title = stringResource(R.string.mypage_resume),
                         spacing = 6.dp,
                         onClick = { onNavigateToResume() },
                     )
                     MenuCard(
-                        title = "게시글 / 댓글",
+                        title = stringResource(R.string.mypage_posts_comments),
                         onClick = { onNavigateToPostAndComments() },
                     )
                 }
@@ -237,7 +239,7 @@ private fun MyPage(
                 ) {
                     Column {
                         Text(
-                            text = "Hello World 정보",
+                            text = stringResource(R.string.mypage_app_info),
                             style = AppTypography.body01,
                             color = HelloWorldMain500,
                             modifier = Modifier
@@ -245,21 +247,21 @@ private fun MyPage(
                                 .padding(vertical = 8.dp),
                         )
                         MenuListItem(
-                            title = "서비스 이용약관",
+                            title = stringResource(R.string.terms_service),
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW, "https://burnt-cellar-02c.notion.site/HelloWorld-262d4f1c212180c0bdd6cddbffacbc31?source=copy_link".toUri())
                                 context.startActivity(intent)
                             }
                         )
                         MenuListItem(
-                            title = "개인정보 처리방침",
+                            title = stringResource(R.string.terms_privacy),
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW, "https://burnt-cellar-02c.notion.site/HelloWorld-262d4f1c212180049db4c7972cf4c6f2?source=copy_link".toUri())
                                 context.startActivity(intent)
                             }
                         )
                         MenuListItem(
-                            title = "오픈소스 라이선스",
+                            title = stringResource(R.string.mypage_opensource_license),
                             onClick = {
                                 OssLicensesMenuActivity.setActivityTitle("오픈소스 라이선스")
                                 context.startActivity(
@@ -278,7 +280,7 @@ private fun MyPage(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "앱 버전",
+                                text = stringResource(R.string.mypage_app_version),
                                 style = AppTypography.body02,
                                 color = HelloWorldGrayScale800,
                                 modifier = Modifier
@@ -295,7 +297,7 @@ private fun MyPage(
                     }
                     Column {
                         Text(
-                            text = "계정",
+                            text = stringResource(R.string.mypage_account),
                             style = AppTypography.body01,
                             color = HelloWorldMain500,
                             modifier = Modifier
@@ -303,14 +305,14 @@ private fun MyPage(
                                 .padding(vertical = 8.dp)
                         )
                         MenuListItem(
-                            title = "로그아웃",
+                            title = stringResource(R.string.logout),
                             onClick = {
                                 updateDialogData(
                                     DialogData(
-                                        title = "로그아웃 하시겠어요?",
-                                        subTitle = "다음에 다시 만나요!",
-                                        dismiss = "취소",
-                                        confirm = "로그아웃",
+                                        title = R.string.mypage_logout_dialog_title,
+                                        subTitle = R.string.mypage_logout_dialog_subtitle,
+                                        dismiss = R.string.community_post_cancel,
+                                        confirm = R.string.logout,
                                         onDismiss = { updateDialogData(null) },
                                         onConfirm = {
                                             updateDialogData(null)
@@ -325,7 +327,7 @@ private fun MyPage(
                             }
                         )
                         MenuListItem(
-                            title = "탈퇴하기",
+                            title = stringResource(R.string.withdraw),
                             onClick = { onNavigateToWithdraw() }
                         )
                     }
@@ -362,7 +364,9 @@ private fun MenuCard(
             text = title,
             style = AppTypography.label03,
             color = HelloWorldGrayScale800,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .widthIn(max = 60.dp)
         )
     }
 }

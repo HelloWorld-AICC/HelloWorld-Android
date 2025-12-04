@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.mypage.MyPageRepository
+import com.example.core.ui.R
 import com.example.model.mypage.AllCommentResponse
 import com.example.model.mypage.AllCommunityResponse
 import com.example.model.mypage.Comment
@@ -29,8 +30,8 @@ class PostAndCommentsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<MyPostAndCommentUiState>(MyPostAndCommentUiState.Loading)
     val uiState: StateFlow<MyPostAndCommentUiState> = _uiState.asStateFlow()
 
-    private val _selectedMenu = MutableStateFlow("게시글")
-    val selectedMenu: StateFlow<String> = _selectedMenu.asStateFlow()
+    private val _selectedMenu = MutableStateFlow(R.string.posts)
+    val selectedMenu: StateFlow<Int> = _selectedMenu.asStateFlow()
 
     private val _posts = MutableStateFlow<List<Community>>(emptyList())
     private val _comments = MutableStateFlow<List<Comment>>(emptyList())
@@ -42,7 +43,7 @@ class PostAndCommentsViewModel @Inject constructor(
         loadData()
     }
 
-    fun changeMenu(menu: String) {
+    fun changeMenu(menu: Int) {
         _selectedMenu.value = menu
         _posts.value = emptyList()
         _comments.value = emptyList()
@@ -52,7 +53,7 @@ class PostAndCommentsViewModel @Inject constructor(
         loadData(menu)
     }
 
-    fun loadData(type: String = "게시글") {
+    fun loadData(type: Int = R.string.posts) {
         if (_isLoading.value || !hasMoreData.value) return
 
         _isLoading.value = true
@@ -60,7 +61,7 @@ class PostAndCommentsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = MyPostAndCommentUiState.Loading
             when (type) {
-                "게시글" -> {
+                R.string.posts -> {
                     myPageRepository.getAllMyCommunity(
                         PageSizeRequest(
                             page = currentPages.intValue,
@@ -90,7 +91,7 @@ class PostAndCommentsViewModel @Inject constructor(
                         }
                     )
                 }
-                "댓글" -> {
+                R.string.comments -> {
                     myPageRepository.getAllMyComment(
                         PageSizeRequest(
                             page = currentPages.intValue,

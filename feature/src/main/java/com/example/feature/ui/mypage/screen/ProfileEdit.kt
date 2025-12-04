@@ -1,6 +1,5 @@
 package com.example.feature.ui.mypage.screen
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,8 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +49,7 @@ import coil3.compose.AsyncImage
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.component.HWDropdownMenuBox
+import com.example.core.ui.component.HWToast
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale0
 import com.example.core.ui.theme.HelloWorldGrayScale100
@@ -61,10 +60,9 @@ import com.example.core.ui.theme.HelloWorldMain100
 import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.rememberPhotoPickerWithPermission
-import com.example.feature.R
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
 import com.example.model.common.Language
-import kotlin.collections.forEach
+import com.example.core.ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +78,7 @@ fun ProfileEdit(
     val editingUserImg by viewModel.editingUserImg.collectAsState()
     val editingLanguage by viewModel.editingLanguage.collectAsState()
     val dialogData by viewModel.dialogData.collectAsState()
+    val toastData by viewModel.toastData.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -121,10 +120,10 @@ fun ProfileEdit(
                         } else {
                             viewModel.updateDialogData(
                                 DialogData(
-                                    title = "앗, 잠시만요!",
-                                    subTitle = "지금 나가시면 입력한 정보는 모두 지워집니다.",
-                                    dismiss = "나가기",
-                                    confirm = "수정하기",
+                                    title = R.string.signup_exit_title,
+                                    subTitle = R.string.signup_exit_message,
+                                    dismiss = R.string.signup_exit_leave,
+                                    confirm = R.string.action_edit,
                                     onDismiss = {
                                         viewModel.updateDialogData()
                                         onNavigateBack()
@@ -139,7 +138,7 @@ fun ProfileEdit(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "프로필 변경",
+                text = stringResource(R.string.mypage_profile_edit),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -224,7 +223,7 @@ fun ProfileEdit(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "닉네임 변경",
+                    text = stringResource(R.string.mypage_nickname_edit),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale800,
                 )
@@ -263,7 +262,7 @@ fun ProfileEdit(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "언어 변경",
+                    text = stringResource(R.string.mypage_language_change),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale800,
                 )
@@ -336,13 +335,16 @@ fun ProfileEdit(
             enabled = editingNickName.length <= 15
         ) {
             Text(
-                text = "완료",
+                text = stringResource(R.string.confirm),
                 style = AppTypography.heading01,
             )
         }
     }
     dialogData?.let {
         HWDialog(it)
+    }
+    toastData?.let {
+        HWToast(it)
     }
 }
 

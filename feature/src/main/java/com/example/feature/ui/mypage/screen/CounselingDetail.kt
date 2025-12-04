@@ -20,23 +20,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.ui.theme.AppTypography
-import com.example.core.ui.theme.HelloWorldGrayScale500
+import com.example.core.ui.theme.HelloWorldGrayScale700
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.core.ui.theme.HelloWorldMain500
-import com.example.feature.R
+import com.example.core.ui.R
+import com.example.feature.ui.aichat.chatting.MarkdownText
 import com.example.feature.ui.mypage.viewmodel.CounselingDetailViewModel
 
 @Composable
 fun CounselingDetail(
     onNavigateBack: () -> Unit,
-    onNavigateToAIChatDetail: (Int) -> Unit,
+    onNavigateToAIChatDetail: (String) -> Unit,
     viewModel: CounselingDetailViewModel = hiltViewModel()
 ) {
-    val summaryText by viewModel.summaryText.collectAsState()
+    val summary by viewModel.summary.collectAsState()
 
     Column(
         modifier = Modifier
@@ -61,7 +62,7 @@ fun CounselingDetail(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "내 상담 요약",
+                text = stringResource(R.string.mypage_consultation_summary),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -69,24 +70,15 @@ fun CounselingDetail(
         ChatItem(
             modifier = Modifier
                 .padding(horizontal = 24.dp),
-            onClick = { onNavigateToAIChatDetail(1) }
+            title = "${summary?.title}",
+            onClick = { onNavigateToAIChatDetail("${summary?.roomId}") }
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = summaryText,
-            style = AppTypography.body02,
-            color = HelloWorldGrayScale500,
+        MarkdownText(
+            markdown = "${summary?.chatSummary}",
+            textColor = HelloWorldGrayScale700,
             modifier = Modifier
                 .padding(horizontal = 24.dp)
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CounselingDetailPreview() {
-    CounselingDetail(
-        onNavigateBack = {},
-        onNavigateToAIChatDetail = {}
-    )
 }

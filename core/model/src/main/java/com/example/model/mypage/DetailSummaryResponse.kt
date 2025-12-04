@@ -11,6 +11,8 @@ data class DetailSummaryResponse(
     val identificationNum: String,
     @SerialName("uploadedAt")
     val uploadedAt: String,
+    @SerialName("title")
+    val title: String,
     @SerialName("name")
     val name: String,
     @SerialName("userImg")
@@ -18,7 +20,7 @@ data class DetailSummaryResponse(
     @SerialName("chatSummary")
     val chatSummary: String,
     @SerialName("mainPoint")
-    val mainPoint: String,
+    val mainPoint: String?,
     @SerialName("roomId")
     val roomId: String,
 )

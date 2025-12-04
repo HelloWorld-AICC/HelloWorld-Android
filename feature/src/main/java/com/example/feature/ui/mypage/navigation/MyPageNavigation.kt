@@ -14,6 +14,7 @@ import com.example.feature.ui.mypage.screen.ProfileEdit
 import com.example.feature.ui.mypage.screen.Resume
 import com.example.feature.ui.mypage.screen.Withdraw
 import com.example.feature.ui.mypage.screen.WithdrawComplete
+import com.example.feature.ui.mypage.viewmodel.CounselingDetailViewModel
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
 import com.example.model.common.Language
 import com.example.model.mypage.UserInfo
@@ -25,7 +26,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object CounselingSummary
 
-@Serializable data object CounselingDetail
+@Serializable data class CounselingDetail(val summaryId: Int)
 
 @Serializable data object Resume
 
@@ -90,7 +91,7 @@ fun NavController.navigateToCounselingSummary(navOptions: NavOptions? = null) = 
 
 fun NavGraphBuilder.counselingSummaryScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: () -> Unit,
+    onNavigateToCounselingDetail: (Int) -> Unit,
 ) {
     composable<CounselingSummary> {
         CounselingSummary(
@@ -100,16 +101,23 @@ fun NavGraphBuilder.counselingSummaryScreen(
     }
 }
 
-fun NavController.navigateToCounselingDetail(navOptions: NavOptions? = null) = navigate(CounselingDetail, navOptions)
+fun NavController.navigateToCounselingDetail(summaryId: Int, navOptions: NavOptions? = null) = navigate(CounselingDetail(summaryId), navOptions)
 
 fun NavGraphBuilder.counselingDetailScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToAIChatDetail: (Int) -> Unit,
+    onNavigateToAIChatDetail: (String) -> Unit,
 ) {
-    composable<CounselingDetail> {
+    composable<CounselingDetail> { entry ->
+        val route = entry.toRoute<CounselingDetail>()
+
         CounselingDetail(
             onNavigateBack = onNavigateBack,
             onNavigateToAIChatDetail = onNavigateToAIChatDetail,
+            viewModel = hiltViewModel<CounselingDetailViewModel, CounselingDetailViewModel.Factory>(
+                key = "${route.summaryId}"
+            ) { factory ->
+                factory.create(route.summaryId)
+            }
         )
     }
 }
