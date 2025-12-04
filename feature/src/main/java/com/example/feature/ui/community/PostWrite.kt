@@ -2,8 +2,6 @@ package com.example.feature.ui.community
 
 import android.content.Context
 import android.net.Uri
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -47,6 +45,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.video.videoFrameMillis
+import com.example.core.ui.R
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.theme.AppTypography
@@ -66,7 +66,6 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
 import com.example.core.util.rememberMultiplePhotoPickerWithPermission
-import com.example.feature.R
 import com.example.model.common.ContentType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,10 +125,10 @@ internal fun CommunityPostWrite(
                         } else {
                             viewModel.updateDialogData(
                                 DialogData(
-                                    title = "앗, 잠시만요!",
-                                    subTitle = "지금 나가시면 입력한 정보는 모두 지워집니다.",
-                                    dismiss = "나가기",
-                                    confirm = "계속 작성하기",
+                                    title = R.string.signup_exit_title,
+                                    subTitle = R.string.signup_exit_message,
+                                    dismiss = R.string.signup_exit_leave,
+                                    confirm = R.string.signup_exit_continue,
                                     onDismiss = {
                                         viewModel.updateDialogData()
                                         onNavigateBack()
@@ -171,7 +170,7 @@ internal fun CommunityPostWrite(
                     .padding(top = 12.dp)
             ) {
                 Text(
-                    text = "카테고리",
+                    text = stringResource(R.string.community_post_category),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale800,
                 )
@@ -183,25 +182,25 @@ internal fun CommunityPostWrite(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TabIconAndLabel(
-                        title = "직장 내 고충",
+                        title = stringResource(R.string.community_category_workplace),
                         icon = painterResource(R.drawable.ic_problem),
                         onIconClick = { viewModel.changeTab(0) },
                         isSelected = selectedTab == 0,
                     )
                     TabIconAndLabel(
-                        title = "체류 및 비자",
+                        title = stringResource(R.string.community_category_visa),
                         icon = painterResource(R.drawable.ic_national),
                         onIconClick = { viewModel.changeTab(1) },
                         isSelected = selectedTab == 1,
                     )
                     TabIconAndLabel(
-                        title = "산재 및 의료",
+                        title = stringResource(R.string.community_category_insurance),
                         icon = painterResource(R.drawable.ic_medical),
                         onIconClick = { viewModel.changeTab(2) },
                         isSelected = selectedTab == 2,
                     )
                     TabIconAndLabel(
-                        title = "기타",
+                        title = stringResource(R.string.community_category_etc),
                         icon = painterResource(R.drawable.ic_etc),
                         onIconClick = { viewModel.changeTab(3) },
                         isSelected = selectedTab == 3,
@@ -218,7 +217,7 @@ internal fun CommunityPostWrite(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "제목",
+                        text = stringResource(R.string.community_post_title),
                         style = AppTypography.label01,
                         color = HelloWorldGrayScale800,
                     )
@@ -249,7 +248,7 @@ internal fun CommunityPostWrite(
                     ) {
                         if (title.isBlank()) {
                             Text(
-                                text = "제목을 작성해 주세요 ( 최대 50자 )",
+                                text = stringResource(R.string.community_post_title_placeholder),
                                 style = AppTypography.heading02,
                                 color = HelloWorldGrayScale300,
                             )
@@ -268,7 +267,7 @@ internal fun CommunityPostWrite(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "내용",
+                        text = stringResource(R.string.community_post_content),
                         style = AppTypography.label01,
                         color = HelloWorldGrayScale800,
                     )
@@ -296,7 +295,7 @@ internal fun CommunityPostWrite(
                     ) {
                         if (content.isBlank()) {
                             Text(
-                                text = "게시글을 작성해 주세요 ( 최대 2000자 )",
+                                text = stringResource(R.string.community_post_content_placeholder),
                                 style = AppTypography.body02,
                                 color = HelloWorldGrayScale300,
                             )
@@ -310,7 +309,7 @@ internal fun CommunityPostWrite(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "사진",
+                        text = stringResource(R.string.community_post_photo),
                         style = AppTypography.label01,
                         color = HelloWorldGrayScale800,
                     )
@@ -359,7 +358,7 @@ internal fun CommunityPostWrite(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "사진은 최대 10장까지 업로드 가능합니다",
+                        text = stringResource(R.string.community_post_photo_limit),
                         style = AppTypography.label03,
                         color = HelloWorldGrayScale300,
                     )
@@ -369,12 +368,12 @@ internal fun CommunityPostWrite(
                                         color = HelloWorldGrayScale300,
                                     )*/
                     Text(
-                        text = "과도한 비방 및 욕설이 포함된 게시물은 신고에 의해 무통보 삭제될 수 있습니다",
+                        text = stringResource(R.string.community_post_guideline_abuse),
                         style = AppTypography.label03,
                         color = HelloWorldGrayScale300,
                     )
                     Text(
-                        text = "초상권•저작권 침해 등 위법 게시물은 관리자 판단으로 삭제될 수 있습니다",
+                        text = stringResource(R.string.community_post_guideline_copyright),
                         style = AppTypography.label03,
                         color = HelloWorldGrayScale300,
                     )
@@ -386,10 +385,10 @@ internal fun CommunityPostWrite(
                 focusManager.clearFocus()
                 viewModel.updateDialogData(
                     DialogData(
-                        title = if (isCreate) "게시글을 게시하시겠어요?" else "게시글을 수정하시겠어요?",
-                        subTitle = "게시 후에도 수정 하실 수 있습니다.",
-                        dismiss = "취소하기",
-                        confirm = if (isCreate) "게시하기" else "수정하기",
+                        title = if (isCreate) R.string.community_post_publish_confirm else R.string.community_post_edit_confirm,
+                        subTitle = R.string.community_post_edit_notice,
+                        dismiss = R.string.community_post_cancel,
+                        confirm = if (isCreate) R.string.community_post_publish else R.string.action_edit,
                         onDismiss = { viewModel.updateDialogData() },
                         onConfirm = {
                             viewModel.updateDialogData()
@@ -419,7 +418,7 @@ internal fun CommunityPostWrite(
             )
         ) {
             Text(
-                text = "완료",
+                text = stringResource(R.string.community_post_complete),
                 style = AppTypography.heading01,
             )
         }

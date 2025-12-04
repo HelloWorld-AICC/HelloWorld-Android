@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.core.ui.theme.AppTypography
@@ -71,7 +72,7 @@ fun HWToast(
                 contentAlignment = Alignment.CenterStart
             ) {
                 Text(
-                    text = data.text,
+                    text = stringResource(data.text),
                     style = AppTypography.label01,
                     color = HelloWorldMain0
                 )
@@ -81,7 +82,7 @@ fun HWToast(
 }
 
 data class ToastData(
-    val text: String = "",
+    val text: Int,
     val duration: Long = 2000,
     val onDismiss: () -> Unit = {},
 )

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="confirm">Confirm</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_report">Report</string>
+    <string name="action_back">Go Back</string>
+
+    <string name="terms_privacy">Privacy Policy</string>
+    <string name="terms_service">Terms of Service</string>
+
+    <string name="logout">Logout</string>
+    <string name="withdraw">Withdraw</string>
+
+    <string name="posts">Posts</string>
+    <string name="comments">Comments</string>
+
+    <!-- 회원가입 -->
+    <string name="auth_tagline">With you in every moment where life and work connect.</string>
+
+    <string name="auth_language_title">Which language are you comfortable with?</string>
+    <string name="auth_language_subtitle">Please select the language you would like to use.</string>
+
+    <string name="signup_welcome_title">Join us with HelloWorld.</string>
+    <string name="signup_terms_title">Please agree to the terms and conditions for using the service.</string>
+    <string name="signup_terms_agree_all">Agree to All</string>
+
+    <string name="signup_terms_agree_all_notice">\'Agree to All\' is processed as having checked and agreed to all individual terms.</string>
+    <string name="signup_terms_privacy_detail">Details of Privacy Policy</string>
+    <string name="signup_terms_service_detail">Details of User Terms of Service</string>
+
+    <string name="signup_exit_title">Oh, wait a minute!</string>
+    <string name="signup_exit_message">If you leave now, all entered information will be erased.</string>
+    <string name="signup_exit_leave">Exit</string>
+    <string name="signup_exit_continue">Continue Writing</string>
+
+    <string name="signup_complete_title">Registration is complete!</string>
+    <string name="signup_complete_go_home">Go to Home</string>
+
+    <!-- 홈 -->
+
+    <string name="home_go_mypage">Go to My Page</string>
+
+    <string name="home_service_title">HelloWorld Service</string>
+
+    <string name="home_chatbot_title">Chatbot Consultation</string>
+    <string name="home_chatbot_subtitle">24-Hour Consultation for Concerns</string>
+
+    <string name="home_ai_resume_title">AI Self-Introduction Letter</string>
+    <string name="home_ai_resume_subtitle">Write easily with AI.</string>
+
+    <string name="home_nearby_center_title">Nearby Counseling Centers</string>
+    <string name="home_nearby_center_subtitle">When you need consultation, right here.</string>
+
+    <string name="home_community_title">Community</string>
+    <string name="home_community_subtitle">Talk together and sympathize.</string>
+
+    <!-- 커뮤니티 -->
+    <string name="community_category_workplace">Workplace Grievances</string>
+    <string name="community_category_visa">Stay and Visa</string>
+    <string name="community_category_insurance">Industrial Accidents and Medical</string>
+    <string name="community_category_etc">Other</string>
+
+    <string name="community_empty_message">There are no posts yet.\nWrite your first post!</string>
+
+    <string name="community_input_placeholder">Leave a comment.</string>
+
+    <string name="community_report_post_confirm">Would you like to report the post?</string>
+    <string name="community_report_comment_confirm">Would you like to report the comment?</string>
+    <string name="community_report_post_complete">The post has been reported.</string>
+    <string name="community_report_comment_complete">The comment has been reported.</string>
+    <string name="community_report_warning">You may be penalized for false reporting.</string>
+
+    <string name="community_delete_post_confirm">Would you like to delete the post?</string>
+    <string name="community_delete_post_warning">Deleted posts cannot be recovered.</string>
+    <string name="community_delete_post_complete">The post has been deleted.</string>
+    <string name="community_delete_comment_confirm">Would you like to delete the comment?</string>
+    <string name="community_delete_comment_warning">Deleted comments cannot be recovered.</string>
+    <string name="community_delete_comment_complete">The comment has been deleted.</string>
+
+    <string name="community_post_category">Category</string>
+    <string name="community_post_title">Title</string>
+    <string name="community_post_content">Content</string>
+    <string name="community_post_photo">Photo</string>
+    <string name="community_post_complete">Edit Complete</string>
+    <string name="community_post_edit_complete">3</string>
+
+    <string name="community_post_publish">Post</string>
+    <string name="community_post_cancel">Cancel</string>
+    <string name="community_post_exit">Exit</string>
+    <string name="community_post_continue">Continue Writing</string>
+
+    <string name="community_post_publish_confirm">Would you like to post the article?</string>
+    <string name="community_post_edit_confirm">Would you like to revise the post?</string>
+    <string name="community_post_edit_notice">You can still edit after posting.</string>
+    <string name="community_post_exit_warning">If you leave now, all entered information will be erased.</string>
+
+    <string name="community_post_title_placeholder">Please enter a title ( Max 50 characters ).</string>
+    <string name="community_post_content_placeholder">Please write the post ( Max 2000 characters ).</string>
+    <string name="community_post_photo_limit">Up to 10 photos can be uploaded.</string>
+    <string name="community_post_guideline_abuse">Posts containing excessive slander and profanity may be deleted without notice upon reporting.</string>
+    <string name="community_post_guideline_copyright">Illegal posts, such as those infringing on portrait rights or copyrights, may be deleted at the discretion of the administrator.</string>
+
+    <!-- AI 채팅 -->
+    <string name="ai_recent_consultation">My Recent Consultations</string>
+    <string name="ai_new_chat">New Chat</string>
+    <string name="ai_empty_message">There are no consultation records yet.\nStart an AI consultation with Lingo.</string>
+
+    <string name="ai_greeting">Hello!</string>
+    <string name="ai_prompt">What concerns do you have?</string>
+    <string name="ai_input_placeholder">Enter your message</string>
+    <!-- TODO Toast -->
+
+    <string name="ai_summary_complete_title">Summary is complete.</string>
+    <string name="ai_summary_location">The consultation summary can be viewed in My Page > My Consultation Summary.</string>
+
+    <!-- 오프라인 상담센터 -->
+    <string name="offline_center_nearby">Nearby Counseling Centers</string>
+    <string name="offline_center_open">Open</string>
+    <string name="offline_center_closed">Closed</string>
+
+    <!--마이페이지 -->
+    <string name="mypage_welcome_message">HelloWorld is always cheering for you, who works hard in a foreign land today.</string>
+
+    <string name="mypage_profile_edit">Change Profile</string>
+    <string name="mypage_consultation_summary">My Consultation Summary</string>
+    <string name="mypage_resume">Resume\n/ Self-Introduction Letter</string>
+    <string name="mypage_posts_comments">Posts\n/ Comments</string>
+
+    <string name="mypage_app_info">About Hello World</string>
+    <string name="mypage_opensource_license">Open Source License</string>
+    <string name="mypage_app_version">App Version</string>
+    <string name="mypage_account">Account</string>
+
+    <string name="mypage_logout_dialog_title">Would you like to log out?</string>
+    <string name="mypage_logout_dialog_subtitle">See you again next time!</string>
+
+    <string name="mypage_nickname_edit">Change Nickname</string>
+    <string name="mypage_language_change">Change Language</string>
+
+    <string name="mypage_withdraw_title">Are you sure you want to withdraw?</string>
+    <string name="mypage_withdraw_warning">Even after withdrawing, the posts and comments you wrote may remain on the service, and management such as editing or deleting will not be possible afterwards.</string>
+    <string name="mypage_withdraw_reason_title">Please tell us the reason for your decision to withdraw.</string>
+    <string name="mypage_withdraw_reason_placeholder">Please select a reason.</string>
+    <string name="mypage_withdraw_reason_no_feature">I don\'t have the necessary features.</string>
+    <string name="mypage_withdraw_reason_not_helpful">It is not helpful.</string>
+    <string name="mypage_withdraw_reason_difficult">It is difficult to use.</string>
+    <string name="mypage_withdraw_reason_no_work">I no longer work in Korea.</string>
+    <string name="mypage_withdraw_reason_etc">Other</string>
+
+    <string name="mypage_withdraw_confirm">Would you like to withdraw?</string>
+    <string name="mypage_withdraw_rights_warning">You will lose the right to manage your posts and comments.</string>
+
+    <string name="mypage_withdraw_complete_title">Withdrawal is complete.</string>
+    <string name="mypage_withdraw_complete_message">Thank you for being with us so far. HelloWorld will always be by your side.</string>
+    <string name="ai_chat_toast">채팅은 500자 이하로 입력해주세요.</string>
+    <string name="mypage_chat_sumary">Chat Summary</string>
+</resources>

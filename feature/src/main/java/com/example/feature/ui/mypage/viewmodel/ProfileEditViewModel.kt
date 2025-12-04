@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.mypage.MyPageRepository
 import com.example.core.ui.component.DialogData
+import com.example.core.ui.component.ToastData
 import com.example.domain.SetProfileUseCase
 import com.example.model.common.Language
 import com.example.model.common.Result
@@ -40,12 +41,22 @@ class ProfileEditViewModel @AssistedInject constructor(
     private val _dialogData = MutableStateFlow<DialogData?>(null)
     val dialogData: StateFlow<DialogData?> = _dialogData.asStateFlow()
 
+    private val _toastData = MutableStateFlow<ToastData?>(null)
+    val toastData = _toastData.asStateFlow()
+
     fun updateDialogData(data: DialogData? = null) {
         _dialogData.value = data
     }
 
     fun updateNickname(nickName: String) {
         _editingNickName.value = nickName
+        if (nickName.length > 15) {
+            _toastData.value = ToastData(
+                text = "닉네임은 15자 이하로 입력해주세요.",
+                duration = 1000,
+                onDismiss = { _toastData.value = null }
+            )
+        }
     }
 
     fun updateUserImg(imgUri: Uri) {
@@ -91,8 +102,6 @@ class ProfileEditViewModel @AssistedInject constructor(
             }
         }
     }
-
-
 
     @AssistedFactory
     interface Factory {

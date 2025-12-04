@@ -10,12 +10,12 @@ data class LanguageRequest(
 )
 
 @Serializable
-enum class Language(val code: Long, val displayName: String, val flag: String) {
-    ENGLISH(1, "English", Flag.ENGLISH),
-    KOREAN(2, "Korean", Flag.KOREAN),
-    JAPANESE(3, "Japanese", Flag.JAPANESE),
-    CHINESE(4, "Chinese", Flag.CHINESE),
-    VIETNAMESE(5, "Vietnamese", Flag.VIETNAMESE);
+enum class Language(val code: Long, val displayName: String, val flag: String, val localeCode: String) {
+    ENGLISH(1, "English", Flag.ENGLISH, "en"),
+    KOREAN(2, "Korean", Flag.KOREAN, "ko"),
+    JAPANESE(3, "Japanese", Flag.JAPANESE, "ja"),
+    CHINESE(4, "Chinese", Flag.CHINESE, "zh-CN"),
+    VIETNAMESE(5, "Vietnamese", Flag.VIETNAMESE, "vi");
 
     companion object {
         fun fromCode(code: Long): Language? {

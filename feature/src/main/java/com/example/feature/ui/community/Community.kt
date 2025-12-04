@@ -1,6 +1,5 @@
 package com.example.feature.ui.community
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -58,7 +58,7 @@ import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
 import com.example.core.util.extension.truncateWithEllipsis
-import com.example.feature.R
+import com.example.core.ui.R
 import com.example.model.common.ContentType
 import com.example.model.community.Post
 
@@ -121,7 +121,7 @@ internal fun Community(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "커뮤니티",
+                    text = stringResource(R.string.home_community_title),
                     style = AppTypography.body01,
                     color = HelloWorldGrayScale800
                 )
@@ -135,25 +135,25 @@ internal fun Community(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TabIconAndLabel(
-                    title = "직장 내 고충",
+                    title = stringResource(R.string.community_category_workplace),
                     icon = painterResource(R.drawable.ic_problem),
                     onIconClick = { viewModel.changeTab(0) },
                     isSelected = pagerState.currentPage == 0,
                 )
                 TabIconAndLabel(
-                    title = "체류 및 비자",
+                    title = stringResource(R.string.community_category_visa),
                     icon = painterResource(R.drawable.ic_national),
                     onIconClick = { viewModel.changeTab(1) },
                     isSelected = pagerState.currentPage == 1,
                 )
                 TabIconAndLabel(
-                    title = "산재 및 의료",
+                    title = stringResource(R.string.community_category_insurance),
                     icon = painterResource(R.drawable.ic_medical),
                     onIconClick = { viewModel.changeTab(2) },
                     isSelected = pagerState.currentPage == 2,
                 )
                 TabIconAndLabel(
-                    title = "기타",
+                    title = stringResource(R.string.community_category_etc),
                     icon = painterResource(R.drawable.ic_etc),
                     onIconClick = { viewModel.changeTab(3) },
                     isSelected = pagerState.currentPage == 3,
@@ -283,7 +283,7 @@ private fun CommunityTabContent(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!",
+                    text = stringResource(R.string.community_empty_message),
                     style = AppTypography.label02,
                     color = HelloWorldGrayScale300,
                     textAlign = TextAlign.Center

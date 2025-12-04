@@ -17,9 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -42,7 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,19 +51,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import androidx.media3.ui.compose.PlayerSurface
 import coil3.compose.AsyncImage
+import com.example.core.ui.R
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.HWDialog
 import com.example.core.ui.component.HWToast
@@ -83,7 +79,6 @@ import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.util.extension.advancedImePadding
 import com.example.core.util.extension.toCategoryName
 import com.example.core.util.extension.toFormattedDate
-import com.example.feature.R
 import com.example.model.common.ContentType
 import com.example.model.community.CommunityDetailFile
 import com.example.model.community.DetailComment
@@ -180,7 +175,7 @@ internal fun CommunityPostDetail(
                         .size(24.dp)
                 )
                 Text(
-                    text = "커뮤니티",
+                    text = stringResource(R.string.home_community_title),
                     style = AppTypography.heading04,
                     color = HelloWorldGrayScale800
                 )
@@ -204,7 +199,7 @@ internal fun CommunityPostDetail(
                     if (post.isOwner) {
                         DropdownMenuItem(
                             text = { Text(
-                                text = "수정하기",
+                                text = stringResource(R.string.action_edit),
                                 style = AppTypography.label02,
                                 color = HelloWorldGrayScale500,
                             ) },
@@ -222,7 +217,7 @@ internal fun CommunityPostDetail(
                         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                         DropdownMenuItem(
                             text = { Text(
-                                text = "삭제하기",
+                                text = stringResource(R.string.action_delete),
                                 style = AppTypography.label02,
                                 color = HelloWorldGrayScale500,
                             ) },
@@ -230,10 +225,10 @@ internal fun CommunityPostDetail(
                                 expanded = false
                                 viewModel.updateDialogData(
                                     DialogData(
-                                        title = "게시글을 삭제하시겠어요?",
-                                        subTitle = "삭제된 게시글은 복구할 수 없습니다.",
-                                        dismiss = "돌아가기",
-                                        confirm = "삭제하기",
+                                        title = R.string.community_delete_post_confirm,
+                                        subTitle = R.string.community_delete_post_warning,
+                                        dismiss = R.string.action_back,
+                                        confirm = R.string.action_delete,
                                         onDismiss = { viewModel.updateDialogData() },
                                         onConfirm = {
                                             viewModel.updateDialogData()
@@ -255,7 +250,7 @@ internal fun CommunityPostDetail(
                     } else {
                         DropdownMenuItem(
                             text = { Text(
-                                text = "신고하기",
+                                text = stringResource(R.string.action_report),
                                 style = AppTypography.label02,
                                 color = HelloWorldError,
                             ) },
@@ -263,10 +258,10 @@ internal fun CommunityPostDetail(
                                 expanded = false
                                 viewModel.updateDialogData(
                                     DialogData(
-                                        title = "게시글을 신고하시겠어요?",
-                                        subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
-                                        dismiss = "돌아가기",
-                                        confirm = "신고하기",
+                                        title = R.string.community_report_post_confirm,
+                                        subTitle = R.string.community_report_warning,
+                                        dismiss = R.string.action_back,
+                                        confirm = R.string.action_report,
                                         onDismiss = { viewModel.updateDialogData() },
                                         onConfirm = {
                                             // TODO api 추가
@@ -275,14 +270,14 @@ internal fun CommunityPostDetail(
                                                 if (result) {
                                                     viewModel.updateToastData(
                                                         ToastData(
-                                                            text = "게시글이 신고되었습니다.",
+                                                            text = R.string.community_report_post_complete,
                                                             onDismiss = { viewModel.updateToastData() }
                                                         )
                                                     )
                                                 } else {
                                                     viewModel.updateToastData(
                                                         ToastData(
-                                                            text = "서버와의 통신에 실패했습니다.",
+                                                            text = 0, // 서버와의 통신에 실패했습니다.
                                                             onDismiss = { viewModel.updateToastData() }
                                                         )
                                                     )
@@ -415,10 +410,10 @@ internal fun CommunityPostDetail(
                         onDeleteClick = {
                             viewModel.updateDialogData(
                                 DialogData(
-                                    title = "댓글을 삭제하시겠어요?",
-                                    subTitle = "삭제된 댓글은 복구할 수 없습니다.",
-                                    dismiss = "돌아가기",
-                                    confirm = "삭제하기",
+                                    title = R.string.community_delete_comment_confirm,
+                                    subTitle = R.string.community_delete_comment_warning,
+                                    dismiss = R.string.action_back,
+                                    confirm = R.string.action_delete,
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
                                         viewModel.updateDialogData()
@@ -426,7 +421,7 @@ internal fun CommunityPostDetail(
                                             if (result) {
                                                 viewModel.updateToastData(
                                                     ToastData(
-                                                        text = "댓글이 삭제 되었습니다.",
+                                                        text = R.string.community_delete_comment_complete,
                                                         onDismiss = {
                                                             viewModel.updateToastData()
                                                             onCommunityUpdated()
@@ -436,7 +431,7 @@ internal fun CommunityPostDetail(
                                             } else {
                                                 viewModel.updateToastData(
                                                     ToastData(
-                                                        text = "댓글 삭제에 실패 했습니다.",
+                                                        text = 0, // 댓글 삭제에 실패 했습니다.
                                                         onDismiss = { viewModel.updateToastData() }
                                                     )
                                                 )
@@ -449,10 +444,10 @@ internal fun CommunityPostDetail(
                         onReportClick = {
                             viewModel.updateDialogData(
                                 DialogData(
-                                    title = "댓글을 신고하시겠어요?",
-                                    subTitle = "허위 신고 시 제재를 받을 수 있습니다.",
-                                    dismiss = "돌아가기",
-                                    confirm = "신고하기",
+                                    title = R.string.community_report_comment_confirm,
+                                    subTitle = R.string.community_report_warning,
+                                    dismiss = R.string.action_back,
+                                    confirm = R.string.action_report,
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
                                         // TODO api 추가
@@ -503,7 +498,7 @@ internal fun CommunityPostDetail(
                 ) {
                     if (commentText.isBlank()) {
                         Text(
-                            text = "댓글을 남겨보세요",
+                            text = stringResource(R.string.community_input_placeholder),
                             style = AppTypography.label02,
                             color = HelloWorldGrayScale300,
                         )
@@ -611,7 +606,7 @@ private fun CommentItem(
                     if (comment.isOwner) {
                         DropdownMenuItem(
                             text = { Text(
-                                text = "삭제하기",
+                                text = stringResource(R.string.action_delete),
                                 style = AppTypography.label02,
                                 color = HelloWorldGrayScale500,
                             ) },
@@ -625,7 +620,7 @@ private fun CommentItem(
                     } else {
                         DropdownMenuItem(
                             text = { Text(
-                                text = "신고하기",
+                                text = stringResource(R.string.action_report),
                                 style = AppTypography.label02,
                                 color = HelloWorldError,
                             ) },
