@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -30,9 +31,13 @@ import com.example.core.ui.theme.HelloWorldMain400
 import com.example.core.ui.theme.HelloWorldMain600
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import com.example.feature.ui.mypage.navigation.navigateToMyPage
 import com.example.feature.ui.home.viewmodel.HomeViewModel
 import com.example.core.data.network.RetrofitInstance
+import com.example.feature.ui.aichat.navigation.navigateToAIChat
+import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
+import com.example.feature.ui.community.navigation.navigateToCommunity
 
 @Composable
 fun HomeScreen(
@@ -82,19 +87,19 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "님",
+                        text = stringResource( languageR.string.home_greeting_suffix),
                         style = AppTypography.heading01,
                         color = HelloWorldGrayScale500
                     )
                 }
                 Text(
-                    text = "안녕하세요!",
+                    text = stringResource(languageR.string.home_greeting_message),
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale500
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "마이페이지 가기 →",
+                    text =  stringResource(languageR.string.home_go_mypage) + " →",
                     style = AppTypography.label02,
                     color = HelloWorldMain600,
                     modifier = Modifier.clickable {
@@ -121,7 +126,7 @@ fun HomeScreen(
                 .padding(24.dp, 30.dp, 24.dp, 19.dp)
         ) {
             Text(
-                text = "헬로월드 서비스",
+                text = stringResource(languageR.string.home_service_title),
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale500
             )
@@ -131,18 +136,20 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 HomeServiceCard(
-                    title = "챗봇 상담",
-                    subtitle = "24시간 고민 상담",
+                    title = stringResource(languageR.string.home_chatbot_title),
+                    subtitle = stringResource(languageR.string.home_chatbot_subtitle),
                     iconRes = R.drawable.ic_service_chat,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    navController = navController
                 )
                 HomeServiceCard(
-                    title = "AI 자기소개서",
-                    subtitle = "AI와 함께 쉽게 작성해요",
+                    title = stringResource(languageR.string.home_ai_resume_title),
+                    subtitle = stringResource(languageR.string.home_ai_resume_subtitle),
                     iconRes = R.drawable.ic_service_ai,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    navController = navController
                 )
             }
 
@@ -151,18 +158,20 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 HomeServiceCard(
-                    title = "내 주변 상담센터",
-                    subtitle = "상담이 필요할 때, 바로 여기",
+                    title = stringResource(languageR.string.home_nearby_center_title),
+                    subtitle = stringResource(languageR.string.home_nearby_center_subtitle),
                     iconRes = R.drawable.ic_service_location,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    navController = navController
                 )
                 HomeServiceCard(
-                    title = "커뮤니티",
-                    subtitle = "함께 이야기하고 공감해요",
+                    title = stringResource(languageR.string.home_community_title),
+                    subtitle = stringResource(languageR.string.home_community_subtitle),
                     iconRes = R.drawable.ic_service_community,
                     backgroundColor = Color.White,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    navController = navController
                 )
             }
 
@@ -182,7 +191,8 @@ fun HomeServiceCard(
     subtitle: String,
     iconRes: Int,
     backgroundColor: Color,
-    modifier: Modifier
+    modifier: Modifier,
+    navController : NavController
 ) {
     val shadowColor = Color(0x665E8DC5)
     Box(
@@ -194,7 +204,17 @@ fun HomeServiceCard(
             }
             .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
             .shadow(elevation = 1.dp, ambientColor = shadowColor, spotColor = shadowColor)
-            .padding(12.dp, 16.dp, 12.dp, 8.dp),
+            .clickable(
+                onClick = {
+                    when (title) {
+                        "챗봇 상담" -> { navController.navigateToAIChat() }
+                        "커뮤니티" -> { navController.navigateToCommunity() }
+                    }
+
+                }
+            )
+            .padding(12.dp, 16.dp, 12.dp, 8.dp)
+
     ) {
         Column {
             Column {
