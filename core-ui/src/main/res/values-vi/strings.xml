@@ -111,4 +111,6 @@
     <string name="community_empty_message">Chưa có bài viết nào.\nHãy viết bài đăng đầu tiên của bạn!</string>
     <string name="ai_chat_toast">Vui lòng nhập tin nhắn chat dưới 500 ký tự.</string>
     <string name="mypage_chat_sumary">Tóm tắt chat</string>
+    <string name="home_greeting_suffix">,</string>
+    <string name="home_greeting_message">Xin chào!</string>
 </resources>
