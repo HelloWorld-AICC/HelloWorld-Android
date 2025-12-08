@@ -44,6 +44,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +62,7 @@ import com.example.core.ui.theme.HelloWorldMain500
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.core.util.extension.advancedImePadding
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,9 +96,9 @@ internal fun RecentChattingScreen(
 
     var showSummaryDialog by remember { mutableStateOf(false) }
 
-    val introSet = remember { setOf("안녕하세요!", "어떤 고민이 있으신가요?") }
+    val introSet = remember { setOf(languageR.string.ai_greeting, languageR.string.ai_prompt) }
     val lastSummarizableBot = messages.lastOrNull {
-        it.sender.equals("bot", ignoreCase = true) && it.content !in introSet
+        it.sender.equals("bot", ignoreCase = true) && it.content !in introSet.toString()
     }
 
     LaunchedEffect(messages.size) {
@@ -124,7 +126,7 @@ internal fun RecentChattingScreen(
                 }
             }
     ) {
-        BackHeader(title = "AI Chat", onBackClick = onBackClick)
+        BackHeader(title = stringResource(languageR.string.home_chatbot_title), onBackClick = onBackClick)
         HorizontalDivider(color = HelloWorldMain200)
 
         LazyColumn(
@@ -181,7 +183,7 @@ internal fun RecentChattingScreen(
 
                 if (userInput.isEmpty()) {
                     Text(
-                        text = "메시지를 입력하세요",
+                        text = stringResource(languageR.string.ai_input_placeholder),
                         style = AppTypography.label02,
                         color = HelloWorldGrayScale300,
                         modifier = Modifier.padding(start = 12.dp)
@@ -304,13 +306,13 @@ fun SummaryCompletedDialog(onDismiss: () -> Unit) {
                     .padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
                 Text(
-                    text = "요약이 완료되었습니다",
+                    text = stringResource(languageR.string.ai_summary_complete_title),
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale500
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "상담요약은 마이페이지 > 내 상담 요약에서 볼 수 있습니다.",
+                    text = stringResource(languageR.string.ai_summary_location),
                     style = AppTypography.label01,
                     color = HelloWorldGrayScale300
                 )
@@ -325,7 +327,7 @@ fun SummaryCompletedDialog(onDismiss: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "확인",
+                    text = stringResource(languageR.string.confirm),
                     style = AppTypography.label01,
                     color = HelloWorldMain0
                 )

@@ -19,6 +19,8 @@ fun NavGraphBuilder.aiChatScreen(
     }
 }
 
+fun NavController.navigateToAIChat(navOptions: NavOptions? = null) = navigate(route = "채팅 상담", navOptions)
+
 fun NavController.navigateToAIChatDetail(roomId: String, navOptions: NavOptions? = null) {
     navigate("room/$roomId", navOptions)
 }

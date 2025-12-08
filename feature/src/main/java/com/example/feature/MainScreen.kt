@@ -21,7 +21,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.example.feature.onboarding.AgreementScreen
 import com.example.feature.ui.aichat.navigation.aiChatDetailScreen
 import com.example.feature.ui.aichat.navigation.aiChatScreen
 import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
@@ -47,6 +46,7 @@ import com.example.feature.ui.mypage.navigation.profileEditScreen
 import com.example.feature.ui.mypage.navigation.resumeScreen
 import com.example.feature.ui.mypage.navigation.withdrawCompleteScreen
 import com.example.feature.ui.mypage.navigation.withdrawScreen
+import com.example.feature.ui.onboarding.screen.AgreementScreen
 import com.example.feature.ui.onboarding.screen.CongratulationsScreen
 import com.example.feature.ui.onboarding.screen.LanguageScreen
 import com.example.feature.ui.onboarding.screen.LoginScreen
@@ -84,10 +84,21 @@ fun MyBottomNavigation(navController: NavHostController) {
                 selected = isSelected,
                 onClick = {
                     if (!isSelected) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                        if (item.route == "홈") {
+                            // ✅ 홈으로 갈 때마다 전체 스택 초기화
+                            navController.navigate("홈") {
+                                popUpTo(0) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } else {
+                            // 나머지 탭은 기존처럼 동작
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     }
                 },
@@ -180,7 +191,7 @@ fun MyNavigationHost(navController: NavHostController) {
         )
         counselingDetailScreen(
             onNavigateBack = navController::navigateUp,
-            onNavigateToAIChatDetail = { roomId -> navController.navigateToAIChatDetail(roomId.toString()) }
+            onNavigateToAIChatDetail = { roomId -> navController.navigateToAIChatDetail(roomId) }
         )
         resumeScreen(
             onNavigateBack = navController::navigateUp

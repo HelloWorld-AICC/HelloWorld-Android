@@ -113,4 +113,5 @@
     <string name="mypage_chat_sumary">Tóm tắt chat</string>
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Xin chào!</string>
+    <string name="temp_nickname_deadline">Vui lòng nhập biệt danh không quá 15 ký tự.</string>
 </resources>

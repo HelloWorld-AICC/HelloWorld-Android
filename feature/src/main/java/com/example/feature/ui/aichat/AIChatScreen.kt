@@ -10,15 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +44,7 @@ import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldMain200
 import com.example.core.ui.theme.HelloWorldMain500
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -103,7 +100,7 @@ internal fun AiChatScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = stringResource(id = R.string.no_chat_content),
+                text = stringResource(languageR.string.ai_empty_message),
                 style = AppTypography.label01,
                 color = HelloWorldGrayScale300,
                 textAlign = TextAlign.Center
@@ -149,7 +146,7 @@ fun ChatNewButton(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "새 채팅",
+            text = stringResource(languageR.string.ai_new_chat),
             style = AppTypography.label01,
             color = HelloWorldMain500
         )
@@ -169,7 +166,7 @@ fun RecentChatSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "최근 나의 상담",
+                text = stringResource(languageR.string.ai_recent_consultation),
                 style = AppTypography.heading04,
                 color = Color.Black
             )
@@ -233,7 +230,7 @@ fun HeaderTitle(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Ai Chat",
+            text = stringResource(languageR.string.home_chatbot_title),
             style = AppTypography.heading04,
             textAlign = TextAlign.Center
         )

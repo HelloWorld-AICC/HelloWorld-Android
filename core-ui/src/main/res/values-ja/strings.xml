@@ -113,4 +113,5 @@
     <string name="community_empty_message">まだ投稿がありません。\n最初の投稿を作成してみましょう！</string>
     <string name="ai_chat_toast">チャットは500文字以内で入力してください。</string>
     <string name="mypage_chat_sumary">チャット要約</string>
+    <string name="temp_nickname_deadline">ニックネームは15文字以下で入力してください。</string>
 </resources>

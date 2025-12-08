@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
@@ -16,13 +17,14 @@ import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 
 @Composable
 fun CongratulationsScreen(navController: NavHostController) {
     Scaffold(
         bottomBar = {
             BottomButton(
-                text = "홈으로 가기",
+                text = stringResource(languageR.string.signup_complete_go_home),
                 onClick = { navController.navigate("홈") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -66,7 +68,7 @@ fun CongratulationsScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(48.dp))
 
             Text(
-                text = "회원가입이 완료되었습니다!",
+                text = stringResource(languageR.string.signup_complete_go_home),
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale800
             )
@@ -74,7 +76,7 @@ fun CongratulationsScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "삶과 일이 이어지는 그 모든 순간을 함께",
+                text = stringResource(languageR.string.auth_tagline),
                 style = AppTypography.body02,
                 color = HelloWorldGrayScale300
             )

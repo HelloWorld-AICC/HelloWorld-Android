@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.core.ui.theme.*
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import com.example.feature.ui.splash.SplashImg
 import com.example.feature.ui.splash.SplashLogo
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -31,6 +32,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.example.feature.ui.onboarding.viewmodel.LoginViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import com.example.core.data.network.RetrofitInstance
 
 
@@ -74,7 +76,7 @@ fun LoginScreen(navController: NavController) {
                 SplashLogo()
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "삶과 일이 이어지는 그 모든 순간을 함께",
+                    text = stringResource(languageR.string.auth_tagline),
                     style = AppTypography.heading04,
                     color = HelloWorldMain500
                 )

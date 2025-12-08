@@ -141,7 +141,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_service_chat,
                     backgroundColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    navController = navController
+                    onClick = { navController.navigateToAIChat() }
                 )
                 HomeServiceCard(
                     title = stringResource(languageR.string.home_ai_resume_title),
@@ -149,7 +149,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_service_ai,
                     backgroundColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    navController = navController
+                    onClick = { }
                 )
             }
 
@@ -163,7 +163,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_service_location,
                     backgroundColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    navController = navController
+                    onClick = { navController.navigate("상담 센터")}
                 )
                 HomeServiceCard(
                     title = stringResource(languageR.string.home_community_title),
@@ -171,7 +171,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_service_community,
                     backgroundColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    navController = navController
+                    onClick = { navController.navigateToCommunity() }
                 )
             }
 
@@ -192,7 +192,7 @@ fun HomeServiceCard(
     iconRes: Int,
     backgroundColor: Color,
     modifier: Modifier,
-    navController : NavController
+    onClick: () -> Unit,
 ) {
     val shadowColor = Color(0x665E8DC5)
     Box(
@@ -204,15 +204,7 @@ fun HomeServiceCard(
             }
             .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
             .shadow(elevation = 1.dp, ambientColor = shadowColor, spotColor = shadowColor)
-            .clickable(
-                onClick = {
-                    when (title) {
-                        "챗봇 상담" -> { navController.navigateToAIChat() }
-                        "커뮤니티" -> { navController.navigateToCommunity() }
-                    }
-
-                }
-            )
+            .clickable(onClick = onClick)
             .padding(12.dp, 16.dp, 12.dp, 8.dp)
 
     ) {

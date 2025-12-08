@@ -2,6 +2,7 @@ package com.example.feature.ui.mypage.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.mypage.MyPageRepository
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.core.ui.R as languageR
 
 @HiltViewModel(assistedFactory = ProfileEditViewModel.Factory::class)
 class ProfileEditViewModel @AssistedInject constructor(
@@ -52,7 +54,7 @@ class ProfileEditViewModel @AssistedInject constructor(
         _editingNickName.value = nickName
         if (nickName.length > 15) {
             _toastData.value = ToastData(
-                text = "닉네임은 15자 이하로 입력해주세요.",
+                text = languageR.string.temp_nickname_deadline,
                 duration = 1000,
                 onDismiss = { _toastData.value = null }
             )

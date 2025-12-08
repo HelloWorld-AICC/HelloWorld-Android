@@ -1,6 +1,7 @@
 
 package com.example.feature.ui.mypage.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.network.RetrofitInstance

@@ -113,4 +113,5 @@
     <string name="mypage_chat_sumary">聊天摘要</string>
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">您好！</string>
+    <string name="temp_nickname_deadline">昵称请限制在15个字符以内。</string>
 </resources>

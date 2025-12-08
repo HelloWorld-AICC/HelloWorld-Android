@@ -155,6 +155,7 @@
     <string name="mypage_withdraw_complete_message">Thank you for being with us so far. HelloWorld will always be by your side.</string>
     <string name="ai_chat_toast">Please enter the chat within 500 characters.</string>
     <string name="mypage_chat_sumary">Chat Summary</string>
-    <string name="home_greeting_suffix">Hello</string>
+    <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Hello</string>
+    <string name="temp_nickname_deadline">Please enter a nickname of 15 characters or fewer.</string>
 </resources>

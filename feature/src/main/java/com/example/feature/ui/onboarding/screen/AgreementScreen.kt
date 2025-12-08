@@ -1,4 +1,4 @@
-package com.example.feature.onboarding
+package com.example.feature.ui.onboarding.screen
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.core.ui.component.DialogData
@@ -24,6 +25,7 @@ import com.example.core.ui.component.HWDialog
 import com.example.core.ui.components.BottomButton
 import com.example.core.ui.theme.*
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import kotlinx.coroutines.launch
 import kotlin.String
 
@@ -57,7 +59,7 @@ fun AgreementScreen(navController: NavHostController) {
     Scaffold(
         bottomBar = {
             BottomButton(
-                text = "확인",
+                text = stringResource(languageR.string.confirm),
                 onClick = { showModal = true },
                 enabled = agreePrivacy && agreeTerms,
                 modifier = Modifier.fillMaxWidth()
@@ -155,10 +157,10 @@ fun AgreementScreen(navController: NavHostController) {
     if (showExitDialog) {
         HWDialog(
             data = DialogData(
-                title = "앗, 잠시만요",
-                subTitle = "지금 나가시면 입력한 정보는 모두 지워집니다.",
-                dismiss = "나가기",
-                confirm = "계속 작성하기",
+                title = languageR.string.signup_exit_title,
+                subTitle = languageR.string.signup_exit_message,
+                dismiss = languageR.string.signup_exit_leave,
+                confirm = languageR.string.signup_exit_continue,
                 onDismiss = {
                     showExitDialog = false
                     activity?.finish()
@@ -263,7 +265,7 @@ fun TermsModal(onDismiss: (Boolean) -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "개인정보 처리방침",
+                    text = stringResource(languageR.string.terms_privacy),
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale800
                 )
