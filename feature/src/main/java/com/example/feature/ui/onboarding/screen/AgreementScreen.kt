@@ -41,7 +41,7 @@ fun AgreementScreen(navController: NavHostController) {
 
     val allAgree = agreeTerms && agreePrivacy
 
-    var showExitDialog by remember { mutableStateOf(false) }     // 🔥 뒤로가기 확인 모달
+    var showExitDialog by remember { mutableStateOf(false) }
 
     BackHandler(enabled = !showModal) {
         showExitDialog = true
@@ -84,7 +84,7 @@ fun AgreementScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "HelloWorld와 함께해요",
+                text = stringResource(languageR.string.signup_welcome_title),
                 style = AppTypography.heading01,
                 color = HelloWorldGrayScale800
             )
@@ -92,7 +92,7 @@ fun AgreementScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "서비스 이용을 위한 약관에 동의해 주세요",
+                text = stringResource(languageR.string.signup_terms_title),
                 style = AppTypography.body02,
                 color = HelloWorldGrayScale300
             )
@@ -104,7 +104,7 @@ fun AgreementScreen(navController: NavHostController) {
                     .fillMaxWidth()
             ) {
                 AgreementCheckbox(
-                    text = "모두 동의",
+                    text = stringResource(languageR.string.signup_terms_agree_all),
                     checked = allAgree,
                     onCheckedChange = { isChecked ->
                         agreeTerms = isChecked
@@ -135,7 +135,7 @@ fun AgreementScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "'모두 동의'는, 개별 약관을 모두 확인하고 동의하신 것으로 처리됩니다.",
+                    text = stringResource(languageR.string.signup_terms_agree_all_notice),
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale300
                 )
@@ -148,7 +148,7 @@ fun AgreementScreen(navController: NavHostController) {
             onDismiss = { isAgreed ->
                 showModal = false
                 if (isAgreed) {
-                    shouldNavigateToHome = true   // ✅ 동의했을 때만 네비게이션 트리거
+                    shouldNavigateToHome = true
                 }
             }
         )
@@ -257,7 +257,8 @@ fun TermsModal(onDismiss: (Boolean) -> Unit) {
                 modifier = Modifier
                     .height(400.dp)
                     .verticalScroll(scrollState)
-                    .padding(8.dp)
+                    .padding(horizontal = 8.dp)
+                    .padding(top = 8.dp)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_info),
@@ -271,7 +272,7 @@ fun TermsModal(onDismiss: (Boolean) -> Unit) {
                 )
 
                 Text(
-                    text = "\n개인정보 처리방침은 HelloWorld 서비스 제공 개발팀(이하 \"당사\"라 합니다)이 운영하는 가입절차를 거친 이용자를 위한 이용 가능형 서비스 플랫폼에 있어, 개인정보를 어떻게 수집, 이용, 보관, 파기하는지에 대해 정보를 담은 방침을 의미합니다. 개인정보 처리방침은 개인정보보호법 등 국내 개인정보 보호 법령을 모두 준수하고 있습니다. 본 개인정보 처리방침에서 정하지 않은 용어의 정의는 서비스 이용약관을 따릅니다.\n\n수집하는 개인정보의 항목\n\n팀은 서비스 제공을 위해 다음 항목 중 최소한의 개인정보를 수집합니다.\n\n1. 회원가입 시 수집하는 개인정보\n- 카카오톡 계정 정보, 닉네임\n1. 별도로 수집하는 개인정보\n1) 프로필 사진을 저장할 경우\n- 프로필 사진\n\n  작성되었습니다. 그 다음 내용 여기까지 오게 해주세요 그 다음 내용 여기까지 오게 해주세요그 다음 내용 여기까지 오게 해주세요그 다음 내용 여기까지 오게 해주세요그 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요 다음 내용 여기까지 오게 해주세요.",
+                    text = stringResource(languageR.string.privacy_policy_full),
                     style = AppTypography.label02,
                     color = HelloWorldGrayScale500
                 )
