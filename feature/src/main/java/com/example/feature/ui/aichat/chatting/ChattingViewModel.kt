@@ -6,18 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.data.model.aichat.AIChatMessage
 import com.example.core.data.model.aichat.AIChatLogResponse
 import com.example.core.data.network.RetrofitInstance
-import com.example.network.response.ApiResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.ResponseBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
+import java.io.EOFException
 import java.io.IOException
 
 @HiltViewModel
@@ -42,30 +44,30 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d(TAG, "🔵 요청: getAIChatLog($roomId)")
-                val resp = RetrofitInstance.aiChatService.getAIChatLog(roomId) // Response<AIChatLogResponse>
+                val resp = RetrofitInstance.aiChatService.getAIChatLog(roomId)
 
                 if (!resp.isSuccessful) {
                     Log.w(TAG, "❗getAIChatLog 실패: HTTP ${resp.code()}")
                     return@launch
                 }
 
-                val body: AIChatLogResponse = resp.body()
-                    ?: run {
-                        Log.w(TAG, "❗getAIChatLog 응답 body=null")
-                        return@launch
-                    }
+                val body: AIChatLogResponse = resp.body() ?: run {
+                    Log.w(TAG, "❗getAIChatLog 응답 body=null")
+                    return@launch
+                }
 
                 Log.d(TAG, "✅ 응답: roomId=${body.roomId}, chatLogs=${body.chatLogs.size}")
 
                 val cleanedLogs: List<AIChatMessage> = body.chatLogs.map { m ->
-                    // 서버가 user 메시지에 양끝 쿼트를 덧씌워 보내는 경우 방어
-                    val cleaned = if (m.sender.equals("user", ignoreCase = true))
+                    val base = if (m.sender.equals("user", ignoreCase = true))
                         m.content.removeSurrounding("\"")
-                    else m.content
-                    AIChatMessage(content = cleaned, sender = m.sender)
+                    else
+                        m.content
+                    val normalized = normalizeServerText(base)
+                    Log.d("Response", base)
+                    AIChatMessage(content = normalized, sender = m.sender)
                 }
 
-                // 첫 로드 시에만 인트로 메시지 앞에 붙이기 (중복 방지)
                 val existing = _chatMessages.value[body.roomId].orEmpty()
                 val intro = if (existing.isEmpty()) listOf(
                     AIChatMessage("안녕하세요!", sender = "bot"),
@@ -83,9 +85,6 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                 }
                 _selectedChatId.value = body.roomId
 
-                finalMessages.forEachIndexed { i, m ->
-                    Log.d(TAG, "🗨️ $i : ${m.sender} → ${m.content}")
-                }
             } catch (e: IOException) {
                 Log.e(TAG, "네트워크 오류(getAIChatLog): ${e.message}", e)
             } catch (e: HttpException) {
@@ -112,8 +111,10 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                 roomId = chatId,
                 message = userMessage,
                 onPartialResponse = { partial ->
+                    // 들어온 조각을 곧바로 누적하여 마지막 bot 말풍선에 반영
                     streamedText += partial
                     val curMsgs = _chatMessages.value[chatId].orEmpty()
+
                     val newList =
                         if (curMsgs.lastOrNull()?.sender == "bot")
                             curMsgs.dropLast(1) + AIChatMessage(streamedText, "bot")
@@ -123,7 +124,6 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                     _chatMessages.value = _chatMessages.value.toMutableMap().apply {
                         put(chatId, newList)
                     }
-                    Log.d(TAG, "🔄 스트리밍 누적: $streamedText")
                 },
                 onComplete = { roomIdFromResponse ->
                     finalRoomId = roomIdFromResponse ?: chatId
@@ -150,70 +150,132 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * 서버가 text/event-stream 형식으로 "data: ..." 라인을 지속 전송한다고 가정.
+     * 라인 단위로 즉시 onPartialResponse를 호출하여 UI가 실시간 반영되도록 함.
+     */
+    /**
+     * 서버가 text/event-stream 형식으로 "data: ..." 라인을 지속 전송한다고 가정.
+     * - `data:`(빈값)  → PASS (누적 안 함)
+     * - `data:   `     → 공백 n칸 누적 (2칸=LF1, 홀수는 스페이스1)
+     * - `data:  -`     → 선행 공백 누적 후 문자 토큰 방출
+     */
     private suspend fun askToAIWithStream(
         roomId: String,
         message: String,
         onPartialResponse: (String) -> Unit,
         onComplete: (String?) -> Unit
-    ) {
+    ) = withContext(Dispatchers.IO) {
         try {
             Log.d(TAG, "🌐 요청: askToAI(roomId=$roomId, message=$message)")
-
-            // 서버가 단순 문자열 본문을 받는다면 text/plain 이 더 안전.
-            // 만약 {"message": "..."} JSON을 요구한다면 DTO로 바꾸거나 실제 JSON으로 전송하세요.
             val requestBody = message.toRequestBody("text/plain".toMediaTypeOrNull())
-            val resp = RetrofitInstance.aiChatService.askToAI(roomId, requestBody) // Response<ResponseBody>
+            val resp = RetrofitInstance.aiChatService.askToAI(roomId, requestBody)
 
             if (!resp.isSuccessful) {
                 Log.w(TAG, "❗askToAI 실패: HTTP ${resp.code()}")
-                onComplete(null)
-                return
+                withContext(Dispatchers.Main) { onComplete(null) }
+                return@withContext
             }
 
-            val source = resp.body()?.source()
+            val body = resp.body()
+            val source = body?.source()
             if (source == null) {
                 Log.w(TAG, "❗askToAI 응답 body=null")
-                onComplete(null); return
+                withContext(Dispatchers.Main) { onComplete(null) }
+                return@withContext
             }
 
             var roomIdFromStream: String? = null
-            val builder = StringBuilder()
-            var emptyDataCount = 0
 
-            while (!source.exhausted()) {
-                val line = source.readUtf8Line()
-                Log.d(TAG, "📩 SSE 수신: $line")
+            // 공백 누적 버퍼
+            var pendingSpaces = 0        // ' ' 개수
+            var pendingNewlines = 0      // '\n' 개수 (공백 2칸 = 개행 1개)
 
-                if (line != null && line.startsWith("data:")) {
-                    val content = line.removePrefix("data:")
-                    if (content.startsWith("Room ID:")) {
-                        roomIdFromStream = content.removePrefix("Room ID:").trim()
-                        Log.d(TAG, "🏷️ 추출 Room ID: $roomIdFromStream")
-                    } else {
-                        if (content.isEmpty()) {
-                            emptyDataCount++
-                            if (emptyDataCount == 2) {
-                                builder.append("\n")
-                                emptyDataCount = 0
-                            }
-                        } else {
-                            emptyDataCount = 0
-                            builder.append(content)
-                        }
-                    }
-                } else if (line.isNullOrBlank()) {
-                    val block = builder.toString().trimEnd()
-                    if (block.isNotEmpty()) {
-                        onPartialResponse(block)
-                        builder.clear()
-                    }
+            fun accumulateSpaces(n: Int) {
+                if (n <= 0) return
+                pendingNewlines += (n / 2)
+                pendingSpaces   += (n % 2)
+            }
+            fun flushPrefix(): String {
+                val prefix = buildString {
+                    if (pendingNewlines > 0) append("\n".repeat(pendingNewlines))
+                    if (pendingSpaces   > 0) append(" ".repeat(pendingSpaces))
                 }
+                pendingNewlines = 0
+                pendingSpaces = 0
+                return prefix
             }
 
-            onComplete(roomIdFromStream)
+            try {
+                while (!source.exhausted()) {
+                    val line = try { source.readUtf8Line() } catch (e: EOFException) { null }
+                    if (line == null) break
+
+                    Log.d(TAG, "📩 SSE 수신: $line")
+
+                    if (!line.startsWith("data:")) {
+                        // data:가 아닌 줄은 무시(서버 경계 빈줄은 이미 위 규칙으로 처리됨)
+                        continue
+                    }
+
+                    // "data:" 이후 문자열 (공백 보존)
+                    val after = if (line.length > 5) line.substring(5) else ""
+
+                    // 종료 토큰
+                    if (after == "[DONE]" || after == "[COMPLETE]") break
+
+                    // Room ID
+                    if (after.startsWith("Room ID:")) {
+                        roomIdFromStream = after.removePrefix("Room ID:").trim()
+                        Log.d(TAG, "🏷️ 추출 Room ID: $roomIdFromStream")
+                        continue
+                    }
+
+                    // ✅ 빈값 → LF 1개 누적
+                    if (after.isEmpty()) {
+                        pendingNewlines += 1
+                        continue
+                    }
+
+                    // ✅ 전부 공백이면 길이만큼 누적(짝수=LF, 홀수=스페이스)
+                    if (after.all { it == ' ' }) {
+                        accumulateSpaces(after.length)
+                        continue
+                    }
+
+                    // ✅ 혼합 토큰: 선행 공백 누적 후 나머지 텍스트 방출
+                    val firstNonSpaceIdx = after.indexOfFirst { it != ' ' }.let { if (it == -1) after.length else it }
+                    if (firstNonSpaceIdx > 0) accumulateSpaces(firstNonSpaceIdx)
+
+                    val rest = after.drop(firstNonSpaceIdx)
+                    if (rest.isEmpty()) continue
+
+                    val normalized = normalizeServerText(rest)
+
+                    withContext(Dispatchers.Main) {
+                        onPartialResponse(flushPrefix() + normalized)
+                    }
+                }
+
+            } finally {
+                body.close()
+            }
+
+            // 스트림 종료 시 남은 버퍼 방출(선택)
+            if (pendingNewlines > 0 || pendingSpaces > 0) {
+                val tail = "\n".repeat(pendingNewlines) + " ".repeat(pendingSpaces)
+                withContext(Dispatchers.Main) { onPartialResponse(tail) }
+            }
+
+            withContext(Dispatchers.Main) {
+                onComplete(roomIdFromStream)
+            }
+        } catch (ce: CancellationException) {
+            Log.w(TAG, "⚠️ 스트림 취소됨")
+            withContext(Dispatchers.Main) { onComplete(null) }
         } catch (e: Exception) {
             Log.e(TAG, "❌ askToAIWithStream 실패", e)
-            onComplete(null)
+            withContext(Dispatchers.Main) { onComplete(null) }
         }
     }
 
@@ -222,10 +284,8 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d(TAG, "📌 요약 요청: roomId=$roomId")
-                // summaryAIChat: suspend fun summaryAIChat(roomId): Response<ResponseBody>
-                val body = RetrofitInstance.aiChatService.summaryAIChat(roomId).body()
-                    ?: return@launch
-                val result = body.use { it.string() }  // "complete" 등 문자열
+                val body = RetrofitInstance.aiChatService.summaryAIChat(roomId).body() ?: return@launch
+                val result = body.use { it.string() }
                 Log.d(TAG, "✅ 요약 결과: $result")
 
                 if (result.trim().equals("complete", ignoreCase = true)) {
@@ -241,5 +301,17 @@ class ChatViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         private const val TAG = "ChatViewModel"
+    }
+
+    private fun normalizeServerText(raw: String): String {
+        // 1) 두 번 이스케이프된 \\n, \\r 를 실제 개행으로
+        // 2) CRLF/CR 을 모두 LF 로
+        // 3) 탭을 공백으로(선택)
+        return raw
+            .replace("\\r\\n", "\n")   // "\\r\\n" -> "\n"
+            .replace("\\n", "\n")      // "\\n"    -> "\n"
+            .replace("\\r", "\n")      // "\\r"    -> "\n"
+            .replace("\r\n", "\n")     // 실제 CRLF -> LF
+            .replace("\r", "\n")       // 실제 CR   -> LF
     }
 }

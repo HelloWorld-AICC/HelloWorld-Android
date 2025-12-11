@@ -22,8 +22,14 @@ interface AIChatService {
         @Query("roomId") roomId: String
     ): Response<ResponseBody>
 
-    @POST("chat/ask")
     @Streaming
+    @Headers(
+        "Accept: text/event-stream",
+        "Cache-Control: no-cache",
+        "Connection: keep-alive",
+        "Accept-Encoding: identity"
+    )
+    @POST("chat/ask")
     suspend fun askToAI(
         @Query("roomId") roomId : String,
         @Body request: RequestBody

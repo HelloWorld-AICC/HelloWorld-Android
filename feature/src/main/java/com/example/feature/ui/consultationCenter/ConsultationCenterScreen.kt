@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -40,6 +41,7 @@ import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
+import com.example.core.ui.R as languageR
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -196,7 +198,7 @@ fun ConsultationCenterScreen(
 
     // UI
     Column(modifier = Modifier.fillMaxSize()) {
-        BackHeader(title = "오프라인 상담센터", onBackClick = onBackClick)
+        BackHeader(title = stringResource(languageR.string.offline_center_nearby), onBackClick = onBackClick)
 
         Box(
             modifier = Modifier
@@ -420,11 +422,11 @@ fun ConsultationCenterCard(
                 Text(text = center.address, style = AppTypography.label03)
             }
 
-            Image(
-                painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = null,
-                modifier = Modifier.size(64.dp)
-            )
+//            Image(
+//                painter = painterResource(id = R.drawable.ic_google),
+//                contentDescription = null,
+//                modifier = Modifier.size(64.dp)
+//            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))

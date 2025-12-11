@@ -44,7 +44,10 @@ fun LanguageScreen(
                 text = stringResource(R.string.confirm),
                 onClick = {
                     viewModel.setLanguage(selectedLanguage) // 언어 설정
-                    navController.navigate("이용 동의")     // 다음 화면
+                    navController.navigate("이용 동의") {
+                        popUpTo("언어 설정") { inclusive = true }
+                        launchSingleTop = true
+                    }
                 },
                 enabled = true,
             )

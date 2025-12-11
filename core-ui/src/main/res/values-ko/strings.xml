@@ -113,4 +113,5 @@
     <string name="community_empty_message">아직 게시물이 없어요.\n첫 번째 게시물을 작성해보세요!</string>
     <string name="ai_chat_toast">채팅은 500자 이하로 입력해주세요.</string>
     <string name="mypage_chat_sumary">chat 요약</string>
+    <string name="temp_nickname_deadline">닉네임은 15자 이하로 입력해주세요.</string>
 </resources>

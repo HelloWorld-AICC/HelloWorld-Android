@@ -1,8 +1,10 @@
 
 package com.example.feature.ui.mypage.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.data.network.RetrofitInstance
 import com.example.core.ui.component.DialogData
 import com.example.domain.UserInfoUseCase
 import com.example.model.common.Result
@@ -54,8 +56,14 @@ class MyPageViewModel @Inject constructor(
 
     fun logout(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            // TODO logout (token 제거)
-            onResult(true)
+            runCatching {
+                RetrofitInstance.clearTokens()
+            }.onSuccess {
+                onResult(true)
+            }.onFailure { e ->
+                Log.e("MyPageViewModel", "logout failed", e)
+                onResult(false)
+            }
         }
     }
 }
