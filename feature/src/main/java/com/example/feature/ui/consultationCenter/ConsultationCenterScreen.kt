@@ -354,10 +354,17 @@ fun ConsultationCenterListOverlay(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentPadding = PaddingValues(bottom = 72.dp)
+                contentPadding = PaddingValues(bottom = 30.dp)
             ) {
                 items(centerList) { center ->
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     ConsultationCenterCard(center = center) { onClick(center) }
+
+                    if(centerList.indexOf(center) != centerList.lastIndex) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider(color = Color(0xFFCFE3FD))
+                    }
                 }
 
                 item {
@@ -397,10 +404,9 @@ fun ConsultationCenterCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(87.dp)
+            .wrapContentHeight()
             .clickable { onClick() }
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -428,9 +434,6 @@ fun ConsultationCenterCard(
 //                modifier = Modifier.size(64.dp)
 //            )
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-        HorizontalDivider(color = Color(0xFFCFE3FD))
     }
 }
 
