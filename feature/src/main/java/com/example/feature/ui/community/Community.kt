@@ -66,7 +66,7 @@ import com.example.model.community.Post
 @Composable
 internal fun Community(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
-    onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
+    onNavigateToCommunityPostDetail: (Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     onClearCommunityUpdate: () -> Unit,
     modifier: Modifier = Modifier,
@@ -167,25 +167,25 @@ internal fun Community(
                 when (page) {
                     0 -> CommunityTabContent(
                         posts = problemPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(0, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(0) },
                         isLoading = isLoading,
                     )
                     1 -> CommunityTabContent(
                         posts = nationalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(1, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(1) },
                         isLoading = isLoading,
                     )
                     2 -> CommunityTabContent(
                         posts = medicalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(2, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(2) },
                         isLoading = isLoading,
                     )
                     3 -> CommunityTabContent(
                         posts = etcPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(3, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(3) },
                         isLoading = isLoading,
                     )

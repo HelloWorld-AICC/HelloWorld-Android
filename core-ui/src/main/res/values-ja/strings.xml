@@ -110,8 +110,9 @@
     <string name="mypage_logout_dialog_title">ログアウトしますか？</string>
     <string name="mypage_logout_dialog_subtitle">また次回お会いしましょう！</string>
     <string name="mypage_nickname_edit">ニックネームの変更</string>
-    <string name="community_empty_message">まだ投稿がありません。\n最初の投稿を作成してみましょう！</string>
+    <string name="community_empty_message">まだ投稿がありません。 最初の投稿を作成してみましょう！</string>
     <string name="ai_chat_toast">チャットは500文字以内で入力してください。</string>
     <string name="mypage_chat_sumary">チャット要約</string>
     <string name="temp_nickname_deadline">ニックネームは15文字以下で入力してください。</string>
+    <string name="mypage_posts_comments_one_line">投稿 / コメント</string>
 </resources>

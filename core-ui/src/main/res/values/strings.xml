@@ -158,4 +158,5 @@
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Hello</string>
     <string name="temp_nickname_deadline">Please enter a nickname of 15 characters or fewer.</string>
+    <string name="mypage_posts_comments_one_line">Posts/Comments</string>
 </resources>

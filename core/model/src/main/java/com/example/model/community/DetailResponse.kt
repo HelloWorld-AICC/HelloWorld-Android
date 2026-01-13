@@ -9,6 +9,8 @@ data class DetailResponse(
     val title: String = "",
     @SerialName("content")
     val content: String = "",
+    @SerialName("category_id")
+    val categoryId: Long = 0,
     @SerialName("created_at")
     val createdAt: String = "",
     @SerialName("fileList")

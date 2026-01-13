@@ -206,7 +206,7 @@ internal fun CommunityPostDetail(
                             onClick = {
                                 expanded = false
                                 onNavigateToCommunityPostWrite(
-                                    viewModel.request.categoryId.toInt(),
+                                    post.categoryId.toInt(),
                                     viewModel.request.communityId.toInt(),
                                     ContentType.UPDATE
                                 )
@@ -264,7 +264,6 @@ internal fun CommunityPostDetail(
                                         confirm = R.string.action_report,
                                         onDismiss = { viewModel.updateDialogData() },
                                         onConfirm = {
-                                            // TODO api 추가
                                             viewModel.updateDialogData()
                                             viewModel.reportPost { result ->
                                                 if (result) {
@@ -277,7 +276,7 @@ internal fun CommunityPostDetail(
                                                 } else {
                                                     viewModel.updateToastData(
                                                         ToastData(
-                                                            text = 0, // 서버와의 통신에 실패했습니다.
+                                                            text = R.string.community_report_post_complete, // TODO 서버와의 통신에 실패했습니다.
                                                             onDismiss = { viewModel.updateToastData() }
                                                         )
                                                     )
@@ -322,7 +321,7 @@ internal fun CommunityPostDetail(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "${viewModel.request.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
+                            text = "${post.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
                             style = AppTypography.label02,
                             color = HelloWorldGrayScale500,
                         )
@@ -450,7 +449,6 @@ internal fun CommunityPostDetail(
                                     confirm = R.string.action_report,
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
-                                        // TODO api 추가
                                         viewModel.updateDialogData()
                                     },
                                 )

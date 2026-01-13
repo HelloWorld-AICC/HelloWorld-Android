@@ -87,7 +87,6 @@ class PostWriteViewModel @AssistedInject constructor(
         viewModelScope.launch {
             communityRepository.getCommunityPostDetail(
                 request = DetailRequest(
-                    categoryId = request.category.toLong(),
                     communityId = request.communityId.toLong()
                 )
             ).fold(
@@ -137,7 +136,7 @@ class PostWriteViewModel @AssistedInject constructor(
     fun updateCommunityPost(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             communityRepository.updatePost(
-                categoryId = request.category.toLong(),
+                categoryId = _selectedTab.value.toLong(),
                 communityId = request.communityId.toLong(),
                 request = UpdatePostRequest(
                     title = _title.value,

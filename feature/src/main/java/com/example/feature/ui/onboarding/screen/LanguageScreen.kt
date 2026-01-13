@@ -10,9 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -27,6 +29,7 @@ import com.example.core.ui.theme.White
 import com.example.feature.ui.onboarding.viewmodel.LanguageViewModel
 import com.example.model.common.Language
 import com.example.core.ui.R
+import com.example.model.common.National
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +102,7 @@ fun LanguageScreen(
                         .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
                 ) {
                     OutlinedTextField(
-                        value = "${selectedLanguage.flag} ${selectedLanguage.displayName}",
+                        value = "${selectedLanguage.national} ${selectedLanguage.displayName}",
                         onValueChange = {
                             viewModel.setLanguage(selectedLanguage)
                         },
@@ -128,10 +131,28 @@ fun LanguageScreen(
                         Language.entries.forEach { language ->
                             DropdownMenuItem(
                                 text = {
-                                    Text(
-                                        "${language.flag} ${language.displayName}",
-                                        style = AppTypography.heading04
-                                    )
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = when (language.national) {
+                                                National.KOREAN -> painterResource(R.drawable.flag_ko)
+                                                National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                                National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                                National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                                else -> painterResource(R.drawable.flag_ko)
+                                            },
+                                            contentDescription = "국기",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                        )
+                                        Text(
+                                            text = language.displayName,
+                                            style = AppTypography.heading04,
+                                            color = HelloWorldGrayScale800,
+                                        )
+                                    }
                                 },
                                 onClick = {
                                     selectedLanguage = language
