@@ -189,11 +189,11 @@ private fun MyPage(
                         }
                         Image(
                             painter = when (uiState.userInfo.language?.national) {
-                                National.KOREAN -> painterResource(R.drawable.flag_ko)
+                                National.KOREAN -> painterResource(R.drawable.flag_kr)
                                 National.JAPANESE -> painterResource(R.drawable.flag_jp)
                                 National.CHINESE -> painterResource(R.drawable.flag_ch)
                                 National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
-                                else -> painterResource(R.drawable.flag_ko)
+                                else -> painterResource(R.drawable.flag_en)
                             },
                             contentDescription = "국기",
                             modifier = Modifier

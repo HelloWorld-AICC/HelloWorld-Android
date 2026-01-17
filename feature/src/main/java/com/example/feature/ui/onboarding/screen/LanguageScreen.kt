@@ -29,6 +29,7 @@ import com.example.core.ui.theme.White
 import com.example.feature.ui.onboarding.viewmodel.LanguageViewModel
 import com.example.model.common.Language
 import com.example.core.ui.R
+import com.example.core.ui.component.HWDropdownMenuBox
 import com.example.model.common.National
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,10 @@ fun LanguageScreen(
     var selectedLanguage by remember { mutableStateOf(Language.KOREAN) } // 기본값
 
     var expanded by remember { mutableStateOf(false) }
+
+    val editingLanguage by viewModel.editingLanguage.collectAsState()
+    val languages: List<Language> = Language.entries
+
 
     Scaffold(
         bottomBar = {
@@ -89,83 +94,66 @@ fun LanguageScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Box(
+            HWDropdownMenuBox(
                 modifier = Modifier
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, HelloWorldMain100, shape = RoundedCornerShape(8.dp))
-            ) {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
-                ) {
-                    OutlinedTextField(
-                        value = "${selectedLanguage.national} ${selectedLanguage.displayName}",
-                        onValueChange = {
-                            viewModel.setLanguage(selectedLanguage)
-                        },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = HelloWorldMain100,
-                            unfocusedBorderColor = HelloWorldMain100
-                        )
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier
-                            .background(White)
-                            .border(1.dp, HelloWorldMain100, RoundedCornerShape(8.dp)),
-                        shape = RoundedCornerShape(8.dp)
+                    .fillMaxWidth(),
+                selectedItem = if (editingLanguage == null) Language.ENGLISH else editingLanguage,
+                items = languages,
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                onClick = {
+                    viewModel.updateLanguage(it)
+                    expanded = false
+                },
+                selectedContent = { item ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Language.entries.forEach { language ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Image(
-                                            painter = when (language.national) {
-                                                National.KOREAN -> painterResource(R.drawable.flag_ko)
-                                                National.JAPANESE -> painterResource(R.drawable.flag_jp)
-                                                National.CHINESE -> painterResource(R.drawable.flag_ch)
-                                                National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
-                                                else -> painterResource(R.drawable.flag_ko)
-                                            },
-                                            contentDescription = "국기",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                        )
-                                        Text(
-                                            text = language.displayName,
-                                            style = AppTypography.heading04,
-                                            color = HelloWorldGrayScale800,
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    selectedLanguage = language
-                                    expanded = false
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White)
-                            )
-                        }
+                        Image(
+                            painter = when (item?.national) {
+                                National.KOREAN -> painterResource(R.drawable.flag_kr)
+                                National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                else -> painterResource(R.drawable.flag_en)
+                            },
+                            contentDescription = "국기",
+                            modifier = Modifier
+                                .size(24.dp)
+                        )
+                        Text(
+                            text = "${item?.displayName}",
+                            style = AppTypography.heading04,
+                            color = HelloWorldGrayScale800,
+                        )
+                    }
+                },
+                itemContent = { item, isSelected ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = when (item.national) {
+                                National.KOREAN -> painterResource(R.drawable.flag_kr)
+                                National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                else -> painterResource(R.drawable.flag_en)
+                            },
+                            contentDescription = "국기",
+                            modifier = Modifier
+                                .size(24.dp)
+                        )
+                        Text(
+                            text = item.displayName,
+                            style = AppTypography.heading04,
+                            color = HelloWorldGrayScale800,
+                        )
                     }
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.weight(1f))
         }
