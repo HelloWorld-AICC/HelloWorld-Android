@@ -159,6 +159,7 @@ internal fun Community(
                     isSelected = pagerState.currentPage == 3,
                 )
             }
+            Spacer(modifier = Modifier.height(12.dp))
             HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = HelloWorldMain200)
             HorizontalPager(
                 state = pagerState,
