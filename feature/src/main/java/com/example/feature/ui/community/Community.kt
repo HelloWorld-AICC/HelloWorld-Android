@@ -351,11 +351,18 @@ fun CommunityPostItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 카테고리, 날짜
-            Text(
-                text = "${post.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
-                style = AppTypography.label02,
-                color = HelloWorldGrayScale500
-            )
+            Row {
+                Text(
+                    text = stringResource(post.categoryId.toCategoryName()),
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale500,
+                )
+                Text(
+                    text = " • ${post.createdAt.toFormattedDate()}",
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale500,
+                )
+            }
             // 댓글
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -425,8 +432,10 @@ internal fun TabIconAndLabel(
         }
         Text(
             text = title,
+            modifier = Modifier.width(60.dp),
             style = AppTypography.label01,
-            color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300
+            color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300,
+            textAlign = TextAlign.Center
         )
     }
 }

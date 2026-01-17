@@ -1,12 +1,14 @@
 package com.example.core.util.extension
 
-fun Long.toCategoryName(): String {
+import com.example.core.ui.R
+
+fun Long.toCategoryName(): Int {
     return when(this) {
-        0L -> "직장 내 고충"
-        1L -> "체류 및 비자"
-        2L -> "산재 및 의료"
-        3L -> "기타"
-        else -> "직장 내 고충"
+        0L -> R.string.community_category_workplace
+        1L -> R.string.community_category_visa
+        2L -> R.string.community_category_insurance
+        3L -> R.string.community_category_etc
+        else -> R.string.community_category_workplace
     }
 }
 

@@ -276,7 +276,7 @@ internal fun CommunityPostDetail(
                                                 } else {
                                                     viewModel.updateToastData(
                                                         ToastData(
-                                                            text = R.string.community_report_post_complete, // TODO 서버와의 통신에 실패했습니다.
+                                                            text = R.string.failed_connect_server,
                                                             onDismiss = { viewModel.updateToastData() }
                                                         )
                                                     )
@@ -320,11 +320,18 @@ internal fun CommunityPostDetail(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "${post.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
-                            style = AppTypography.label02,
-                            color = HelloWorldGrayScale500,
-                        )
+                        Row {
+                            Text(
+                                text = stringResource(post.categoryId.toCategoryName()),
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            )
+                            Text(
+                                text = " • ${post.createdAt.toFormattedDate()}",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            )
+                        }
                         Text(
                             text = post.title,
                             style = AppTypography.heading02,
@@ -571,7 +578,7 @@ private fun CommentItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "익명${comment.anonymousName}",
+                    text = stringResource(R.string.anonymous, comment.anonymousName),
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale800,
                 )
