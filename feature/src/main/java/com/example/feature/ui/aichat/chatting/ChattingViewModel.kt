@@ -21,6 +21,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.io.EOFException
 import java.io.IOException
+import com.example.core.ui.R as languageR
 
 @HiltViewModel
 class ChatViewModel @Inject constructor() : ViewModel() {
@@ -70,8 +71,8 @@ class ChatViewModel @Inject constructor() : ViewModel() {
 
                 val existing = _chatMessages.value[body.roomId].orEmpty()
                 val intro = if (existing.isEmpty()) listOf(
-                    AIChatMessage("안녕하세요!", sender = "bot"),
-                    AIChatMessage("어떤 고민이 있으신가요?", sender = "bot")
+                    AIChatMessage(languageR.string.ai_greeting.toString(), sender = "bot"),
+                    AIChatMessage(languageR.string.ai_prompt.toString(), sender = "bot")
                 ) else emptyList()
 
                 val finalMessages = intro + cleanedLogs
