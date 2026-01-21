@@ -114,4 +114,9 @@
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Xin chào!</string>
     <string name="temp_nickname_deadline">Vui lòng nhập biệt danh không quá 15 ký tự.</string>
+    <string name="mypage_posts_comments_one_line">Bài viết / Bình luận</string>
+    <string name="failed_connect_server">Kết nối với máy chủ thất bại.</string>
+    <string name="anonymous">Ẩn danh%d</string>
+    <string name="write_post">Viết bài đăng</string>
+    <string name="edit_post">Chỉnh sửa bài đăng</string>
 </resources>

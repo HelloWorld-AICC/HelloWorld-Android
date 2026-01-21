@@ -63,7 +63,7 @@ import com.example.model.mypage.Community
 @Composable
 internal fun PostAndComments(
     onNavigateBack: () -> Unit,
-    onNavigateCommunity: (Int, Int) -> Unit,
+    onNavigateCommunity: (Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     viewModel: PostAndCommentsViewModel = hiltViewModel()
 ) {
@@ -91,7 +91,7 @@ internal fun PostAndComments(
 @Composable
 private fun PostAndComments(
     onNavigateBack: () -> Unit,
-    onNavigateCommunity: (Int, Int) -> Unit,
+    onNavigateCommunity: (Int) -> Unit,
     selectedMenu: Int = R.string.posts,
     uiState: MyPostAndCommentUiState = MyPostAndCommentUiState.Loading,
     changeMenu: (Int) -> Unit,
@@ -124,7 +124,7 @@ private fun PostAndComments(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = stringResource(R.string.mypage_posts_comments),
+                text = stringResource(R.string.mypage_posts_comments_one_line),
                 style = AppTypography.heading04,
                 color = HelloWorldGrayScale800
             )
@@ -154,7 +154,7 @@ private fun PostAndComments(
                         .zIndex(10f),
                     selectedContent = { item ->
                         Text(
-                            text = item.toString(),
+                            text = stringResource(item ?: R.string.posts),
                             style = AppTypography.label01,
                             color = HelloWorldMain500,
                             modifier = Modifier
@@ -190,7 +190,7 @@ private fun PostAndComments(
                         selectedMenu = selectedMenu,
                         onLoadMore = { onLoadMore(it) },
                         onItemClick = { categoryId, communityId ->
-                            onNavigateCommunity(categoryId, communityId)
+                            onNavigateCommunity(communityId)
                         },
                     )
                 }
@@ -456,7 +456,7 @@ private fun CommentItem(
 private fun PostAndCommentsPreview() {
     PostAndComments(
         onNavigateBack = {},
-        onNavigateCommunity = {_, _ -> },
+        onNavigateCommunity = {_ -> },
         onCheckCommunityUpdate = { false }
     )
 }

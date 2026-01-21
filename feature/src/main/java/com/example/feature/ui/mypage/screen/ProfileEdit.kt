@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,6 +65,7 @@ import com.example.core.util.rememberPhotoPickerWithPermission
 import com.example.feature.ui.mypage.viewmodel.ProfileEditViewModel
 import com.example.model.common.Language
 import com.example.core.ui.R
+import com.example.model.common.National
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -199,11 +202,18 @@ fun ProfileEdit(
                             .size(16.dp)
                     )
                 }
-                Text(
-                    text = "${initUser.language?.flag}",
-                    fontSize = 28.sp,
+                Image(
+                    painter = when (initUser.language?.national) {
+                        National.KOREAN -> painterResource(R.drawable.flag_kr)
+                        National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                        National.CHINESE -> painterResource(R.drawable.flag_ch)
+                        National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                        else -> painterResource(R.drawable.flag_en)
+                    },
+                    contentDescription = "국기",
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
+                        .size(24.dp)
                 )
             }
             Text(
@@ -282,9 +292,17 @@ fun ProfileEdit(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "${item?.flag}",
-                                fontSize = 24.sp
+                            Image(
+                                painter = when (item?.national) {
+                                    National.KOREAN -> painterResource(R.drawable.flag_kr)
+                                    National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                    National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                    National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                    else -> painterResource(R.drawable.flag_en)
+                                },
+                                contentDescription = "국기",
+                                modifier = Modifier
+                                    .size(24.dp)
                             )
                             Text(
                                 text = "${item?.displayName}",
@@ -298,9 +316,17 @@ fun ProfileEdit(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = item.flag,
-                                fontSize = 24.sp
+                            Image(
+                                painter = when (item.national) {
+                                    National.KOREAN -> painterResource(R.drawable.flag_kr)
+                                    National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                    National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                    National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                    else -> painterResource(R.drawable.flag_en)
+                                },
+                                contentDescription = "국기",
+                                modifier = Modifier
+                                    .size(24.dp)
                             )
                             Text(
                                 text = item.displayName,

@@ -1,15 +1,14 @@
 package com.example.feature.ui.community
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.community.CommunityRepository
 import com.example.core.ui.component.DialogData
 import com.example.core.ui.component.ToastData
-import com.example.core.util.extension.toFormattedDate
 import com.example.model.community.DetailComment
 import com.example.model.community.DetailRequest
 import com.example.model.community.DetailResponse
-import com.example.model.community.Post
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -17,9 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = PostDetailViewModel.Factory::class)
 class PostDetailViewModel @AssistedInject constructor(
@@ -55,6 +53,7 @@ class PostDetailViewModel @AssistedInject constructor(
 
     fun getContent(init: Boolean? = null) {
         if (init == true) {
+            _post.update { DetailResponse() }
             _commentList.value = emptyList()
             _page.value = 0
         }
@@ -121,7 +120,7 @@ class PostDetailViewModel @AssistedInject constructor(
     fun deletePost(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             communityRepository.deletePost(
-                categoryId = request.categoryId,
+                categoryId = _post.value.categoryId,
                 communityId = request.communityId
             ).fold(
                 onSuccess = {
