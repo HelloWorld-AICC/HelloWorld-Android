@@ -98,8 +98,11 @@ fun ConsultationCenterScreen(
     // 위치 → 행정구역명 갱신
     LaunchedEffect(userLocation) {
         userLocation?.let { ll ->
-            reverseGeocodeToSidoGu(context, ll)?.let { sidoGu ->
-                locationTitle = sidoGu
+            val sidoGu = reverseGeocodeToSidoGu(context, ll)
+            Log.d("LOCATION_DEBUG", "📍 reverseGeocode result = $sidoGu (lat=${ll.latitude}, lng=${ll.longitude})")
+
+            sidoGu?.let {
+                locationTitle = it
             }
         }
     }
@@ -457,22 +460,66 @@ suspend fun reverseGeocodeToSidoGu(
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         suspendCancellableCoroutine { cont ->
             geocoder.getFromLocation(lat, lng, 1) { list ->
+                Log.d("GEOCODER_DEBUG", "getFromLocation size=${list.size}, lat=$lat, lng=$lng")
+
                 val a = list.firstOrNull()
-                val sido = normalizeSido(a?.adminArea)
-                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
-                cont.resume(
-                    if (!sido.isNullOrBlank() && !gu.isNullOrBlank())
-                        "$sido $gu" else null
+                if (a == null) {
+                    Log.w("GEOCODER_DEBUG", "Address is null (empty list)")
+                    cont.resume(null)
+                    return@getFromLocation
+                }
+
+                Log.d(
+                    "GEOCODER_DEBUG",
+                    """
+                adminArea=${a.adminArea}
+                subAdminArea=${a.subAdminArea}
+                locality=${a.locality}
+                subLocality=${a.subLocality}
+                thoroughfare=${a.thoroughfare}
+                featureName=${a.featureName}
+                """.trimIndent()
                 )
+
+                val sido = normalizeSido(a.adminArea)
+                // 🔥 여기 추가 / 교체
+                val guOrDong =
+                    a.subAdminArea
+                        ?: a.locality
+                        ?: a.subLocality
+                        ?: a.thoroughfare      // ✅ 역삼동
+                        ?: a.subThoroughfare
+                        ?: a.featureName
+
+                val result =
+                    if (!sido.isNullOrBlank() && !guOrDong.isNullOrBlank())
+                        "$sido $guOrDong"
+                    else null
+
+                Log.d("GEOCODER_DEBUG", "result=$result (sido=$sido, gu=$guOrDong)")
+
+                cont.resume(result)
             }
         }
     } else {
         withContext(Dispatchers.IO) {
             try {
                 val a = geocoder.getFromLocation(lat, lng, 1)?.firstOrNull()
-                val sido = normalizeSido(a?.adminArea)
-                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
-                if (!sido.isNullOrBlank() && !gu.isNullOrBlank()) "$sido $gu" else null
+                if (a == null) return@withContext null
+
+                val sido = normalizeSido(a.adminArea)
+
+                val guOrDong =
+                    a.subAdminArea
+                        ?: a.locality
+                        ?: a.subLocality
+                        ?: a.thoroughfare
+                        ?: a.subThoroughfare
+                        ?: a.featureName
+
+                if (!sido.isNullOrBlank() && !guOrDong.isNullOrBlank())
+                    "$sido $guOrDong"
+                else null
             } catch (_: Exception) {
                 null
             }

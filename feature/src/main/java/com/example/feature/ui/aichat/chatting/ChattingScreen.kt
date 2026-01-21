@@ -195,7 +195,7 @@ internal fun RecentChattingScreen(
                     painter = painterResource(id = R.drawable.ic_arrow_up),
                     contentDescription = "Send",
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
+                        .align(Alignment.TopEnd)
                         .padding(6.dp)
                         .clickable(
                             enabled = userInput.isNotBlank(),
