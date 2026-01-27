@@ -124,7 +124,7 @@
 
     <string name="mypage_profile_edit">Change Profile</string>
     <string name="mypage_consultation_summary">My Consultation Summary</string>
-    <string name="mypage_resume">Resume\n/ Self-Introduction Letter</string>
+    <string name="mypage_resume">Resume / Self-Introduction Letter</string>
     <string name="mypage_posts_comments">Posts\n/ Comments</string>
 
     <string name="mypage_app_info">About Hello World</string>
@@ -164,5 +164,8 @@
     <string name="anonymous">Anonymous%d</string>
     <string name="write_post">Write Post</string>
     <string name="edit_post">Edit Post</string>
+
+    <string name="msg_feature_preparing">This feature is currently under development.</string>
+    <string name="header_resume">Resume / Self-Introduction Letter</string>
 
 </resources>

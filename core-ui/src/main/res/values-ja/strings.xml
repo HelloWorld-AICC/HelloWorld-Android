@@ -119,4 +119,6 @@
     <string name="anonymous">匿名%d</string>
     <string name="write_post">投稿の作成</string>
     <string name="edit_post">投稿の修正</string>
+    <string name="msg_feature_preparing">この機能は現在準備中です。</string>
+    <string name="header_resume">履歴書 / 自己紹介書</string>
 </resources>

@@ -119,4 +119,6 @@
     <string name="anonymous">匿名%d</string>
     <string name="write_post">发布帖子</string>
     <string name="edit_post">修改帖子</string>
+    <string name="msg_feature_preparing">该功能正在准备中。</string>
+    <string name="header_resume">简历 / 自我介绍信</string>
 </resources>

@@ -129,6 +129,7 @@ fun NavGraphBuilder.resumeScreen(
 ) {
     composable<Resume> {
         Resume(
+            onNavigateBack = onNavigateBack
         )
     }
 }

@@ -85,6 +85,8 @@
     <string name="mypage_profile_edit">프로필 변경</string>
     <string name="mypage_consultation_summary">내 상담 요약</string>
     <string name="mypage_resume">이력서\n/ 자기소개서</string>
+    <string name="msg_feature_preparing">해당 기능은 준비중입니다.</string>
+    <string name="header_resume">이력서 / 자기소개서</string>
     <string name="mypage_posts_comments">게시글\n/ 댓글</string>
     <string name="mypage_app_info">Hello World 정보</string>
     <string name="mypage_opensource_license">오픈소스 라이선스</string>
