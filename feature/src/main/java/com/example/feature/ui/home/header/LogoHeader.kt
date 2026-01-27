@@ -20,7 +20,7 @@ fun LogoHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .padding(start = 20.dp, top = 16.dp),
+            .padding(horizontal = 24.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {

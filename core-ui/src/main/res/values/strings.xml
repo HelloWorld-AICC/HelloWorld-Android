@@ -158,4 +158,11 @@
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Hello</string>
     <string name="temp_nickname_deadline">Please enter a nickname of 15 characters or fewer.</string>
+    <string name="mypage_posts_comments_one_line">Posts/Comments</string>
+
+    <string name="failed_connect_server">Failed to communicate with the server.</string>
+    <string name="anonymous">Anonymous%d</string>
+    <string name="write_post">Write Post</string>
+    <string name="edit_post">Edit Post</string>
+
 </resources>

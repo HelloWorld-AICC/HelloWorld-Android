@@ -29,10 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +57,7 @@ import com.example.model.common.Language
 import com.example.model.mypage.UserInfo
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.example.core.ui.R
+import com.example.model.common.National
 
 @Composable
 fun MyPage(
@@ -184,11 +187,18 @@ private fun MyPage(
                                 contentDescription = null
                             )
                         }
-                        Text(
-                            text = "${uiState.userInfo.language?.flag}",
-                            fontSize = 28.sp,
+                        Image(
+                            painter = when (uiState.userInfo.language?.national) {
+                                National.KOREAN -> painterResource(R.drawable.flag_kr)
+                                National.JAPANESE -> painterResource(R.drawable.flag_jp)
+                                National.CHINESE -> painterResource(R.drawable.flag_ch)
+                                National.VIETNAMESE -> painterResource(R.drawable.flag_vi)
+                                else -> painterResource(R.drawable.flag_en)
+                            },
+                            contentDescription = "국기",
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
+                                .size(24.dp)
                         )
                     }
                     Column(
@@ -229,6 +239,7 @@ private fun MyPage(
                     )
                     MenuCard(
                         title = stringResource(R.string.mypage_posts_comments),
+                        spacing = 6.dp,
                         onClick = { onNavigateToPostAndComments() },
                     )
                 }

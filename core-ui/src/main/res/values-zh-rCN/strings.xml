@@ -114,4 +114,9 @@
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">您好！</string>
     <string name="temp_nickname_deadline">昵称请限制在15个字符以内。</string>
+    <string name="mypage_posts_comments_one_line">帖子 / 评论</string>
+    <string name="failed_connect_server">与服务器通信失败。</string>
+    <string name="anonymous">匿名%d</string>
+    <string name="write_post">发布帖子</string>
+    <string name="edit_post">修改帖子</string>
 </resources>

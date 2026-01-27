@@ -66,7 +66,7 @@ import com.example.model.community.Post
 @Composable
 internal fun Community(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
-    onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
+    onNavigateToCommunityPostDetail: (Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     onClearCommunityUpdate: () -> Unit,
     modifier: Modifier = Modifier,
@@ -159,6 +159,7 @@ internal fun Community(
                     isSelected = pagerState.currentPage == 3,
                 )
             }
+            Spacer(modifier = Modifier.height(12.dp))
             HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = HelloWorldMain200)
             HorizontalPager(
                 state = pagerState,
@@ -167,25 +168,25 @@ internal fun Community(
                 when (page) {
                     0 -> CommunityTabContent(
                         posts = problemPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(0, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(0) },
                         isLoading = isLoading,
                     )
                     1 -> CommunityTabContent(
                         posts = nationalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(1, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(1) },
                         isLoading = isLoading,
                     )
                     2 -> CommunityTabContent(
                         posts = medicalPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(2, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(2) },
                         isLoading = isLoading,
                     )
                     3 -> CommunityTabContent(
                         posts = etcPosts,
-                        onPostClick = { onNavigateToCommunityPostDetail(3, it) },
+                        onPostClick = { onNavigateToCommunityPostDetail(it) },
                         onLoadMore = { viewModel.loadMorePosts(3) },
                         isLoading = isLoading,
                     )
@@ -317,7 +318,7 @@ fun CommunityPostItem(
             ) {
                 Text(
                     text = post.title.truncateWithEllipsis(20),
-                    style = AppTypography.body02,
+                    style = AppTypography.heading04,
                     color = HelloWorldGrayScale800,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -325,7 +326,7 @@ fun CommunityPostItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = post.content.truncateWithEllipsis(if (post.imageUrl != null) 30 else 40),
-                    style = AppTypography.label01,
+                    style = AppTypography.body02,
                     color = HelloWorldGrayScale500,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -351,11 +352,18 @@ fun CommunityPostItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 카테고리, 날짜
-            Text(
-                text = "${post.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
-                style = AppTypography.label03,
-                color = HelloWorldGrayScale500
-            )
+            Row {
+                Text(
+                    text = stringResource(post.categoryId.toCategoryName()),
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale500,
+                )
+                Text(
+                    text = " • ${post.createdAt.toFormattedDate()}",
+                    style = AppTypography.label02,
+                    color = HelloWorldGrayScale500,
+                )
+            }
             // 댓글
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -370,7 +378,7 @@ fun CommunityPostItem(
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = "${post.commentNum}",
-                    style = AppTypography.label03,
+                    style = AppTypography.label02,
                     color = HelloWorldGrayScale500
                 )
             }
@@ -425,8 +433,10 @@ internal fun TabIconAndLabel(
         }
         Text(
             text = title,
+            modifier = Modifier.width(60.dp),
             style = AppTypography.label01,
-            color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300
+            color = if (isSelected) HelloWorldGrayScale800 else HelloWorldGrayScale300,
+            textAlign = TextAlign.Center
         )
     }
 }

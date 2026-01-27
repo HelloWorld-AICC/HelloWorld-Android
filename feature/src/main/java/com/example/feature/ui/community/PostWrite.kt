@@ -145,7 +145,7 @@ internal fun CommunityPostWrite(
                     .size(24.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            val title = if (isCreate) "게시글 작성" else "게시글 수정"
+            val title = stringResource(if (isCreate) R.string.write_post else R.string.edit_post)
             Text(
                 text = title,
                 style = AppTypography.heading04,
@@ -167,7 +167,8 @@ internal fun CommunityPostWrite(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(top = 12.dp)
+                    .padding(top = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
                     text = stringResource(R.string.community_post_category),

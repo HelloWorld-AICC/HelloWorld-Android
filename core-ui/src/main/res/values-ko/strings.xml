@@ -114,4 +114,9 @@
     <string name="ai_chat_toast">채팅은 500자 이하로 입력해주세요.</string>
     <string name="mypage_chat_sumary">chat 요약</string>
     <string name="temp_nickname_deadline">닉네임은 15자 이하로 입력해주세요.</string>
+    <string name="mypage_posts_comments_one_line">게시글 / 댓글</string>
+    <string name="failed_connect_server">서버와의 통신에 실패했습니다.</string>
+    <string name="anonymous">익명%d</string>
+    <string name="write_post">게시글 작성</string>
+    <string name="edit_post">게시글 수정</string>
 </resources>
