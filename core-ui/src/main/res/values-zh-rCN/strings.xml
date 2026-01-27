@@ -93,7 +93,7 @@
     <string name="logout">退出登录</string>
     <string name="mypage_language_change">更改语言</string>
     <string name="mypage_withdraw_title">您确定要退出吗？</string>
-    <string name="mypage_withdraw_warning">即使在您退出后，您撰写的帖子和评论仍可能保留在服务中，之后将无法进行编辑、删除等管理。</string>
+    <string name="mypage_withdraw_warning">即使在您退出后，您撰写的帖子和评论仍可能保留在服务中，\n之后将无法进行编辑、删除等管理。</string>
     <string name="mypage_withdraw_reason_title">请告诉我们您决定退出的原因</string>
     <string name="mypage_withdraw_reason_placeholder">请选择原因</string>
     <string name="mypage_withdraw_reason_no_feature">没有所需功能</string>
@@ -104,7 +104,7 @@
     <string name="mypage_withdraw_confirm">您确定要退出吗？</string>
     <string name="mypage_withdraw_rights_warning">您将失去对帖子和评论的管理权限</string>
     <string name="mypage_withdraw_complete_title">退出已完成。</string>
-    <string name="mypage_withdraw_complete_message">感谢您一路相伴。HelloWorld 将永远在您身边。</string>
+    <string name="mypage_withdraw_complete_message">感谢您一路相伴。\nHelloWorld 将永远在您身边。</string>
     <string name="mypage_logout_dialog_title">您确定要退出登录吗？</string>
     <string name="mypage_logout_dialog_subtitle">期待下次再见！</string>
     <string name="mypage_nickname_edit">更改昵称</string>

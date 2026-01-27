@@ -95,7 +95,7 @@
     <string name="logout">ログアウト</string>
     <string name="mypage_language_change">言語の変更</string>
     <string name="mypage_withdraw_title">本当に退会しますか？</string>
-    <string name="mypage_withdraw_warning">退会された後も、作成された投稿とコメントはサービスに残る可能性があり、その後は修正・削除などの管理ができなくなります。</string>
+    <string name="mypage_withdraw_warning">退会された後も、作成された投稿とコメントはサービスに残る可能性があり、\nその後は修正・削除などの管理ができなくなります。</string>
     <string name="mypage_withdraw_reason_title">退会を決意した理由を教えてください</string>
     <string name="mypage_withdraw_reason_placeholder">理由を選択してください</string>
     <string name="mypage_withdraw_reason_no_feature">必要な機能がありません</string>
@@ -106,7 +106,7 @@
     <string name="mypage_withdraw_confirm">退会しますか？</string>
     <string name="mypage_withdraw_rights_warning">投稿とコメントに対する権限がなくなります</string>
     <string name="mypage_withdraw_complete_title">退会が完了しました。</string>
-    <string name="mypage_withdraw_complete_message">今までご一緒していただきありがとうございます。HelloWorldはいつもあなたのそばにいます。</string>
+    <string name="mypage_withdraw_complete_message">今までご一緒していただきありがとうございます。\nHelloWorldはいつもあなたのそばにいます。</string>
     <string name="mypage_logout_dialog_title">ログアウトしますか？</string>
     <string name="mypage_logout_dialog_subtitle">また次回お会いしましょう！</string>
     <string name="mypage_nickname_edit">ニックネームの変更</string>

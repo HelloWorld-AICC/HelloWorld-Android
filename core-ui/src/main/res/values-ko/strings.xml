@@ -97,7 +97,7 @@
     <string name="posts">게시글</string>
     <string name="mypage_language_change">언어 변경</string>
     <string name="mypage_withdraw_title">정말 탈퇴하실 건가요?</string>
-    <string name="mypage_withdraw_warning">탈퇴하신 후에도 작성하신 글과 댓글은 서비스에 남을 수 있으며, 이후에는 수정·삭제 등 관리가 불가능합니다.</string>
+    <string name="mypage_withdraw_warning">탈퇴하신 후에도 작성하신 글과 댓글은 서비스에 남을 수 있으며,\n이후에는 수정·삭제 등 관리가 불가능합니다.</string>
     <string name="mypage_withdraw_reason_title">탈퇴를 결심하게 된 이유를 알려주세요</string>
     <string name="mypage_withdraw_reason_placeholder">이유를 선택해주세요</string>
     <string name="mypage_withdraw_reason_no_feature">필요한 기능이 없어요</string>
@@ -108,7 +108,7 @@
     <string name="mypage_withdraw_confirm">탈퇴 하시겠어요?</string>
     <string name="mypage_withdraw_rights_warning">게시글과 댓글에 대한 권한이 없어집니다</string>
     <string name="mypage_withdraw_complete_title">탈퇴가 완료되었습니다.</string>
-    <string name="mypage_withdraw_complete_message">지금까지 함께해주셔서 감사합니다. HelloWorld는 늘 곁에 있을게요.</string>
+    <string name="mypage_withdraw_complete_message">지금까지 함께해주셔서 감사합니다.\nHelloWorld는 늘 곁에 있을게요.</string>
     <string name="mypage_logout_dialog_subtitle">다음에 다시 만나요!</string>
     <string name="mypage_nickname_edit">닉네임 변경</string>
     <string name="mypage_logout_dialog_title">로그아웃 하시겠어요?</string>

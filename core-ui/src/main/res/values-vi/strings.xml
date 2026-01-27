@@ -93,7 +93,7 @@
     <string name="logout">Đăng xuất</string>
     <string name="mypage_language_change">Thay đổi ngôn ngữ</string>
     <string name="mypage_withdraw_title">Bạn có thực sự muốn rút khỏi không?</string>
-    <string name="mypage_withdraw_warning">Ngay cả sau khi rút khỏi, các bài viết và bình luận bạn đã viết có thể vẫn còn trên dịch vụ, và sau đó không thể quản lý như chỉnh sửa hoặc xóa.</string>
+    <string name="mypage_withdraw_warning">Ngay cả sau khi rút khỏi, các bài viết và bình luận bạn đã viết có thể vẫn còn trên dịch vụ,\nvà sau đó không thể quản lý như chỉnh sửa hoặc xóa.</string>
     <string name="mypage_withdraw_reason_title">Vui lòng cho biết lý do bạn quyết định rút khỏi.</string>
     <string name="mypage_withdraw_reason_placeholder">Vui lòng chọn lý do</string>
     <string name="mypage_withdraw_reason_no_feature">Không có các tính năng cần thiết</string>
@@ -104,7 +104,7 @@
     <string name="mypage_withdraw_confirm">Bạn có muốn rút khỏi không?</string>
     <string name="mypage_withdraw_rights_warning">Bạn sẽ mất quyền đối với bài viết và bình luận.</string>
     <string name="mypage_withdraw_complete_title">Rút khỏi đã hoàn tất.</string>
-    <string name="mypage_withdraw_complete_message">Cảm ơn bạn đã đồng hành cùng chúng tôi cho đến nay. HelloWorld sẽ luôn ở bên bạn.</string>
+    <string name="mypage_withdraw_complete_message">Cảm ơn bạn đã đồng hành cùng chúng tôi cho đến nay.\nHelloWorld sẽ luôn ở bên bạn.</string>
     <string name="mypage_logout_dialog_title">Bạn có muốn đăng xuất không?</string>
     <string name="mypage_logout_dialog_subtitle">Hẹn gặp lại lần sau!</string>
     <string name="mypage_nickname_edit">Thay đổi biệt danh</string>
