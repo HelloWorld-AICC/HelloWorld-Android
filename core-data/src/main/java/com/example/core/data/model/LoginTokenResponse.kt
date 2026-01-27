@@ -12,7 +12,7 @@ data class LoginTokenItem (
 )
 
 @Serializable
-data class LoginTokenResult(
+data class  LoginTokenResult(
     val tokenList: List<LoginTokenItem>
 )
 
