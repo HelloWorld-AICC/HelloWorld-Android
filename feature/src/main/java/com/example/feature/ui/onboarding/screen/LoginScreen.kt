@@ -34,6 +34,7 @@ import com.example.feature.ui.onboarding.viewmodel.LoginViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import com.example.core.data.network.RetrofitInstance
+import com.google.android.gms.common.api.Scope
 
 
 @Composable
@@ -82,8 +83,14 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            GoogleSignInButton { email, accessToken ->
-                viewModel.handleGoogleLogin(email, accessToken)
+            GoogleSignInButton { email, authCode, accessToken, idToken ->
+                // 필요하면 viewModel에서 token 저장/서버전달
+                viewModel.handleGoogleLogin(
+                    email = email,
+                    authCode = authCode,
+                    accessToken = accessToken,
+                    idToken = idToken
+                )
             }
 
             SplashImg()
@@ -92,7 +99,9 @@ fun LoginScreen(navController: NavController) {
 }
 
 @Composable
-fun GoogleSignInButton(onTokenReceived: (String?, String?) -> Unit) {
+fun GoogleSignInButton(
+    onTokenReceived: (email: String?, authCode: String?, accessToken: String?, idToken: String?) -> Unit
+) {
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
@@ -104,8 +113,37 @@ fun GoogleSignInButton(onTokenReceived: (String?, String?) -> Unit) {
             val account = task.getResult(ApiException::class.java)
             val email = account?.email
             val authCode = account?.serverAuthCode
-            Log.d("LOGIN", "email: $email, authCode: $authCode")
-            onTokenReceived(email, authCode)
+            val idToken = account?.idToken
+
+            // ✅ accessToken 발급은 네트워크/IO 성격이라 백그라운드에서
+            // Composable 안이므로 간단히 Thread로 처리(프로젝트에 맞게 coroutine으로 바꿔도 됨)
+            Thread {
+                val androidAccount = account?.account
+                val accessToken = try {
+                    if (androidAccount == null) null
+                    else {
+                        val scopeStr =
+                            "oauth2:https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+
+                        com.google.android.gms.auth.GoogleAuthUtil.getToken(
+                            context,
+                            androidAccount,   // ✅ Account (non-null)
+                            scopeStr
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("LOGIN", "accessToken 가져오기 실패", e)
+                    null
+                }
+
+                Log.d("LOGIN", "email=$email authCode=$authCode idToken=$idToken accessToken=$accessToken")
+
+                // 메인스레드로 콜백
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    onTokenReceived(email, authCode, accessToken, idToken)
+                }
+            }.start()
+
         } catch (e: ApiException) {
             Log.e("LOGIN", "Google 로그인 실패", e)
         }
@@ -113,15 +151,18 @@ fun GoogleSignInButton(onTokenReceived: (String?, String?) -> Unit) {
 
     Button(
         onClick = {
+            Log.d("LOGIN", "INITLOGIN")
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(
-                    "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com"
-                )
+                .requestIdToken("283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com")
                 .requestEmail()
                 .requestProfile()
                 .requestServerAuthCode(
                     "283350122061-8gk7hs4eesqrqu6gmjl29okt44221otm.apps.googleusercontent.com",
                     true
+                )
+                .requestScopes(
+                    com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/userinfo.email"),
+                    com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/userinfo.profile")
                 )
                 .build()
 
@@ -149,3 +190,4 @@ fun GoogleSignInButton(onTokenReceived: (String?, String?) -> Unit) {
         )
     }
 }
+
