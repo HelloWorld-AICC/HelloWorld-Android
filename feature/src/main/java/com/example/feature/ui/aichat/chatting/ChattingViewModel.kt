@@ -41,7 +41,11 @@ class ChatViewModel @Inject constructor() : ViewModel() {
     private val _summaryCompleted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val summaryCompleted = _summaryCompleted.asSharedFlow()
 
-    fun loadChatLog(roomId: String) {
+    fun loadChatLog(
+        roomId: String,
+        greeting: String,
+        prompt: String
+    ) {
         viewModelScope.launch {
             try {
                 Log.d(TAG, "🔵 요청: getAIChatLog($roomId)")
@@ -49,11 +53,13 @@ class ChatViewModel @Inject constructor() : ViewModel() {
 
                 if (!resp.isSuccessful) {
                     Log.w(TAG, "❗getAIChatLog 실패: HTTP ${resp.code()}")
+                    setMessagesWithIntro(roomId, greeting, prompt, emptyList())
                     return@launch
                 }
 
                 val body: AIChatLogResponse = resp.body() ?: run {
                     Log.w(TAG, "❗getAIChatLog 응답 body=null")
+                    setMessagesWithIntro(roomId, greeting, prompt, emptyList())
                     return@launch
                 }
 
@@ -69,17 +75,12 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                     AIChatMessage(content = normalized, sender = m.sender)
                 }
 
-                val existing = _chatMessages.value[body.roomId].orEmpty()
-                val intro = if (existing.isEmpty()) listOf(
-                    AIChatMessage(languageR.string.ai_greeting.toString(), sender = "bot"),
-                    AIChatMessage(languageR.string.ai_prompt.toString(), sender = "bot")
-                ) else emptyList()
-
-                val finalMessages = intro + cleanedLogs
-
-                _chatMessages.value = _chatMessages.value.toMutableMap().apply {
-                    put(body.roomId, finalMessages)
-                }
+                setMessagesWithIntro(
+                    roomId = body.roomId,
+                    greeting = greeting,
+                    prompt = prompt,
+                    logs = cleanedLogs
+                )
 
                 if (!_chatRoomIds.value.contains(body.roomId)) {
                     _chatRoomIds.value = _chatRoomIds.value + body.roomId
@@ -93,6 +94,23 @@ class ChatViewModel @Inject constructor() : ViewModel() {
             } catch (e: Exception) {
                 Log.e(TAG, "알 수 없는 오류(getAIChatLog): ${e.message}", e)
             }
+        }
+    }
+
+    private fun setMessagesWithIntro(
+        roomId: String,
+        greeting: String,
+        prompt: String,
+        logs: List<AIChatMessage>
+    ) {
+        val intro = listOf(
+            AIChatMessage(content = greeting, sender = "bot"),
+            AIChatMessage(content = prompt, sender = "bot")
+        )
+        val finalMessages = intro + logs
+
+        _chatMessages.value = _chatMessages.value.toMutableMap().apply {
+            put(roomId, finalMessages)
         }
     }
 
