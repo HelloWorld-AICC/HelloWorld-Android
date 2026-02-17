@@ -270,12 +270,11 @@ class RetrofitCommunityDataSource @Inject constructor(
         }
     }
 
-    override suspend fun updatePost(categoryId: Long, communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse> {
+    override suspend fun updatePost(communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse> {
         Log.d(TAG, "updatePost() called")
 
         return try {
             val response = communityApi.updateCommunityPost(
-                categoryId = categoryId,
                 communityId = communityId,
                 request = request
             )
