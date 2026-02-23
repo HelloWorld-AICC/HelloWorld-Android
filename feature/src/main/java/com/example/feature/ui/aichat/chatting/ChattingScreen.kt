@@ -136,6 +136,20 @@ internal fun RecentChattingScreen(
         BackHeader(title = stringResource(languageR.string.home_chatbot_title), onBackClick = onBackClick)
         HorizontalDivider(color = HelloWorldMain200)
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(HelloWorldMain100)
+                .padding(horizontal = 26.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "AI 답변은 정확하지 않을 수 있으므로, 중요한 사항은 관련 기관을 통해 직접 확인해주세요.",
+                style = AppTypography.label02,
+                color = HelloWorldGrayScale300
+            )
+        }
+
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
