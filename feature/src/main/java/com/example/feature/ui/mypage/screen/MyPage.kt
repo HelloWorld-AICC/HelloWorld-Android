@@ -225,19 +225,23 @@ private fun MyPage(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     MenuCard(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_my_profile),
                         title = stringResource(R.string.mypage_profile_edit),
                         onClick = { onNavigateToProfileEdit(uiState.userInfo.name, uiState.userInfo.userImg, uiState.userInfo.language) }, // TODO language
                     )
                     MenuCard(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_my_counseling),
                         title = stringResource(R.string.mypage_consultation_summary),
                         onClick = { onNavigateToCounselingSummary() },
                     )
                     MenuCard(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_my_resume),
                         title = stringResource(R.string.mypage_resume),
                         spacing = 6.dp,
                         onClick = { onNavigateToResume() },
                     )
                     MenuCard(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_my_post),
                         title = stringResource(R.string.mypage_posts_comments),
                         spacing = 6.dp,
                         onClick = { onNavigateToPostAndComments() },
@@ -355,6 +359,7 @@ private fun MyPage(
 
 @Composable
 private fun MenuCard(
+    imageVector: ImageVector,
     title: String = "",
     spacing: Dp = 12.dp,
     onClick: () -> Unit = {},
@@ -364,11 +369,11 @@ private fun MenuCard(
             .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
+        Image(
+            imageVector = imageVector,
+            contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray)
         )
         Spacer(modifier = Modifier.height(spacing))
         Text(

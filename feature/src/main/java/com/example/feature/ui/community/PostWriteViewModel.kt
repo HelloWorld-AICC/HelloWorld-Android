@@ -136,7 +136,6 @@ class PostWriteViewModel @AssistedInject constructor(
     fun updateCommunityPost(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             communityRepository.updatePost(
-                categoryId = _selectedTab.value.toLong(),
                 communityId = request.communityId.toLong(),
                 request = UpdatePostRequest(
                     title = _title.value,
