@@ -144,7 +144,7 @@ internal fun RecentChattingScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "AI 답변은 정확하지 않을 수 있으므로, 중요한 사항은 관련 기관을 통해 직접 확인해주세요.",
+                text = stringResource(languageR.string.chat_warn),
                 style = AppTypography.label02,
                 color = HelloWorldGrayScale300
             )

@@ -121,4 +121,5 @@
     <string name="edit_post">修改帖子</string>
     <string name="msg_feature_preparing">该功能正在准备中。</string>
     <string name="header_resume">简历 / 自我介绍信</string>
+    <string name="chat_warn">AI 的回答可能并不完全准确。对于重要事项，请直接向相关机构或主管部门进行确认。</string>
 </resources>

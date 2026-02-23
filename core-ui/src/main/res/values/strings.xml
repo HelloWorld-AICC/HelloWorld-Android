@@ -168,5 +168,6 @@
 
     <string name="msg_feature_preparing">This feature is currently under development.</string>
     <string name="header_resume">Resume / Self-Introduction Letter</string>
+    <string name="chat_warn">AI responses may not always be accurate. For important matters, please verify directly with the relevant authorities or institutions.</string>
 
 </resources>
