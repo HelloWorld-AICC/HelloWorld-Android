@@ -45,10 +45,17 @@ class LoginViewModel @Inject constructor(
                     if (!idToken.isNullOrBlank()) {
                         val googleResponse = RetrofitInstance.authService.getToken(idToken)
                         if (googleResponse.isSuccess) {
-                            Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
-                            saveTokens(googleResponse.result?.tokenList)
-                            _loginSuccess.value = true
-                            _isExistUser.value = false
+                            if (googleResponse.result.isExist ) {
+                                Log.d("LOGIN", "구글 로그인 성공 (기존 가입자)")
+                                saveTokens(googleResponse.result?.tokenList)
+                                _loginSuccess.value = true
+                                _isExistUser.value = true
+                            } else {
+                                Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
+                                saveTokens(googleResponse.result?.tokenList)
+                                _loginSuccess.value = true
+                                _isExistUser.value = false
+                            }
                         } else {
                             Log.e("LOGIN", "구글 로그인 API 실패")
                         }

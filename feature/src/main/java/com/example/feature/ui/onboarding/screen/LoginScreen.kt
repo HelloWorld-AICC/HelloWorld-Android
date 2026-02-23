@@ -48,17 +48,17 @@ fun LoginScreen(navController: NavController) {
 
     // 로그인 성공 시 화면 전환
     if (loginSuccess) {
-//        if (isExistUser) {
-//            navController.navigate("홈") {
-//                popUpTo("온보딩") { inclusive = true }
-//                launchSingleTop = true
-//            }
-//        } else {
+        if (isExistUser) {
+            navController.navigate("홈") {
+                popUpTo("온보딩") { inclusive = true }
+                launchSingleTop = true
+            }
+        } else {
             navController.navigate("언어 설정") {
                 popUpTo("스플래시") { inclusive = false }
                 launchSingleTop = true
             }
-//        }
+        }
     }
 
     Box(
