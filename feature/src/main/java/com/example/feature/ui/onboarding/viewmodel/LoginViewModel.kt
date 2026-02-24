@@ -24,38 +24,45 @@ class LoginViewModel @Inject constructor(
     private val _isExistUser = MutableStateFlow(false)
     val isExistUser: StateFlow<Boolean> = _isExistUser
 
-    fun handleGoogleLogin(email: String?, accessToken: String?) {
-        if (email.isNullOrBlank()) {
-            Log.e("LOGIN", "이메일이 null이거나 비어 있음")
-            return
-        }
+    fun handleGoogleLogin(email: String?, authCode: String?, accessToken: String?, idToken : String?) {
+//        if (email.isNullOrBlank()) {
+//            Log.e("LOGIN", "이메일이 null이거나 비어 있음")
+//            return
+//        }
 
         viewModelScope.launch {
             try {
-                val emailResponse = RetrofitInstance.authService.loginWithEmail(LoginEmailRequest(email))
+//                val emailResponse = RetrofitInstance.authService.loginWithEmail(LoginEmailRequest(email))
 
-                if (emailResponse.isSuccess) { // 기존 회원
-                    Log.d("LOGIN", "이메일 로그인 성공")
-                    saveTokens(emailResponse.result?.tokenList)
-                    _loginSuccess.value = true
-                    _isExistUser.value = true
-                } else {
-                    Log.w("LOGIN", "이메일 로그인 실패 → 구글 로그인 시도")
+//                if (emailResponse.isSuccess) { // 기존 회원
+//                    Log.d("LOGIN", "이메일 로그인 성공")
+//                    saveTokens(emailResponse.result?.tokenList)
+//                    _loginSuccess.value = true
+//                    _isExistUser.value = true
+//                } else {
+//                    Log.w("LOGIN", "이메일 로그인 실패 → 구글 로그인 시도")
 
-                    if (!accessToken.isNullOrBlank()) {
-                        val googleResponse = RetrofitInstance.authService.getToken(accessToken)
+                    if (!idToken.isNullOrBlank()) {
+                        val googleResponse = RetrofitInstance.authService.getToken(idToken)
                         if (googleResponse.isSuccess) {
-                            Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
-                            saveTokens(googleResponse.result?.tokenList)
-                            _loginSuccess.value = true
-                            _isExistUser.value = false
+                            if (googleResponse.result.isExist ) {
+                                Log.d("LOGIN", "구글 로그인 성공 (기존 가입자)")
+                                saveTokens(googleResponse.result?.tokenList)
+                                _loginSuccess.value = true
+                                _isExistUser.value = true
+                            } else {
+                                Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
+                                saveTokens(googleResponse.result?.tokenList)
+                                _loginSuccess.value = true
+                                _isExistUser.value = false
+                            }
                         } else {
                             Log.e("LOGIN", "구글 로그인 API 실패")
                         }
                     } else {
                         Log.e("LOGIN", "accessToken이 null이라 구글 로그인 불가")
                     }
-                }
+//                }
             } catch (e: Exception) {
                 Log.e("LOGIN", "로그인 과정에서 오류", e)
             }

@@ -121,4 +121,5 @@
     <string name="edit_post">投稿の修正</string>
     <string name="msg_feature_preparing">この機能は現在準備中です。</string>
     <string name="header_resume">履歴書 / 自己紹介書</string>
+    <string name="chat_warn">AIの回答は必ずしも正確とは限りません。重要な事項については、必ず関係機関へ直接ご確認ください。</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -72,8 +73,11 @@ internal fun RecentChattingScreen(
     onBackClick: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(roomId) {
-        viewModel.loadChatLog(roomId)
+    val greeting = stringResource(languageR.string.ai_greeting)
+    val prompt = stringResource(languageR.string.ai_prompt)
+
+    LaunchedEffect(roomId, greeting, prompt) {
+        viewModel.loadChatLog(roomId, greeting, prompt)
     }
 
     val selectedChatId by viewModel.selectedChatId.collectAsState()
@@ -97,9 +101,11 @@ internal fun RecentChattingScreen(
 
     var showSummaryDialog by remember { mutableStateOf(false) }
 
-    val introSet = remember { setOf(languageR.string.ai_greeting, languageR.string.ai_prompt) }
-    val lastSummarizableBot = messages.lastOrNull {
-        it.sender.equals("bot", ignoreCase = true) && it.content !in introSet.toString()
+    val lastSummarizableBot = remember(messages) {
+        val botMessages = messages.filter { it.sender.equals("bot", ignoreCase = true) }
+        // botMessages = [greeting, prompt, ... AI 응답들 ...]
+        // 인트로 2개 제외 -> drop(2)
+        botMessages.drop(2).lastOrNull()
     }
 
     LaunchedEffect(messages.size) {
@@ -129,6 +135,20 @@ internal fun RecentChattingScreen(
     ) {
         BackHeader(title = stringResource(languageR.string.home_chatbot_title), onBackClick = onBackClick)
         HorizontalDivider(color = HelloWorldMain200)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(HelloWorldMain100)
+                .padding(horizontal = 26.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(languageR.string.chat_warn),
+                style = AppTypography.label02,
+                color = HelloWorldGrayScale300
+            )
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -268,6 +288,7 @@ fun ChatBubble(msg: AIChatMessage, viewModel: ChatViewModel, showSummaryIcon: Bo
                     modifier = Modifier
                         .size(20.dp)
                         .offset(x = 23.dp)
+                        .clip(RoundedCornerShape(6.dp))
                         .clickable { viewModel.summarizeMessage() }
                 )
             }

@@ -121,4 +121,5 @@
     <string name="edit_post">Chỉnh sửa bài đăng</string>
     <string name="msg_feature_preparing">Tính năng này hiện đang được phát triển.</string>
     <string name="header_resume">Sơ yếu lý lịch / Thư tự giới thiệu</string>
+    <string name="chat_warn">Câu trả lời của AI có thể không hoàn toàn chính xác. Đối với những vấn đề quan trọng, vui lòng xác nhận trực tiếp với cơ quan hoặc tổ chức có liên quan.</string>
 </resources>

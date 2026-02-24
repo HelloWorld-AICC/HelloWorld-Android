@@ -12,8 +12,9 @@ data class LoginTokenItem (
 )
 
 @Serializable
-data class LoginTokenResult(
-    val tokenList: List<LoginTokenItem>
+data class  LoginTokenResult(
+    val tokenList: List<LoginTokenItem>,
+    val isExist : Boolean
 )
 
 @Serializable
