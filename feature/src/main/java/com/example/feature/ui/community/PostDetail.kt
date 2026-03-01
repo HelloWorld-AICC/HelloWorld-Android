@@ -206,7 +206,7 @@ internal fun CommunityPostDetail(
                             onClick = {
                                 expanded = false
                                 onNavigateToCommunityPostWrite(
-                                    viewModel.request.categoryId.toInt(),
+                                    post.categoryId.toInt(),
                                     viewModel.request.communityId.toInt(),
                                     ContentType.UPDATE
                                 )
@@ -264,7 +264,6 @@ internal fun CommunityPostDetail(
                                         confirm = R.string.action_report,
                                         onDismiss = { viewModel.updateDialogData() },
                                         onConfirm = {
-                                            // TODO api 추가
                                             viewModel.updateDialogData()
                                             viewModel.reportPost { result ->
                                                 if (result) {
@@ -277,7 +276,7 @@ internal fun CommunityPostDetail(
                                                 } else {
                                                     viewModel.updateToastData(
                                                         ToastData(
-                                                            text = 0, // 서버와의 통신에 실패했습니다.
+                                                            text = R.string.failed_connect_server,
                                                             onDismiss = { viewModel.updateToastData() }
                                                         )
                                                     )
@@ -321,11 +320,18 @@ internal fun CommunityPostDetail(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "${viewModel.request.categoryId.toCategoryName()} • ${post.createdAt.toFormattedDate()}",
-                            style = AppTypography.label02,
-                            color = HelloWorldGrayScale500,
-                        )
+                        Row {
+                            Text(
+                                text = stringResource(post.categoryId.toCategoryName()),
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            )
+                            Text(
+                                text = " • ${post.createdAt.toFormattedDate()}",
+                                style = AppTypography.label02,
+                                color = HelloWorldGrayScale500,
+                            )
+                        }
                         Text(
                             text = post.title,
                             style = AppTypography.heading02,
@@ -450,7 +456,6 @@ internal fun CommunityPostDetail(
                                     confirm = R.string.action_report,
                                     onDismiss = { viewModel.updateDialogData() },
                                     onConfirm = {
-                                        // TODO api 추가
                                         viewModel.updateDialogData()
                                     },
                                 )
@@ -573,7 +578,7 @@ private fun CommentItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "익명${comment.anonymousName}",
+                    text = stringResource(R.string.anonymous, comment.anonymousName),
                     style = AppTypography.label03,
                     color = HelloWorldGrayScale800,
                 )

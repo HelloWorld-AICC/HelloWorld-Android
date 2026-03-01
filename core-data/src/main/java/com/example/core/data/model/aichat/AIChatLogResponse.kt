@@ -5,8 +5,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AIChatLogResponse(
-    @SerialName("roomId") val roomId : String,
-    @SerialName("chatLogs") val chatLogs : List<AIChatMessage>
+    @SerialName("timestamp") val timestamp: String,
+    @SerialName("path") val path: String,
+    @SerialName("status") val status: Int,
+    @SerialName("error") val error: String,
+    @SerialName("requestId") val requestId: String,
+    @SerialName("data") val data: AIChatLogData
+)
+
+@Serializable
+data class AIChatLogData(
+    @SerialName("roomId") val roomId: String,
+    @SerialName("chatLogs") val chatLogs: List<AIChatMessage>
 )
 
 @Serializable

@@ -5,9 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -35,6 +38,9 @@ import com.example.core.ui.R as languageR
 import com.example.feature.ui.mypage.navigation.navigateToMyPage
 import com.example.feature.ui.home.viewmodel.HomeViewModel
 import com.example.core.data.network.RetrofitInstance
+import com.example.core.ui.theme.HelloWorldGoogleBorder
+import com.example.core.ui.theme.HelloWorldMain100
+import com.example.core.ui.theme.HelloWorldMain300
 import com.example.feature.ui.aichat.navigation.navigateToAIChat
 import com.example.feature.ui.aichat.navigation.navigateToAIChatDetail
 import com.example.feature.ui.community.navigation.navigateToCommunity
@@ -73,9 +79,9 @@ fun HomeScreen(
         // 상단 사용자 정보 영역
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .wrapContentSize()
+                .padding(horizontal = 34.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
@@ -97,7 +103,13 @@ fun HomeScreen(
                     style = AppTypography.heading01,
                     color = HelloWorldGrayScale500
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.width(115.dp),
+                    thickness = 1.dp,
+                    color = HelloWorldMain300
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text =  stringResource(languageR.string.home_go_mypage) + " →",
                     style = AppTypography.label02,
@@ -109,18 +121,18 @@ fun HomeScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.width(37.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.avatar_character),
                 contentDescription = "사용자 아바타",
-                modifier = Modifier.size(140.dp)
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(164.dp)
             )
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         // 서비스 카드 목록
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .background(Color.White, shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
                 .padding(24.dp, 30.dp, 24.dp, 19.dp)
@@ -131,9 +143,11 @@ fun HomeScreen(
                 color = HelloWorldGrayScale500
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
                 HomeServiceCard(
                     title = stringResource(languageR.string.home_chatbot_title),
@@ -153,9 +167,11 @@ fun HomeScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
                 HomeServiceCard(
                     title = stringResource(languageR.string.home_nearby_center_title),
@@ -174,6 +190,15 @@ fun HomeScreen(
                     onClick = { navController.navigateToCommunity() }
                 )
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = HelloWorldMain100
+            )
+            Spacer(modifier = Modifier.height(12.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.banner_helloworld),
@@ -194,16 +219,13 @@ fun HomeServiceCard(
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
-    val shadowColor = Color(0x665E8DC5)
+
+    val shadowColor = Color(0xFF0b458a)
     Box(
         modifier = modifier
-            .aspectRatio(1.3f)
-            .graphicsLayer {
-                shadowElevation = 4.dp.toPx()
-                shape = RoundedCornerShape(8.dp)
-            }
+            .shadow(elevation = 2.dp, ambientColor = shadowColor, spotColor = shadowColor, shape = RoundedCornerShape(8.dp))
             .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
-            .shadow(elevation = 1.dp, ambientColor = shadowColor, spotColor = shadowColor)
+            .clip(shape = RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
             .padding(12.dp, 16.dp, 12.dp, 8.dp)
 

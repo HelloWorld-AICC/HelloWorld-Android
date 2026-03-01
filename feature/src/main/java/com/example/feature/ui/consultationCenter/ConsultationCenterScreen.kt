@@ -4,6 +4,7 @@ package com.example.feature.ui.consultationCenter
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Build
@@ -13,16 +14,35 @@ import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +56,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.core.data.model.Center
 import com.example.core.ui.component.BackHeader
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldMain700
 import com.example.feature.R
-import com.example.core.ui.R as languageR
+import com.example.model.common.Language
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -66,6 +85,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import kotlin.coroutines.resume
+import com.example.core.ui.R as languageR
 
 private const val CAMERA_LAT_SHIFT = -0.006          // 오버레이 보정
 private const val REQUERY_THRESHOLD_METERS = 5_000f  // 지도 중심 이동 임계(5km)
@@ -84,23 +104,26 @@ fun ConsultationCenterScreen(
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var cameraMoved by remember { mutableStateOf(false) }
 
-    val selectedCenter by viewModel.selectedCenter.collectAsState()
-    val centerList by viewModel.centerList.collectAsState()
+    // ✅ UI는 DisplayCenter만 사용
+    val selectedCenter by viewModel.selectedDisplayCenter.collectAsState()
+    val selectedCenterId by viewModel.selectedCenterId.collectAsState()
+    val centerList by viewModel.displayCenterList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val listState = rememberLazyListState()
+    // ✅ 언어(시/구/동 + 영업중/종료 텍스트 반영에 사용)
+    val language by viewModel.language.collectAsState()
 
+    val listState = rememberLazyListState()
     var locationTitle by remember { mutableStateOf("") }
 
     // 지도 기반 재조회 기준점(마지막 쿼리 중심)
     var lastQueryLocation by remember { mutableStateOf<LatLng?>(null) }
 
-    // 위치 → 행정구역명 갱신
-    LaunchedEffect(userLocation) {
+    // ✅ 위치 → 행정구역명 갱신 (언어 변경 시에도 재계산)
+    LaunchedEffect(userLocation, language) {
         userLocation?.let { ll ->
-            reverseGeocodeToSidoGu(context, ll)?.let { sidoGu ->
-                locationTitle = sidoGu
-            }
+            val title = reverseGeocodeToSidoGu(context, ll, language)
+            locationTitle = title.orEmpty()
         }
     }
 
@@ -183,7 +206,7 @@ fun ConsultationCenterScreen(
         } else onDispose { }
     }
 
-    // 센터 선택 시 카메라 이동
+    // 센터 선택 시 카메라 이동 (DisplayCenter)
     LaunchedEffect(selectedCenter) {
         selectedCenter?.let { center ->
             val raw = LatLng(center.latitude, center.longitude)
@@ -212,7 +235,7 @@ fun ConsultationCenterScreen(
                 uiSettings = MapUiSettings(myLocationButtonEnabled = hasLocationPermission),
                 onMapClick = { viewModel.selectCenter(null) }
             ) {
-                // ✅ 지도 이동 후(카메라 멈춤) 중심이 5km 이상 바뀌면 재조회 (반경 제한 없음)
+                // ✅ 지도 이동 후(카메라 멈춤) 중심이 5km 이상 바뀌면 재조회
                 MapEffect(lastQueryLocation) { map ->
                     map.setOnCameraIdleListener {
                         val target = map.cameraPosition.target
@@ -249,16 +272,16 @@ fun ConsultationCenterScreen(
                     }
                 }
 
-                // 마커
+                // ✅ 마커 (DisplayCenter)
                 centerList.forEach { center ->
-                    val markerState = remember(center) {
+                    val markerState = remember(center.centerId) {
                         MarkerState(position = LatLng(center.latitude, center.longitude))
                     }
                     Marker(
                         state = markerState,
                         title = center.name,
                         onClick = {
-                            viewModel.selectCenter(center)
+                            viewModel.selectCenter(center.centerId)
                             false
                         }
                     )
@@ -267,10 +290,11 @@ fun ConsultationCenterScreen(
 
             ConsultationCenterListOverlay(
                 centerList = centerList,
-                selectedCenter = selectedCenter,
+                selectedCenterId = selectedCenterId,
                 headerTitle = locationTitle,
                 listState = listState,
                 isLoading = isLoading,
+                language = language,
                 modifier = Modifier.align(Alignment.BottomCenter),
                 onClick = { viewModel.selectCenter(it) }
             )
@@ -308,13 +332,14 @@ private fun startLocationUpdatesSafely(
 
 @Composable
 fun ConsultationCenterListOverlay(
-    centerList: List<Center>,
-    selectedCenter: Center?,
+    centerList: List<CenterViewModel.CenterDisplay>,
+    selectedCenterId: Int?,
     headerTitle: String,
     listState: LazyListState,
     isLoading: Boolean,
+    language: Language,
     modifier: Modifier = Modifier,
-    onClick: (Center) -> Unit
+    onClick: (Int?) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -354,10 +379,25 @@ fun ConsultationCenterListOverlay(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentPadding = PaddingValues(bottom = 72.dp)
+                contentPadding = PaddingValues(bottom = 30.dp)
             ) {
-                items(centerList) { center ->
-                    ConsultationCenterCard(center = center) { onClick(center) }
+                itemsIndexed(
+                    items = centerList,
+                    key = { _, item -> item.centerId }
+                ) { index, center ->
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    ConsultationCenterCard(
+                        center = center,
+                        isSelected = center.centerId == selectedCenterId,
+                        language = language,
+                        onClick = { onClick(center.centerId) }
+                    )
+
+                    if (index != centerList.lastIndex) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider(color = Color(0xFFCFE3FD))
+                    }
                 }
 
                 item {
@@ -391,16 +431,20 @@ fun ConsultationCenterListOverlay(
 
 @Composable
 fun ConsultationCenterCard(
-    center: Center,
+    center: CenterViewModel.CenterDisplay,
+    isSelected: Boolean,
+    language: Language,
     onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(87.dp)
+            .wrapContentHeight()
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (isSelected) Color(0xFFF3F8FF) else Color.Transparent)
             .clickable { onClick() }
+            .padding(vertical = 2.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -409,29 +453,71 @@ fun ConsultationCenterCard(
             Column {
                 Text(text = center.name, style = AppTypography.body01)
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = if (center.status == "OPEN") "영업 중" else "영업 종료",
-                        style = AppTypography.label03,
-                        color = if (center.status == "OPEN") Color(0xFF5A90D2) else Color(0xFFA6A6A6)
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Text(text = "•", style = AppTypography.label03)
+
+                if(center.isOpenNow) {
+                    Row{
+                        Image(
+                            painter = painterResource(id = R.drawable.alarm),
+                            modifier = Modifier.size(10.dp),
+                            contentDescription = "알람"
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = "09:00 ~ ${center.closed}",
+                            style = AppTypography.label03,
+                            color = Color(0xFF6A6A6A),
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row{
+                        Image(
+                            painter = painterResource(id = R.drawable.call),
+                            modifier = Modifier.size(10.dp),
+                            contentDescription = "전화"
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = /*center.number"*/"010-0000-0000",
+                            style = AppTypography.label03,
+                            color = Color(0xFF6A6A6A),
+                        )
+                    }
+                } else {
+                    Row {
+                        Text(
+                            text = stringResource(languageR.string.offline_center_closed),
+                            style = AppTypography.label03,
+                            color = Color(0xFFA6A6A6)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "•", style = AppTypography.label03)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = /*center.number"*/"010-0000-0000",
+                            style = AppTypography.label03,
+                            color = Color(0xFF6A6A6A),
+                        )
+                    }
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = center.address, style = AppTypography.label03)
+                Text(text = center.address, style = AppTypography.label03, color = Color(0xFF6A6A6A))
             }
-
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_google),
-//                contentDescription = null,
-//                modifier = Modifier.size(64.dp)
-//            )
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-        HorizontalDivider(color = Color(0xFFCFE3FD))
     }
+}
+
+// ----------------- reverse geocode (언어 반영) -----------------
+
+private fun languageToLocale(language: Language): Locale = when (language) {
+    Language.KOREAN -> Locale.KOREA
+    Language.ENGLISH -> Locale.US
+    Language.JAPANESE -> Locale.JAPAN
+    Language.CHINESE -> Locale.SIMPLIFIED_CHINESE   // zh-CN
+    Language.VIETNAMESE -> Locale("vi", "VN")
 }
 
 private fun normalizeSido(admin: String?): String {
@@ -443,11 +529,38 @@ private fun normalizeSido(admin: String?): String {
         .replace("특별자치도", "도")
 }
 
+private fun formatAdminArea(a: Address, language: Language): String? {
+    val admin = a.adminArea
+    val subAdmin = a.subAdminArea
+    val locality = a.locality
+    val subLocality = a.subLocality
+
+    // ✅ 한국어: 기존 포맷 유지 ("서울시 강남구" / "경기도 수원시" 등)
+    if (language == Language.KOREAN) {
+        val sido = normalizeSido(admin)
+        val guOrDong =
+            subAdmin
+                ?: locality
+                ?: subLocality
+                ?: a.thoroughfare
+                ?: a.subThoroughfare
+                ?: a.featureName
+
+        return if (sido.isNotBlank() && !guOrDong.isNullOrBlank()) "$sido $guOrDong" else null
+    }
+
+    // ✅ 그 외 언어: Geocoder가 주는 표현 기반으로 자연스럽게 조합
+    val part1 = admin ?: return null
+    val part2 = subAdmin ?: locality ?: subLocality
+    return if (!part2.isNullOrBlank()) "$part2, $part1" else part1
+}
+
 suspend fun reverseGeocodeToSidoGu(
     context: Context,
-    latLng: LatLng
+    latLng: LatLng,
+    language: Language
 ): String? {
-    val geocoder = Geocoder(context, Locale.KOREA)
+    val geocoder = Geocoder(context, languageToLocale(language))
     val lat = latLng.latitude
     val lng = latLng.longitude
 
@@ -455,21 +568,18 @@ suspend fun reverseGeocodeToSidoGu(
         suspendCancellableCoroutine { cont ->
             geocoder.getFromLocation(lat, lng, 1) { list ->
                 val a = list.firstOrNull()
-                val sido = normalizeSido(a?.adminArea)
-                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
-                cont.resume(
-                    if (!sido.isNullOrBlank() && !gu.isNullOrBlank())
-                        "$sido $gu" else null
-                )
+                if (a == null) {
+                    cont.resume(null)
+                    return@getFromLocation
+                }
+                cont.resume(formatAdminArea(a, language))
             }
         }
     } else {
         withContext(Dispatchers.IO) {
             try {
-                val a = geocoder.getFromLocation(lat, lng, 1)?.firstOrNull()
-                val sido = normalizeSido(a?.adminArea)
-                val gu = a?.locality ?: a?.subLocality ?: a?.subAdminArea
-                if (!sido.isNullOrBlank() && !gu.isNullOrBlank()) "$sido $gu" else null
+                val a = geocoder.getFromLocation(lat, lng, 1)?.firstOrNull() ?: return@withContext null
+                formatAdminArea(a, language)
             } catch (_: Exception) {
                 null
             }

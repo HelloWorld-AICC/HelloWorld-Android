@@ -124,7 +124,7 @@
 
     <string name="mypage_profile_edit">Change Profile</string>
     <string name="mypage_consultation_summary">My Consultation Summary</string>
-    <string name="mypage_resume">Resume\n/ Self-Introduction Letter</string>
+    <string name="mypage_resume">Resume / Self-Introduction Letter</string>
     <string name="mypage_posts_comments">Posts\n/ Comments</string>
 
     <string name="mypage_app_info">About Hello World</string>
@@ -139,7 +139,8 @@
     <string name="mypage_language_change">Change Language</string>
 
     <string name="mypage_withdraw_title">Are you sure you want to withdraw?</string>
-    <string name="mypage_withdraw_warning">Even after withdrawing, the posts and comments you wrote may remain on the service, and management such as editing or deleting will not be possible afterwards.</string>
+    <string name="mypage_withdraw_warning">Even after withdrawing, the posts and comments you wrote may remain on the service,\nand management such as editing or deleting will not be possible
+        afterwards.</string>
     <string name="mypage_withdraw_reason_title">Please tell us the reason for your decision to withdraw.</string>
     <string name="mypage_withdraw_reason_placeholder">Please select a reason.</string>
     <string name="mypage_withdraw_reason_no_feature">I don\'t have the necessary features.</string>
@@ -152,10 +153,21 @@
     <string name="mypage_withdraw_rights_warning">You will lose the right to manage your posts and comments.</string>
 
     <string name="mypage_withdraw_complete_title">Withdrawal is complete.</string>
-    <string name="mypage_withdraw_complete_message">Thank you for being with us so far. HelloWorld will always be by your side.</string>
+    <string name="mypage_withdraw_complete_message">Thank you for being with us so far.\nHelloWorld will always be by your side.</string>
     <string name="ai_chat_toast">Please enter the chat within 500 characters.</string>
     <string name="mypage_chat_sumary">Chat Summary</string>
     <string name="home_greeting_suffix">,</string>
     <string name="home_greeting_message">Hello</string>
     <string name="temp_nickname_deadline">Please enter a nickname of 15 characters or fewer.</string>
+    <string name="mypage_posts_comments_one_line">Posts/Comments</string>
+
+    <string name="failed_connect_server">Failed to communicate with the server.</string>
+    <string name="anonymous">Anonymous%d</string>
+    <string name="write_post">Write Post</string>
+    <string name="edit_post">Edit Post</string>
+
+    <string name="msg_feature_preparing">This feature is currently under development.</string>
+    <string name="header_resume">Resume / Self-Introduction Letter</string>
+    <string name="chat_warn">AI responses may not always be accurate. For important matters, please verify directly with the relevant authorities or institutions.</string>
+
 </resources>

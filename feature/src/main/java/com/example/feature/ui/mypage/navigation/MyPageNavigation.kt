@@ -129,6 +129,7 @@ fun NavGraphBuilder.resumeScreen(
 ) {
     composable<Resume> {
         Resume(
+            onNavigateBack = onNavigateBack
         )
     }
 }
@@ -137,7 +138,7 @@ fun NavController.navigateToPostAndComments(navOptions: NavOptions? = null) = na
 
 fun NavGraphBuilder.postAndCommentsScreen(
     onNavigateBack: () -> Unit,
-    onNavigateCommunity: (Int, Int) -> Unit,
+    onNavigateCommunity: (Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
 ) {
     composable<PostAndComments> {

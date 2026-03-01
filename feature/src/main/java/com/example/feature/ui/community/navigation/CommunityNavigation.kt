@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object Community
 
-@Serializable data class CommunityPostDetail(val categoryId: Int, val communityId: Int)
+@Serializable data class CommunityPostDetail(val communityId: Int)
 
 @Serializable data class CommunityPostWrite(val category: Int, val communityId: Int = 0, val type: ContentType)
 
@@ -25,7 +25,7 @@ fun NavController.navigateToCommunity(navOptions: NavOptions? = null) = navigate
 
 fun NavGraphBuilder.communityScreen(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
-    onNavigateToCommunityPostDetail: (Int, Int) -> Unit,
+    onNavigateToCommunityPostDetail: (Int) -> Unit,
     onCheckCommunityUpdate: () -> Boolean,
     onClearCommunityUpdate: () -> Unit,
 ) {
@@ -39,7 +39,7 @@ fun NavGraphBuilder.communityScreen(
     }
 }
 
-fun NavController.navigateToCommunityPostDetail(categoryId: Int, communityId: Int, navOptions: NavOptions? = null) = navigate(CommunityPostDetail(categoryId, communityId), navOptions)
+fun NavController.navigateToCommunityPostDetail(communityId: Int, navOptions: NavOptions? = null) = navigate(CommunityPostDetail(communityId), navOptions)
 
 fun NavGraphBuilder.communityPostDetailScreen(
     onNavigateToCommunityPostWrite: (Int, Int, ContentType) -> Unit,
@@ -50,7 +50,7 @@ fun NavGraphBuilder.communityPostDetailScreen(
     composable<CommunityPostDetail> { entry ->
         val route = entry.toRoute<CommunityPostDetail>()
 
-        val request = DetailRequest(categoryId = route.categoryId.toLong(), communityId = route.communityId.toLong())
+        val request = DetailRequest(communityId = route.communityId.toLong())
 
         CommunityPostDetail(
             onNavigateToCommunityPostWrite = onNavigateToCommunityPostWrite,

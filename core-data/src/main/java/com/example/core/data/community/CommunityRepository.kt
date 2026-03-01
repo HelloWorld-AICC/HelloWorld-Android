@@ -19,7 +19,7 @@ interface CommunityRepository {
     suspend fun getCommunityPostDetail(request: DetailRequest): Result<DetailResponse>
     suspend fun submitComment(communityId: Long, content: String): Result<CommunityResponse>   // return CommentId
 
-    suspend fun updatePost(categoryId: Long, communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse>
+    suspend fun updatePost(communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse>
     suspend fun deletePost(categoryId: Long, communityId: Long): Result<DeletePostResponse>
     suspend fun deleteComment(communityId: Long, commentId: Long): Result<DeleteCommentResponse>
     suspend fun reportPost(communityId: Long): Result<ReportPostResponse>

@@ -1,16 +1,33 @@
 package com.example.feature
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +69,6 @@ import com.example.feature.ui.onboarding.screen.LanguageScreen
 import com.example.feature.ui.onboarding.screen.LoginScreen
 import com.example.feature.ui.splash.screen.SplashScreen
 
-// 아이콘 리소스 구성 (기본 / 클릭)
 data class NavItem(
     val route: String,
     val iconResId: Int,
@@ -68,54 +84,89 @@ val items = listOf(
     NavItem("커뮤니티", R.drawable.ic_community, R.drawable.ic_community_click)
 )
 
+@Preview
+@Composable
+private fun preview() {
+    MyBottomNavigation(rememberNavController())
+}
+
 @Composable
 fun MyBottomNavigation(navController: NavHostController) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination
+    val currentRoute = currentDestination?.route
 
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 0.dp
+    // 바 전체 컨테이너 (둥글게 + 그림자 + 패딩)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .navigationBarsPadding()
+            .height(60.dp)
     ) {
-        items.forEach { item ->
-            val isSelected = currentDestination?.route == item.route
-            val iconRes = if (isSelected) item.iconClickResId else item.iconResId
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { item ->
+                val isSelected = currentRoute == item.route
+                val iconRes = if (isSelected) item.iconClickResId else item.iconResId
 
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (!isSelected) {
-                        if (item.route == "홈") {
-                            // ✅ 홈으로 갈 때마다 전체 스택 초기화
-                            navController.navigate("홈") {
-                                popUpTo(0) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        } else {
-                            // 나머지 탭은 기존처럼 동작
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+                BottomBarItem(
+                    modifier = Modifier.weight(1f), // ✅ 균등 분배
+                    selected = isSelected,
+                    iconRes = iconRes,
+                    contentDescription = item.route,
+                    onClick = {
+                        if (!isSelected) {
+                            if (item.route == "홈") {
+                                navController.navigate("홈") {
+                                    popUpTo(0) { inclusive = true }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
+                            } else {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         }
                     }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = iconRes),
-                        contentDescription = item.route,
-                        tint = Color.Unspecified // 아이콘 색상 유지
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.Transparent
                 )
-            )
+            }
         }
     }
 }
+
+@Composable
+private fun BottomBarItem(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    iconRes: Int,
+    contentDescription: String,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = contentDescription,
+            tint = Color.Unspecified,
+            modifier = Modifier.size(66.dp) // 아이콘 크기
+        )
+    }
+}
+
 
 // 메인 네비게이션 호스트
 @Composable

@@ -36,8 +36,8 @@ class CommunityRepositoryImpl @Inject constructor(
         return communityDataSource.submitComment(communityId, content)
     }
 
-    override suspend fun updatePost(categoryId: Long, communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse> {
-        return communityDataSource.updatePost(categoryId, communityId, request)
+    override suspend fun updatePost(communityId: Long, request: UpdatePostRequest): Result<UpdatePostResponse> {
+        return communityDataSource.updatePost(communityId, request)
     }
 
     override suspend fun deletePost(categoryId: Long, communityId: Long): Result<DeletePostResponse> {

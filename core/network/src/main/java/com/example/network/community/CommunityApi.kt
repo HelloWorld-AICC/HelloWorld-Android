@@ -68,7 +68,6 @@ interface CommunityApi {
 
     @PATCH(ApiConstants.UPDATE_COMMUNITY_POST)
     suspend fun updateCommunityPost(
-        @Path("category_id") categoryId: Long,
         @Path("community_id") communityId: Long,
         @Body request: UpdatePostRequest
     ): Response<ApiResponse<UpdatePostResponse>>

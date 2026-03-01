@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +61,12 @@ internal fun AiChatScreen(
         viewModel.getAIChattingRooms()
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.createdChatRoomId.collectLatest { roomId ->
+            onPostClick(roomId)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,7 +80,7 @@ internal fun AiChatScreen(
         Banner()
         Spacer(modifier = Modifier.height(24.dp))
         RecentChatSection (
-            onPostClick = onPostClick
+            onCreateChatClick = viewModel::createChatRoom
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -155,7 +162,7 @@ fun ChatNewButton(
 
 @Composable
 fun RecentChatSection(
-    onPostClick: (String?) -> Unit
+    onCreateChatClick: () -> Unit
 ) {
     Column {
         Row(
@@ -170,7 +177,7 @@ fun RecentChatSection(
                 style = AppTypography.heading04,
                 color = Color.Black
             )
-            ChatNewButton { onPostClick("new_chat") }
+            ChatNewButton(onPostClick = onCreateChatClick)
         }
     }
 }
@@ -257,7 +264,7 @@ fun AiChatScreenPreview() {
         Banner()
         Spacer(modifier = Modifier.height(24.dp))
         RecentChatSection(
-            onPostClick = {}
+            onCreateChatClick = {}
         )
         Spacer(modifier = Modifier.height(8.dp))
         ConversationItem(

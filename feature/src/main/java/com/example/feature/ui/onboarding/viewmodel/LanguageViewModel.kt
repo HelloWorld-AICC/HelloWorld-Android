@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.core.data.common.LanguageRepository
 import com.example.model.common.Language
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Result // Kotlin 표준 Result<T>
@@ -16,6 +19,13 @@ import kotlin.Result // Kotlin 표준 Result<T>
 class LanguageViewModel @Inject constructor(
     private val languageRepository: LanguageRepository
 ) : ViewModel() {
+
+    private val _editingLanguage = MutableStateFlow<Language?>(null)
+    val editingLanguage: StateFlow<Language?> = _editingLanguage.asStateFlow()
+
+    fun updateLanguage(language: Language) {
+        _editingLanguage.value = language
+    }
 
     fun setLanguage(language: Language) {
         viewModelScope.launch {
