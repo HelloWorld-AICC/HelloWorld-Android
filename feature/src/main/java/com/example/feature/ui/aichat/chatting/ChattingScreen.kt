@@ -103,8 +103,7 @@ internal fun RecentChattingScreen(
 
     val lastSummarizableBot = remember(messages) {
         val botMessages = messages.filter { it.sender.equals("bot", ignoreCase = true) }
-        // botMessages = [greeting, prompt, ... AI 응답들 ...]
-        // 인트로 2개 제외 -> drop(2)
+
         botMessages.drop(2).lastOrNull()
     }
 
