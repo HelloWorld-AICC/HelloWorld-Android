@@ -1,9 +1,9 @@
 package com.example.core.data.api
 
 import com.example.core.data.model.aichat.AIChatLogResponse
+import com.example.core.data.model.aichat.AskToAIRequest
 import com.example.core.data.model.aichat.ChattingRoom
-import com.example.network.response.ApiResponse
-import okhttp3.RequestBody
+import com.example.core.data.model.aichat.CreateChatRoomResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,6 +16,9 @@ import retrofit2.http.Streaming
 
 interface AIChatService {
 
+    @POST("api/chat/create-room")
+    suspend fun createChatRoom(): Response<CreateChatRoomResponse>
+
     @Headers("Accept: text/plain") // 문자열 응답 힌트 (선택)
     @POST("summary")
     suspend fun summaryAIChat(
@@ -24,21 +27,21 @@ interface AIChatService {
 
     @Streaming
     @Headers(
-        "Accept: text/event-stream",
+        "Content-Type: application/json",
         "Cache-Control: no-cache",
         "Connection: keep-alive",
         "Accept-Encoding: identity"
     )
-    @POST("chat/ask")
+    @POST("/api/chat/ask")
     suspend fun askToAI(
         @Query("roomId") roomId : String,
-        @Body request: RequestBody
+        @Body request: AskToAIRequest
     ) : Response<ResponseBody>
 
     @GET("user/room-list")
     suspend fun getAIChattingRooms() : Response<List<ChattingRoom>>
 
-    @GET("chat/room-log")
+    @GET("/api/chat/room-log")
     suspend fun getAIChatLog(
         @Query("roomId") roomId : String
     ) :  Response<AIChatLogResponse>
