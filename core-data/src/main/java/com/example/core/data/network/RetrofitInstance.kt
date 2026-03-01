@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
 
     private const val BASE_URL = "https://helloworldhelp.shop/mvc/"
-    private const val BASE_URL_WEBFLUX = "https://helloworldhelp.shop/webflux/"
+    private const val BASE_URL_WEBFLUX = "https://helloworld-container-app-v1.kindgrass-eef61520.koreacentral.azurecontainerapps.io/"
     private lateinit var prefs: SharedPreferences
 
     fun init(context: Context) {
