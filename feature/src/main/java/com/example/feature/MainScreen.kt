@@ -2,8 +2,6 @@ package com.example.feature
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,22 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +55,7 @@ import com.example.feature.ui.onboarding.screen.AgreementScreen
 import com.example.feature.ui.onboarding.screen.CongratulationsScreen
 import com.example.feature.ui.onboarding.screen.LanguageScreen
 import com.example.feature.ui.onboarding.screen.LoginScreen
+import com.example.feature.ui.resume.screen.ResumeScreen
 import com.example.feature.ui.splash.screen.SplashScreen
 
 data class NavItem(
@@ -192,7 +181,7 @@ fun MyNavigationHost(navController: NavHostController) {
             onBackClick = navController::navigateUp
         )
 
-        composable("이력서 작성") { Text("이력서 작성 화면", modifier = Modifier.padding(16.dp)) }
+        composable("이력서 작성") { ResumeScreen() }
         communityScreen(
             onNavigateToCommunityPostWrite = navController::navigateToCommunityPostWrite,
             onNavigateToCommunityPostDetail = navController::navigateToCommunityPostDetail,
