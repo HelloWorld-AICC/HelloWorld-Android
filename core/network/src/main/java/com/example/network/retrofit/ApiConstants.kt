@@ -18,7 +18,7 @@ object ApiConstants {
 
     const val SET_LANGUAGE = "myPage/language/{language_id}"    // POST 언어 변경
 
-    const val UPDATE_COMMUNITY_POST = "community/{category_id}/{community_id}/modify"           // PATCH    글 수정
+    const val UPDATE_COMMUNITY_POST = "community/{community_id}/modify"           // PATCH    글 수정
     const val DELETE_COMMUNITY_POST = "community/{category_id}/{community_id}/delete"           // DELETE   글 삭제
     const val DELETE_COMMUNITY_COMMENT = "community/{community_id}/{comment_id}/comment/delete" // DELETE   댓글 등록
     const val REPORT_COMMUNITY_POST = "report/community/{community_id}"                         // POST     글 신고

@@ -149,7 +149,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_service_ai,
                     backgroundColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    onClick = { }
+                    onClick = { navController.navigate("이력서 작성") }
                 )
             }
 
