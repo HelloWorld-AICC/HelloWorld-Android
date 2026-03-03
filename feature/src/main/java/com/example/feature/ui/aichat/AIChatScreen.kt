@@ -217,7 +217,7 @@ fun ConversationItem(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = chattingRoom.title,
+            text = chattingRoom.title ?: "새로운 채팅",
             style = AppTypography.heading04,
             color = Color.Black
         )

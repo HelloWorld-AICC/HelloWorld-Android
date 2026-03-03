@@ -454,54 +454,37 @@ fun ConsultationCenterCard(
                 Text(text = center.name, style = AppTypography.body01)
                 Spacer(modifier = Modifier.height(4.dp))
 
-                if(center.isOpenNow) {
-                    Row{
-                        Image(
-                            painter = painterResource(id = R.drawable.alarm),
-                            modifier = Modifier.size(10.dp),
-                            contentDescription = "알람"
-                        )
+                Row{
+                    Image(
+                        painter = painterResource(id = R.drawable.alarm),
+                        modifier = Modifier.size(10.dp),
+                        contentDescription = "알람"
+                    )
 
-                        Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
-                        Text(
-                            text = "09:00 ~ ${center.closed}",
-                            style = AppTypography.label03,
-                            color = Color(0xFF6A6A6A),
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row{
-                        Image(
-                            painter = painterResource(id = R.drawable.call),
-                            modifier = Modifier.size(10.dp),
-                            contentDescription = "전화"
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        Text(
-                            text = /*center.number"*/"010-0000-0000",
-                            style = AppTypography.label03,
-                            color = Color(0xFF6A6A6A),
-                        )
-                    }
-                } else {
-                    Row {
-                        Text(
-                            text = stringResource(languageR.string.offline_center_closed),
-                            style = AppTypography.label03,
-                            color = Color(0xFFA6A6A6)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "•", style = AppTypography.label03)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = /*center.number"*/"010-0000-0000",
-                            style = AppTypography.label03,
-                            color = Color(0xFF6A6A6A),
-                        )
-                    }
+                    Text(
+                        text = "09:00 ~ ${center.closed}",
+                        style = AppTypography.label03,
+                        color = Color(0xFF6A6A6A),
+                    )
                 }
+//                Spacer(modifier = Modifier.height(4.dp))
+//                Row{
+//                    Image(
+//                        painter = painterResource(id = R.drawable.call),
+//                        modifier = Modifier.size(10.dp),
+//                        contentDescription = "전화"
+//                    )
+//                    Spacer(modifier = Modifier.width(4.dp))
+
+//                    Text(
+//                        text = /*center.number"*/"010-0000-0000",
+//                        style = AppTypography.label03,
+//                        color = Color(0xFF6A6A6A),
+//                    )
+//                }
+
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = center.address, style = AppTypography.label03, color = Color(0xFF6A6A6A))
