@@ -2,7 +2,7 @@
 <resources>
     <string name="confirm">Xác nhận</string>
     <string name="comments">Bình luận</string>
-    <string name="auth_tagline">Đồng hành cùng bạn trong mọi khoảnh khắc cuộc sống và công việc kết nối.</string>
+    <string name="auth_tagline">Kết nối cuộc sống và công việc.</string>
     <string name="auth_language_title">Bạn cảm thấy thoải mái với ngôn ngữ nào?</string>
     <string name="auth_language_subtitle">Vui lòng chọn ngôn ngữ bạn muốn sử dụng.</string>
     <string name="signup_welcome_title">Đồng hành cùng HelloWorld.</string>

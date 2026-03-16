@@ -2,7 +2,7 @@
 <resources>
     <string name="confirm">确认</string>
     <string name="comments">帖子</string>
-    <string name="auth_tagline">与您共同度过生活和工作连接的每一个瞬间</string>
+    <string name="auth_tagline">工作，生活，始终相伴。</string>
     <string name="auth_language_title">您用哪种语言更方便？</string>
     <string name="auth_language_subtitle">请选择您想使用的语言</string>
     <string name="signup_welcome_title">携手 HelloWorld</string>
