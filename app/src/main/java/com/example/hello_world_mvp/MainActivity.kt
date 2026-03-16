@@ -1,4 +1,5 @@
 package com.example.hello_world_mvp
+
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,22 +13,25 @@ import androidx.core.os.LocaleListCompat
 import com.example.core.data.common.LanguageRepository
 import com.example.core.ui.theme.HelloWorldTheme
 import com.example.feature.MainScreen
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var languageRepository: LanguageRepository
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface MainActivityEntryPoint {
+        fun languageRepository(): LanguageRepository
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 🌐 저장된 언어를 super.onCreate() 전에 동기적으로 적용
-        applyStoredLanguageSync()
-
         super.onCreate(savedInstanceState)
+        applyStoredLanguageSync()
 
         enableEdgeToEdge()
 
@@ -46,18 +50,23 @@ class MainActivity : AppCompatActivity() {
     private fun applyStoredLanguageSync() {
         runBlocking {
             try {
+                val languageRepository = EntryPointAccessors.fromApplication(
+                    applicationContext,
+                    MainActivityEntryPoint::class.java
+                ).languageRepository()
+
                 val savedLanguage = languageRepository.getLanguage()
                 val localeList = LocaleListCompat.forLanguageTags(savedLanguage.localeCode)
 
-                android.util.Log.d("MainActivity", "🌐 저장된 언어: ${savedLanguage.displayName} (${savedLanguage.localeCode})")
-                android.util.Log.d("MainActivity", "🌐 현재 AppLocales: ${AppCompatDelegate.getApplicationLocales()}")
+                android.util.Log.d("MainActivity", "Stored language: ${savedLanguage.displayName} (${savedLanguage.localeCode})")
+                android.util.Log.d("MainActivity", "Current AppLocales: ${AppCompatDelegate.getApplicationLocales()}")
 
                 AppCompatDelegate.setApplicationLocales(localeList)
 
-                android.util.Log.d("MainActivity", "🌐 언어 적용 완료: ${savedLanguage.localeCode}")
-                android.util.Log.d("MainActivity", "🌐 적용 후 AppLocales: ${AppCompatDelegate.getApplicationLocales()}")
+                android.util.Log.d("MainActivity", "Applied language: ${savedLanguage.localeCode}")
+                android.util.Log.d("MainActivity", "After apply AppLocales: ${AppCompatDelegate.getApplicationLocales()}")
             } catch (e: Exception) {
-                android.util.Log.e("MainActivity", "🌐 언어 적용 실패", e)
+                android.util.Log.e("MainActivity", "Language apply failed", e)
             }
         }
     }

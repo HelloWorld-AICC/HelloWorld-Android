@@ -26,3 +26,9 @@ data class AllCommentResponse(
     @SerialName("allMyCommentList")
     val allMyCommentList: List<Comment>
 )
+
+@Serializable
+data class MyLanguageResponse(
+    @SerialName("language")
+    val language: List<String>
+)

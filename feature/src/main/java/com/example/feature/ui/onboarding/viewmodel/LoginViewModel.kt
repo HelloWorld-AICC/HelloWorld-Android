@@ -1,11 +1,15 @@
 package com.example.feature.ui.onboarding.viewmodel
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.data.model.LoginEmailRequest
+import com.example.core.data.common.LanguageRepository
 import com.example.core.data.model.LoginTokenItem
+import com.example.core.data.mypage.MyPageRepository
 import com.example.core.data.network.RetrofitInstance
+import com.example.model.common.Language
 import com.example.network.interceptor.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
+    private val myPageRepository: MyPageRepository,
+    private val languageRepository: LanguageRepository
 ) : ViewModel() {
 
     private val _loginSuccess = MutableStateFlow(false)
@@ -24,77 +30,72 @@ class LoginViewModel @Inject constructor(
     private val _isExistUser = MutableStateFlow(false)
     val isExistUser: StateFlow<Boolean> = _isExistUser
 
-    fun handleGoogleLogin(email: String?, authCode: String?, accessToken: String?, idToken : String?) {
-//        if (email.isNullOrBlank()) {
-//            Log.e("LOGIN", "이메일이 null이거나 비어 있음")
-//            return
-//        }
-
+    fun handleGoogleLogin(email: String?, authCode: String?, accessToken: String?, idToken: String?) {
         viewModelScope.launch {
             try {
-//                val emailResponse = RetrofitInstance.authService.loginWithEmail(LoginEmailRequest(email))
+                if (!idToken.isNullOrBlank()) {
+                    val googleResponse = RetrofitInstance.authService.getToken(idToken)
 
-//                if (emailResponse.isSuccess) { // 기존 회원
-//                    Log.d("LOGIN", "이메일 로그인 성공")
-//                    saveTokens(emailResponse.result?.tokenList)
-//                    _loginSuccess.value = true
-//                    _isExistUser.value = true
-//                } else {
-//                    Log.w("LOGIN", "이메일 로그인 실패 → 구글 로그인 시도")
+                    if (googleResponse.isSuccess) {
+                        saveTokens(googleResponse.result.tokenList)
+                        syncLanguageFromServer()
 
-                    if (!idToken.isNullOrBlank()) {
-                        val googleResponse = RetrofitInstance.authService.getToken(idToken)
-                        if (googleResponse.isSuccess) {
-                            if (googleResponse.result.isExist ) {
-                                Log.d("LOGIN", "구글 로그인 성공 (기존 가입자)")
-                                saveTokens(googleResponse.result?.tokenList)
-                                _loginSuccess.value = true
-                                _isExistUser.value = true
-                            } else {
-                                Log.d("LOGIN", "구글 로그인 성공 (신규 가입)")
-                                saveTokens(googleResponse.result?.tokenList)
-                                _loginSuccess.value = true
-                                _isExistUser.value = false
-                            }
-                        } else {
-                            Log.e("LOGIN", "구글 로그인 API 실패")
-                        }
+                        _loginSuccess.value = true
+                        _isExistUser.value = googleResponse.result.isExist
                     } else {
-                        Log.e("LOGIN", "accessToken이 null이라 구글 로그인 불가")
+                        Log.e("LOGIN", "Google login API failed")
                     }
-//                }
+                } else {
+                    Log.e("LOGIN", "idToken is null, cannot login")
+                }
             } catch (e: Exception) {
-                Log.e("LOGIN", "로그인 과정에서 오류", e)
+                Log.e("LOGIN", "login failed", e)
             }
         }
     }
 
-    private fun saveTokens(tokenList: List<LoginTokenItem>?) {
+    private suspend fun saveTokens(tokenList: List<LoginTokenItem>?) {
         val atk = tokenList?.firstOrNull { it.types.equals("ATK", true) }?.token
         val rtk = tokenList?.firstOrNull { it.types.equals("RTK", true) }?.token
 
-        viewModelScope.launch {
-            if (!atk.isNullOrBlank()) {
-                // SharedPreferences 저장
-                RetrofitInstance.setAccessToken(atk)
-                Log.d("LOGIN", "ATK 설정 성공 (Prefs): $atk")
-
-                // DataStore 저장
-                tokenRepository.setAccessToken(atk)
-                Log.d("LOGIN", "ATK 설정 성공 (DataStore): $atk")
-            } else {
-                Log.e("LOGIN", "ATK가 비어 있거나 없음")
-            }
-
-            if (!rtk.isNullOrBlank()) {
-                RetrofitInstance.setRefreshToken(rtk)
-                Log.d("LOGIN", "RTK 설정 성공 (Prefs): $rtk")
-
-                tokenRepository.setRefreshToken(rtk)
-                Log.d("LOGIN", "RTK 설정 성공 (DataStore): $rtk")
-            } else {
-                Log.w("LOGIN", "RTK가 비어 있음")
-            }
+        if (!atk.isNullOrBlank()) {
+            RetrofitInstance.setAccessToken(atk)
+            tokenRepository.setAccessToken(atk)
+            Log.d("LOGIN", "ATK saved")
+        } else {
+            Log.e("LOGIN", "ATK is empty")
         }
+
+        if (!rtk.isNullOrBlank()) {
+            RetrofitInstance.setRefreshToken(rtk)
+            tokenRepository.setRefreshToken(rtk)
+            Log.d("LOGIN", "RTK saved")
+        } else {
+            Log.w("LOGIN", "RTK is empty")
+        }
+    }
+
+    private suspend fun syncLanguageFromServer() {
+        myPageRepository.getMyLanguage()
+            .onSuccess { response ->
+                val languageName = response.language.firstOrNull()
+                val language = Language.entries.firstOrNull {
+                    it.displayName.equals(languageName, ignoreCase = true) ||
+                        it.name.equals(languageName, ignoreCase = true) ||
+                        it.localeCode.equals(languageName, ignoreCase = true)
+                }
+
+                if (language != null) {
+                    languageRepository.setLanguage(language)
+                    val localeList = LocaleListCompat.forLanguageTags(language.localeCode)
+                    AppCompatDelegate.setApplicationLocales(localeList)
+                    Log.d("LOGIN", "Language synced: ${language.displayName}")
+                } else {
+                    Log.w("LOGIN", "Language mapping failed: $languageName")
+                }
+            }
+            .onFailure { e ->
+                Log.w("LOGIN", "Language sync failed", e)
+            }
     }
 }
