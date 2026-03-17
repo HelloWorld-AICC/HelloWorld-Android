@@ -1,4 +1,4 @@
-// com/example/feature/ui/consultationCenter/ConsultationCenterScreen.kt
+﻿// com/example/feature/ui/consultationCenter/ConsultationCenterScreen.kt
 package com.example.feature.ui.consultationCenter
 
 import android.Manifest
@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -87,8 +88,8 @@ import java.util.Locale
 import kotlin.coroutines.resume
 import com.example.core.ui.R as languageR
 
-private const val CAMERA_LAT_SHIFT = -0.006          // 오버레이 보정
-private const val REQUERY_THRESHOLD_METERS = 5_000f  // 지도 중심 이동 임계(5km)
+private const val CAMERA_LAT_SHIFT = -0.006          // ?ㅻ쾭?덉씠 蹂댁젙
+private const val REQUERY_THRESHOLD_METERS = 5_000f  // 吏??以묒떖 ?대룞 ?꾧퀎(5km)
 
 private fun correctedForOverlay(latLng: LatLng, shift: Double = CAMERA_LAT_SHIFT): LatLng =
     LatLng(latLng.latitude + shift, latLng.longitude)
@@ -454,37 +455,53 @@ fun ConsultationCenterCard(
                 Text(text = center.name, style = AppTypography.body01)
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Row{
-                    Image(
-                        painter = painterResource(id = R.drawable.alarm),
-                        modifier = Modifier.size(10.dp),
-                        contentDescription = "알람"
-                    )
+                if(center.isOpenNow) {
+                    Row{
+                        Image(
+                            painter = painterResource(id = R.drawable.alarm),
+                            modifier = Modifier.size(10.dp),
+                            contentDescription = "알람"
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    if(center.isOpenNow) {
+                        Image(
+                            painter = painterResource(id = R.drawable.call),
+                            modifier = Modifier.size(10.dp),
+                            contentDescription = "전화"
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(languageR.string.offline_center_closed),
+                            style = AppTypography.label03,
+                            color = Color(0xFF6A6A6A),
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = "•",
+                            style = AppTypography.label03,
+                            color = Color(0xFF6A6A6A),
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = "09:00 ~ ${center.closed}",
+                        text = center.phoneNumber,
                         style = AppTypography.label03,
                         color = Color(0xFF6A6A6A),
                     )
                 }
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Row{
-//                    Image(
-//                        painter = painterResource(id = R.drawable.call),
-//                        modifier = Modifier.size(10.dp),
-//                        contentDescription = "전화"
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-
-//                    Text(
-//                        text = /*center.number"*/"010-0000-0000",
-//                        style = AppTypography.label03,
-//                        color = Color(0xFF6A6A6A),
-//                    )
-//                }
-
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = center.address, style = AppTypography.label03, color = Color(0xFF6A6A6A))

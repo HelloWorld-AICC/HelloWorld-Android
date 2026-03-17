@@ -53,6 +53,7 @@ class CenterViewModel @Inject constructor(
         val longitude: Double,
         val image: String?,
         val isOpenNow: Boolean,   // ✅ "09:00 ~ closed" 로 계산된 영업 여부
+        val phoneNumber : String,
         val closed: String
     )
 
@@ -114,7 +115,7 @@ class CenterViewModel @Inject constructor(
             runCatching { languageRepository.getLanguage() }
                 .onSuccess { _language.value = it }
                 .onFailure {
-                    _language.value = Language.KOREAN
+                    _language.value = Language.ENGLISH
                     Log.e("CenterViewModel", "getLanguageFail", it)
                 }
         }
@@ -259,6 +260,7 @@ class CenterViewModel @Inject constructor(
             longitude = longitude,
             image = image,
             isOpenNow = isOpenNow(closed),
+            phoneNumber = phoneNumber,
             closed = closed
         )
     }
