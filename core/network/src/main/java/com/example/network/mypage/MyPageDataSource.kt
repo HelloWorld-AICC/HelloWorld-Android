@@ -7,12 +7,15 @@ import com.example.model.mypage.AllSummaryResponse
 import com.example.model.mypage.DeleteProfileResponse
 import com.example.model.mypage.DetailSummaryRequest
 import com.example.model.mypage.DetailSummaryResponse
+import com.example.model.mypage.MyLanguageResponse
 import com.example.model.mypage.UserInfo
 import com.example.model.mypage.PageSizeRequest
 import com.example.model.mypage.UpdateProfileResponse
 
 interface MyPageDataSource {
     suspend fun getMyPage(): Result<UserInfo>
+
+    suspend fun getMyLanguage(): Result<MyLanguageResponse>
 
     suspend fun setProfile(
         nickName: String,

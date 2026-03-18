@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.core.data.model.aichat.SummaryChattingRoom
 import com.example.feature.ui.mypage.screen.CounselingDetail
 import com.example.feature.ui.mypage.screen.CounselingSummary
 import com.example.feature.ui.mypage.screen.MyPage
@@ -26,7 +27,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object CounselingSummary
 
-@Serializable data class CounselingDetail(val summaryId: Int)
+@Serializable data class CounselingDetail(val roomId: String, val title: String, val chatSummary: String)
 
 @Serializable data object Resume
 
@@ -91,7 +92,7 @@ fun NavController.navigateToCounselingSummary(navOptions: NavOptions? = null) = 
 
 fun NavGraphBuilder.counselingSummaryScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: (Int) -> Unit,
+    onNavigateToCounselingDetail: (SummaryChattingRoom) -> Unit,
 ) {
     composable<CounselingSummary> {
         CounselingSummary(
@@ -101,7 +102,12 @@ fun NavGraphBuilder.counselingSummaryScreen(
     }
 }
 
-fun NavController.navigateToCounselingDetail(summaryId: Int, navOptions: NavOptions? = null) = navigate(CounselingDetail(summaryId), navOptions)
+fun NavController.navigateToCounselingDetail(
+    roomId: String,
+    title: String,
+    chatSummary: String,
+    navOptions: NavOptions? = null
+) = navigate(CounselingDetail(roomId, title, chatSummary), navOptions)
 
 fun NavGraphBuilder.counselingDetailScreen(
     onNavigateBack: () -> Unit,
@@ -114,9 +120,13 @@ fun NavGraphBuilder.counselingDetailScreen(
             onNavigateBack = onNavigateBack,
             onNavigateToAIChatDetail = onNavigateToAIChatDetail,
             viewModel = hiltViewModel<CounselingDetailViewModel, CounselingDetailViewModel.Factory>(
-                key = "${route.summaryId}"
+                key = route.roomId
             ) { factory ->
-                factory.create(route.summaryId)
+                factory.create(
+                    roomId = route.roomId,
+                    title = route.title,
+                    chatSummary = route.chatSummary
+                )
             }
         )
     }

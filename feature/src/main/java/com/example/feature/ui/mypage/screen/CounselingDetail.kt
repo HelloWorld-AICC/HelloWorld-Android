@@ -70,12 +70,12 @@ fun CounselingDetail(
         ChatItem(
             modifier = Modifier
                 .padding(horizontal = 24.dp),
-            title = "${summary?.title}",
-            onClick = { onNavigateToAIChatDetail("${summary?.roomId}") }
+            title = summary.title,
+            onClick = { onNavigateToAIChatDetail(summary.roomId) }
         )
         Spacer(modifier = Modifier.height(20.dp))
         MarkdownText(
-            markdown = "${summary?.chatSummary}",
+            markdown = summary.chatSummary,
             textColor = HelloWorldGrayScale700,
             modifier = Modifier
                 .padding(horizontal = 24.dp)

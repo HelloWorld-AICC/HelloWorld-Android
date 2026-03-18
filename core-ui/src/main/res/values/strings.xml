@@ -16,7 +16,7 @@
     <string name="comments">Comments</string>
 
     <!-- 회원가입 -->
-    <string name="auth_tagline">With you in every moment where life and work connect.</string>
+    <string name="auth_tagline">Life &amp; Work, Every Moment</string>
 
     <string name="auth_language_title">Which language are you comfortable with?</string>
     <string name="auth_language_subtitle">Please select the language you would like to use.</string>

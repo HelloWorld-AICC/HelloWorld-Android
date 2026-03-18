@@ -8,6 +8,7 @@ import com.example.model.mypage.AllSummaryResponse
 import com.example.model.mypage.DeleteProfileResponse
 import com.example.model.mypage.DetailSummaryRequest
 import com.example.model.mypage.DetailSummaryResponse
+import com.example.model.mypage.MyLanguageResponse
 import com.example.model.mypage.PageSizeRequest
 import com.example.model.mypage.UpdateProfileResponse
 import com.example.model.mypage.UserInfo
@@ -38,4 +39,7 @@ interface MyPageRepository {
     suspend fun getAllMyComment(
         request: PageSizeRequest
     ): Result<AllCommentResponse>
+
+    suspend fun getMyLanguage(
+    ): Result<MyLanguageResponse>
 }

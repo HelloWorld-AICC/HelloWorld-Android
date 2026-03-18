@@ -227,7 +227,13 @@ fun MyNavigationHost(navController: NavHostController) {
         )
         counselingSummaryScreen(
             onNavigateBack = navController::navigateUp,
-            onNavigateToCounselingDetail = navController::navigateToCounselingDetail
+            onNavigateToCounselingDetail = { summary ->
+                navController.navigateToCounselingDetail(
+                    roomId = summary.roomId,
+                    title = summary.title ?: summary.roomSummary.orEmpty(),
+                    chatSummary = summary.roomSummary.orEmpty()
+                )
+            }
         )
         counselingDetailScreen(
             onNavigateBack = navController::navigateUp,

@@ -26,5 +26,6 @@ data class Center(
     @SerialName("closed")    val closed: String,
     @SerialName("image")     val image: String? = null,
     @SerialName("latitude")  val latitude: Double,
-    @SerialName("longitude") val longitude: Double
+    @SerialName("longitude") val longitude: Double,
+    @SerialName("phoneNumber") val phoneNumber: String
 )

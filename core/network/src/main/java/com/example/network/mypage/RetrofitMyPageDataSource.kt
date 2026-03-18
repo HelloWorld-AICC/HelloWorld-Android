@@ -7,6 +7,7 @@ import com.example.model.mypage.AllSummaryResponse
 import com.example.model.mypage.DeleteProfileResponse
 import com.example.model.mypage.DetailSummaryRequest
 import com.example.model.mypage.DetailSummaryResponse
+import com.example.model.mypage.MyLanguageResponse
 import com.example.model.mypage.PageSizeRequest
 import com.example.model.mypage.UpdateProfileResponse
 import com.example.model.mypage.UserInfo
@@ -58,6 +59,38 @@ class RetrofitMyPageDataSource @Inject constructor(
         }
     }
 
+    override suspend fun getMyLanguage(): Result<MyLanguageResponse> {
+        Log.d(TAG, "getMyLanguage() called")
+
+        return try {
+            val response = myPageApi.getMyLanguage()
+            Log.d(TAG, "getMyLanguage() response received - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
+
+            val apiResponse = response.body()
+            Log.d(TAG, "getMyLanguage() apiResponse - result: ${apiResponse?.result}")
+
+            when {
+                !response.isSuccessful -> {
+                    Log.e(TAG, "getMyLanguage() HTTP error - code: ${response.code()}, message: ${response.message()}")
+                    Result.failure(HttpException(response))
+                }
+
+                apiResponse?.isSuccess == true && apiResponse.result != null -> {
+                    Log.d(TAG, "getMyLanguage() success - result: ${apiResponse.result}")
+                    Result.success(apiResponse.result)
+                }
+
+                else -> {
+                    Log.e(TAG, "getMyLanguage() API error - code: ${apiResponse?.code}")
+                    Result.failure(Exception("${apiResponse?.code}"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getMyLanguage() exception", e)
+            Result.failure(e)
+        }
+    }
+
     override suspend fun setProfile(nickName: String, userImg: ByteArray?): Result<UpdateProfileResponse> {
         Log.d(TAG, "setProfile() called")
 
@@ -105,7 +138,35 @@ class RetrofitMyPageDataSource @Inject constructor(
     }
 
     override suspend fun setLanguage(language: Long): Result<Unit> {
-        TODO("Not yet implemented")
+        Log.d(TAG, "setLanguage() called")
+
+        return try {
+            val response = myPageApi.setLanguage(language)
+            Log.d(TAG, "setLanguage() response received - isSuccessful: ${response.isSuccessful}, code: ${response.code()}")
+
+            val apiResponse = response.body()
+            Log.d(TAG, "setLanguage() apiResponse - result: ${apiResponse?.result}")
+
+            when {
+                !response.isSuccessful -> {
+                    Log.e(TAG, "setLanguage() HTTP error - code: ${response.code()}, message: ${response.message()}")
+                    Result.failure(HttpException(response))
+                }
+
+                apiResponse?.isSuccess == true -> {
+                    Log.d(TAG, "setLanguage() success")
+                    Result.success(Unit)
+                }
+
+                else -> {
+                    Log.e(TAG, "setLanguage() API error - code: ${apiResponse?.code}")
+                    Result.failure(Exception("${apiResponse?.code}"))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "setLanguage() exception", e)
+            Result.failure(e)
+        }
     }
 
     override suspend fun getAllSummary(request: PageSizeRequest): Result<AllSummaryResponse> {

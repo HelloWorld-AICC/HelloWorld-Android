@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.data.model.aichat.SummaryChattingRoom
 import com.example.core.ui.theme.AppTypography
 import com.example.core.ui.theme.HelloWorldGrayScale300
 import com.example.core.ui.theme.HelloWorldGrayScale800
@@ -49,7 +50,7 @@ import com.example.feature.ui.mypage.viewmodel.CounselingSummaryViewModel
 @Composable
 fun CounselingSummary(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: (Int) -> Unit,
+    onNavigateToCounselingDetail: (SummaryChattingRoom) -> Unit,
     viewModel: CounselingSummaryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +70,7 @@ fun CounselingSummary(
 @Composable
 private fun CounselingSummary(
     onNavigateBack: () -> Unit,
-    onNavigateToCounselingDetail: (Int) -> Unit,
+    onNavigateToCounselingDetail: (SummaryChattingRoom) -> Unit,
     uiState: CounselingSummaryUiState,
     isLoading: Boolean,
     hasMoreData: Boolean,
@@ -157,8 +158,8 @@ private fun CounselingSummary(
                     ) {
                         items(uiState.result) { summary ->
                             ChatItem(
-                                title = summary.title,
-                                onClick = { onNavigateToCounselingDetail(summary.summaryId.toInt()) }
+                                title = summary.title ?: summary.roomSummary.orEmpty(),
+                                onClick = { onNavigateToCounselingDetail(summary) }
                             )
                         }
 

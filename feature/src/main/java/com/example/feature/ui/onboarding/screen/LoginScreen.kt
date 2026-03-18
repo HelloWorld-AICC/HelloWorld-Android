@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,8 +79,10 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = stringResource(languageR.string.auth_tagline),
+                    modifier = Modifier.fillMaxWidth(),
                     style = AppTypography.heading04,
-                    color = HelloWorldMain500
+                    color = HelloWorldMain500,
+                    textAlign = TextAlign.Center
                 )
             }
 

@@ -20,32 +20,34 @@ fun SplashScreen(
     viewModel: SplashViewModel = hiltViewModel()
 ) {
     val isAutoLoginSuccess by viewModel.isAutoLoginSuccess.collectAsState()
+    var isMinimumSplashTimeElapsed by remember { mutableStateOf(false) }
 
     // 들어오자마자 체크 실행
     LaunchedEffect(Unit) {
         viewModel.checkAutoLogin()
     }
 
-    when (isAutoLoginSuccess) {
-        true -> {
-            // 자동 로그인 성공했을 경우 홈으로 이동
+    LaunchedEffect(Unit) {
+        delay(5000)
+        isMinimumSplashTimeElapsed = true
+    }
+
+    when {
+        isAutoLoginSuccess == true && isMinimumSplashTimeElapsed -> {
             LaunchedEffect("home-nav") {
                 navController.navigate("홈") {
                     popUpTo("스플래시") { inclusive = true }
                 }
             }
         }
-        false -> {
-            // 자동 로그인 실패했을 경우 온보딩으로 이동
+        isAutoLoginSuccess == false && isMinimumSplashTimeElapsed -> {
             LaunchedEffect("onboarding-nav") {
-                delay(1000)
                 navController.navigate("온보딩") {
                     popUpTo("스플래시") { inclusive = true }
                 }
             }
         }
-        null -> {
-            // 아직 체크 중인 경우 기존 UI 유지
+        else -> {
             SplashUI()
         }
     }

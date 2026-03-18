@@ -34,21 +34,21 @@ class AIChatViewModel @Inject constructor() : ViewModel() {
                     val roomId = response.body()?.data?.roomId
                     if (!roomId.isNullOrBlank()) {
                         _createdChatRoomId.tryEmit(roomId)
-                        Log.d(TAG, "새 채팅방 생성 성공: $roomId")
+                        Log.d(TAG, "Created chat room: $roomId")
                     } else {
-                        Log.e(TAG, "새 채팅방 생성 응답에 roomId가 없음")
+                        Log.e(TAG, "Create chat room response did not include a roomId")
                     }
                 } else {
                     val code = response.code()
                     val msg = runCatching { response.errorBody()?.string() }.getOrNull()
-                    Log.e(TAG, "새 채팅방 생성 실패: HTTP $code ${msg.orEmpty()}")
+                    Log.e(TAG, "Create chat room failed: HTTP $code ${msg.orEmpty()}")
                 }
             } catch (e: IOException) {
-                Log.e(TAG, "네트워크 오류로 새 채팅방 생성 실패: ${e.message}", e)
+                Log.e(TAG, "Create chat room failed due to network error: ${e.message}", e)
             } catch (e: HttpException) {
-                Log.e(TAG, "HTTP 예외로 새 채팅방 생성 실패: ${e.message}", e)
+                Log.e(TAG, "Create chat room failed with HTTP exception: ${e.message}", e)
             } catch (e: Exception) {
-                Log.e(TAG, "알 수 없는 오류로 새 채팅방 생성 실패: ${e.message}", e)
+                Log.e(TAG, "Create chat room failed with unexpected error: ${e.message}", e)
             }
         }
     }
@@ -60,24 +60,26 @@ class AIChatViewModel @Inject constructor() : ViewModel() {
 
                 if (response.isSuccessful) {
                     val rooms = response.body()
-                    if (rooms != null) {
-                        _chattingRooms.value = rooms
-                        Log.d(TAG, "채팅방 목록 로드 성공: ${rooms.size}개")
-                    }
+                        ?.data
+                        ?.rooms
+                        .orEmpty()
+                        .filter { it.title != null }
+                    _chattingRooms.value = rooms
+                    Log.d(TAG, "Loaded chatting rooms: ${rooms.size}")
                 } else {
                     val code = response.code()
                     val msg = runCatching { response.errorBody()?.string() }.getOrNull()
-                    Log.e(TAG, "채팅방 목록 로드 실패: HTTP $code ${msg.orEmpty()}")
+                    Log.e(TAG, "Load chatting rooms failed: HTTP $code ${msg.orEmpty()}")
                     _chattingRooms.value = emptyList()
                 }
             } catch (e: IOException) {
-                Log.e(TAG, "네트워크 오류로 채팅방 목록 로드 실패: ${e.message}", e)
+                Log.e(TAG, "Load chatting rooms failed due to network error: ${e.message}", e)
                 _chattingRooms.value = emptyList()
             } catch (e: HttpException) {
-                Log.e(TAG, "HTTP 예외로 채팅방 목록 로드 실패: ${e.message}", e)
+                Log.e(TAG, "Load chatting rooms failed with HTTP exception: ${e.message}", e)
                 _chattingRooms.value = emptyList()
             } catch (e: Exception) {
-                Log.e(TAG, "알 수 없는 오류로 채팅방 목록 로드 실패: ${e.message}", e)
+                Log.e(TAG, "Load chatting rooms failed with unexpected error: ${e.message}", e)
                 _chattingRooms.value = emptyList()
             }
         }

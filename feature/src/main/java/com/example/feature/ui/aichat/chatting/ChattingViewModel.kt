@@ -128,6 +128,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
             _isTyping.value = true
             var streamedText = ""
             var finalRoomId: String? = null
+            var hasReceivedResponse = false
 
             Log.d(TAG, "Send user message: \"$userMessage\"")
 
@@ -135,6 +136,10 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                 roomId = chatId,
                 message = userMessage,
                 onPartialResponse = { partial ->
+                    if (!hasReceivedResponse) {
+                        hasReceivedResponse = true
+                        _isTyping.value = false
+                    }
                     streamedText += partial
                     val currentMessages = _chatMessages.value[chatId].orEmpty()
 
@@ -150,7 +155,6 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                 },
                 onComplete = { roomIdFromResponse ->
                     finalRoomId = roomIdFromResponse ?: chatId
-                    _isTyping.value = false
 
                     if (chatId == "new_chat" && roomIdFromResponse != null) {
                         if (!_chatRoomIds.value.contains(roomIdFromResponse)) {
@@ -169,6 +173,7 @@ class ChatViewModel @Inject constructor() : ViewModel() {
                     Log.d(TAG, "Streaming complete: finalRoomId=$finalRoomId")
                 }
             )
+            _isTyping.value = false
         }
     }
 
@@ -264,14 +269,19 @@ class ChatViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             try {
                 Log.d(TAG, "Request summary: roomId=$roomId")
-                val body = RetrofitInstance.aiChatService.summaryAIChat(roomId).body() ?: return@launch
-                val result = body.use { it.string() }
-                Log.d(TAG, "Summary result: $result")
+                val response = RetrofitInstance.aiChatService.summaryAIChat(roomId)
+                if (!response.isSuccessful) {
+                    Log.w(TAG, "summaryAIChat failed: HTTP ${response.code()}")
+                    return@launch
+                }
 
-                if (result.trim().equals("complete", ignoreCase = true)) {
+                val summary = response.body()?.data?.summary?.trim().orEmpty()
+                Log.d(TAG, "Summary result: $summary")
+
+                if (summary.isNotBlank()) {
                     _summaryCompleted.tryEmit(Unit)
                 } else {
-                    Log.w(TAG, "Unexpected summary response: $result")
+                    Log.w(TAG, "summaryAIChat returned an empty summary")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Summary request failed", e)
